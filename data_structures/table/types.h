@@ -2,8 +2,8 @@
 // Created by User on 29/02/2024.
 //
 
-#ifndef ASSEMBLER_TYPES_H
-#define ASSEMBLER_TYPES_H
+#ifndef ASSEMBLER_TABLE_TYPES_H
+#define ASSEMBLER_TABLE_TYPES_H
 
 typedef struct {
     char *label;
@@ -17,4 +17,4 @@ typedef struct {
 } table;
 
 
-#endif //ASSEMBLER_TYPES_H
+#endif //ASSEMBLER_TABLE_TYPES_H

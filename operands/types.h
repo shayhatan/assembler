@@ -5,39 +5,40 @@
 #ifndef ASSEMBLER_TYPES_H
 #define ASSEMBLER_TYPES_H
 
-enum operandDefinition {
-    Absolute,
-    Relative,
-    External
-};
+#include "../data_structures/linked_list/types.h"
 
-enum operandType {
-    source,
-    target
-};
-
-enum operandDataType {
-    integer,
-    character,
-    boolean
-};
 
 typedef struct {
-    operandType type;
-    operandDefinition definition;
-    operandDataType dataType;
-    /* alternatively we can use int, char, bool pointers */
-    void *data;
-} operand;
+    unsigned int decode: 2;
+    unsigned int targetOperand: 2;
+    unsigned int sourceOperand: 2;
+    unsigned int opcode: 4;
+    unsigned int unused: 4;
+} command_word;
 
-
-/* Encapsulates a parsed token and relevant metadata (f.i - how many operands does it contain, the original operands e.t.c) */
-/* at least one of source or target should be properly defined */
 typedef struct {
-    operand* source;
-    operand* target;
-    /* parsed content in binary */
-    char[14] content;
-} token;
+    unsigned int decode: 2;
+    unsigned int value: 12;
+} argument_word;
+
+
+typedef struct {
+    unsigned int decode: 2;
+    unsigned int targetOperand: 3;
+    unsigned int sourceOperand: 3;
+    unsigned int unused: 6;
+} register_word;
+
+
+typedef union {
+    command_word cmd;
+    register_word reg;
+    argument_word arg;
+} word;
+
+/* Encapsulates a parsed token (source word including all of its extra words in that order) */
+typedef struct {
+    list words;
+} parsed_word;
 
 #endif //ASSEMBLER_TYPES_H
