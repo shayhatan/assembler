@@ -16,10 +16,10 @@ typedef void (*delete_function)(void *);
 
 void *deleteKey(table *table, char *label, delete_function callback);
 
-void dispose(table **table);
+void dispose(table **table, delete_function callback);
 
 typedef void (*iterator_function)(char *, void *);
 
-void iterate(table table, iterator_function callback);
+void iterate(table *table, iterator_function callback);
 
 #endif //ASSEMBLER_TABLE_UTILS_H
