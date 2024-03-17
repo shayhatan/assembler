@@ -5,15 +5,15 @@
 #ifndef ASSEMBLER_TABLE_TYPES_H
 #define ASSEMBLER_TABLE_TYPES_H
 
+#include "../linked_list/types.h"
+
 typedef struct {
     char *label;
     void *value;
-    node *next;
-    node *previous;
-} node;
+} key_value;
 
 typedef struct {
-    node *root;
+    list *list;
 } table;
 
 

@@ -2,6 +2,7 @@
 // Created by User on 17/03/2024.
 //
 
+#include "stdbool.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "types.h"
@@ -95,22 +96,34 @@ node *getNth(list *list, unsigned int index) {
     return NULL;
 }
 
-void *deleteNth(list *list, unsigned int index, delete_function callback) {
+node *search(list *list, search_function callback, void *comparedData) {
+    node *current = getFirst(list);
+    while (current && callback(current->value, comparedData) == false) {
+        current = current->next;
+    }
+    return current;
+}
+
+void deleteNth(list *list, unsigned int index, delete_function callback) {
     node *nthNode = getNth(list, index);
-    if (!nthNode) {
+    deleteNode(nthNode, callback);
+}
+
+void deleteNode(node *node, delete_function callback) {
+    if (!node) {
         return NULL;
     }
-    temp = nthNode->previous;
-    if (nthNode->previous) {
-        (nthNode->previous)->next = nthNode->next;
+    temp = node->previous;
+    if (node->previous) {
+        (node->previous)->next = node->next;
     }
-    if (nthNode->next) {
-        (nthNode->next)->previous = nthNode->previous;
+    if (node->next) {
+        (node->next)->previous = node->previous;
     }
 
     /* dispose of data */
-    callback(nthNode->value);
-    free(nthNode);
+    callback(node->value);
+    free(node);
 }
 
 void dispose(list **listPtr, delete_function callback) {
