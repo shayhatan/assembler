@@ -22,4 +22,6 @@ typedef void (*iterator_function)(char *, void *);
 
 void iterate_table(table *table, iterator_function callback);
 
+void init_table(table *table);
+
 #endif //ASSEMBLER_TABLE_UTILS_H

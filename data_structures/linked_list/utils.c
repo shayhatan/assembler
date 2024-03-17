@@ -5,8 +5,21 @@
 #include "stdbool.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "types.h"
 #include "utils.h"
+
+void setNodeValue(node* node, void* value){
+    if (node->value != NULL) {
+        free(node->value);
+    }
+    node->value = malloc(sizeof(*value));
+    if (node->value == NULL) {
+        /* out of memory */
+        exit(1000);
+    }
+    memcpy(node->value, value, sizeof(*value));
+}
 
 void addFirst(list *list, void *value) {
     node *newNode = NULL;
@@ -19,8 +32,10 @@ void addFirst(list *list, void *value) {
         exit(0);
         return;
     }
-    newNode->value = value;
+    setNodeValue(newNode, value);
+
     newNode->previous = NULL;
+
     if (list->root == NULL) {
         list->root = newNode;
         newNode->next = NULL;
@@ -44,7 +59,8 @@ void addLast(list *list, void *value) {
         exit(0);
         return;
     }
-    newNode->value = value;
+    setNodeValue(newNode, value);
+
     newNode->next = NULL;
 
     if (list->root == NULL) {
@@ -59,7 +75,7 @@ void addLast(list *list, void *value) {
 void *setNth(list *list, unsigned int index, void *value) {
     node *nthNode = getNth(list, index);
     void *currentData = nthNode->value;
-    nthNode->value = value;
+    setNodeValue(nthNode, value);
     return currentData;
 }
 
@@ -76,7 +92,7 @@ node *getLast(list *list) {
         return NULL;
     }
     current = list->root;
-    while (current.next != NULL && current = current.next);
+    while (current->next != NULL) {current = current->next;}
     return current;
 }
 
@@ -124,6 +140,7 @@ void deleteNode(node *node, delete_function callback) {
 
     /* dispose of data */
     callback(node->value);
+    free(node->value);
     free(node);
 }
 
@@ -138,10 +155,12 @@ void dispose(list **listPtr, delete_function callback) {
 
         /* dispose of data */
         callback(current->value);
+        free(current->value);
         free(current);
 
         current = next;
     }
+    free(*listPtr);
 }
 
 void iterate(list *list, iterator_function callback) {
@@ -151,4 +170,9 @@ void iterate(list *list, iterator_function callback) {
         callback(index++, current->value);
         current = current->next;
     }
+}
+
+void init_list(list *list) {
+    list = (list*)malloc(sizeof(list));
+    list->root= NULL;
 }

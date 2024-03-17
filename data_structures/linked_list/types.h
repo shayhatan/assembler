@@ -7,7 +7,6 @@
 
 
 typedef struct node {
-    char *label;
     void *value;
     struct node *next;
     struct node *previous;

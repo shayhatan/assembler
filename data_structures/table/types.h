@@ -7,7 +7,7 @@
 
 #include "../linked_list/types.h"
 
-typedef struct {
+typedef struct key_value {
     char *label;
     void *value;
 } key_value;
