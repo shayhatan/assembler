@@ -14,12 +14,12 @@ void *getValue(table *table, char *label);
 
 typedef void (*delete_function)(void *);
 
-void *deleteKey(table *table, char *label, delete_function callback);
+void deleteKey(table *table, char *label, delete_function callback);
 
-void dispose(table **table, delete_function callback);
+void dispose_table(table **table, delete_function callback);
 
 typedef void (*iterator_function)(char *, void *);
 
-void iterate(table *table, iterator_function callback);
+void iterate_table(table *table, iterator_function callback);
 
 #endif //ASSEMBLER_TABLE_UTILS_H

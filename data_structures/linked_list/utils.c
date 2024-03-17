@@ -6,10 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "types.h"
+#include "utils.h"
 
 void addFirst(list *list, void *value) {
     node *newNode = NULL;
-    if (*list == NULL) {
+    if (list == NULL) {
         return;
     }
     newNode = (node *) malloc(sizeof(node));
@@ -26,7 +27,7 @@ void addFirst(list *list, void *value) {
         newNode->value = value;
         return;
     }
-    newNode.next = list->root;
+    newNode->next = list->root;
     list->root->previous = newNode;
     list->root = newNode;
 }
@@ -34,7 +35,7 @@ void addFirst(list *list, void *value) {
 void addLast(list *list, void *value) {
     node *newNode = NULL;
     node *last = NULL;
-    if (*list == NULL) {
+    if (list == NULL) {
         return;
     }
     newNode = (node *) malloc(sizeof(node));
@@ -86,10 +87,11 @@ node *getNth(list *list, unsigned int index) {
         return NULL;
     }
     current = list->root;
-    while (current.next != NULL && current = current.next) {
+    while (current) {
         if (currentIndex == index) {
             return current;
         }
+        current = current->next;
         currentIndex++;
     }
     /* index was out of range */
@@ -111,9 +113,8 @@ void deleteNth(list *list, unsigned int index, delete_function callback) {
 
 void deleteNode(node *node, delete_function callback) {
     if (!node) {
-        return NULL;
+        return;
     }
-    temp = node->previous;
     if (node->previous) {
         (node->previous)->next = node->next;
     }
@@ -145,7 +146,7 @@ void dispose(list **listPtr, delete_function callback) {
 
 void iterate(list *list, iterator_function callback) {
     unsigned int index = 0;
-    node *current = getFirst(&list);
+    node *current = getFirst(list);
     while (current != NULL) {
         callback(index++, current->value);
         current = current->next;

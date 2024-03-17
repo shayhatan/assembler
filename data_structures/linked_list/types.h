@@ -6,12 +6,13 @@
 #define ASSEMBLER_LIST_TYPES_H
 
 
-typedef struct {
+typedef struct node {
     char *label;
     void *value;
-    node *next;
-    node *previous;
+    struct node *next;
+    struct node *previous;
 } node;
+
 
 typedef struct {
     node *root;
