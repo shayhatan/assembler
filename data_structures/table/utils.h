@@ -5,19 +5,18 @@
 #ifndef ASSEMBLER_UTILS_H
 #define ASSEMBLER_UTILS_H
 
-typedef struct {
-    char *label;
-    void *value;
-    node *next;
-} node;
+#include "types.h"
 
-typedef struct {
-    node *root;
-} table;
+void setValue(table *table, char *label, void *value);
 
-void setValue(char *label, void *value);
+void *getValue(table *table, char *label);
 
-void *getValue(char *label);
+
+typedef void (*delete_function)(void *);
+
+void *deleteKey(table *table, char *label, delete_function callback);
+
+void dispose(table **table);
 
 typedef void (*iterator_function)(char *, void *);
 
