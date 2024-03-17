@@ -18,20 +18,20 @@ enum symbol_flags {
 
 /* symbol properties (symbol-table metadata) */
 char *DOT_CODE = ".code";
-char *DOT_EXTERNAL = ".external";
 char *DOT_DATA = ".data";
 
 typedef struct {
     char *classification; /* symbol property */
     unsigned int value; /* IC + 100 || DC */
+    unsigned int wordsCounter;
 } entry;
 
 typedef struct {
     bool isEOF;
     bool isAssignment; /* is a .string/.data */
     bool hasLabel; /* does begin with a symbol */
-    char *label;
-    char **args; /* consider using other data type */
+    char **labels;
+    char *arg; /* consider using other data type */
     enum labelType labelType;
     enum symbol_flags labelProps;
     enum opcode opcode;

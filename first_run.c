@@ -5,84 +5,92 @@
 #include <stdio.h>
 #include <string.h>
 #include "./parsers/types.h"
-#include "./data_structures/table/types.h"
-#include "./data_structures/table/utils.h"
-#include "./data_structures/linked_list//utils.h"
+#include "labels_table.h"
+#include "./data_structures/linked_list/utils.h"
+#include "logs/utils.h"
 
 unsigned int IC = 0, DC = 0;
-
+bool errored;
 
 input_line parseLine(char *line) {
 
 };
 
+enum analyze_status {
+    stop, next
+};
+
+enum analyze_status analyze_line(input_line line, list *externals) {
+    entry newEntry;
+    char *label = line.labels[0];
+    /* L */
+    int wordCounter = 0;
+    if (line.isEOF) {
+        return stop;
+    }
+    if (line.labelProps & (dot_data | dot_string) & line.hasLabel) {
+        entry *addedEntry;
+        newEntry.classification = DOT_DATA;
+        newEntry.value = DC;
+
+        if (addLabel(label, newEntry)) {
+            return next;
+        }
+
+        /* increase DC according to arguments */
+        if (line.labelProps & dot_string) {
+            char *c = line.arg;
+            /* each character is one word */
+            while (c != NULL) {
+                incrementLabelWordsCounter(label);
+                c++;
+            }
+            addedEntry = get_data(label);
+            if (addedEntry != NULL) {
+                DC += addedEntry->wordsCounter;
+            }
+        }
+        if (line.labelProps & dot_data) {
+            incrementLabelWordsCounter(label);
+            DC += sizeof(int);
+        }
+        return next;
+    }
+
+    if (line.labelProps & dot_external) {
+        while (label != NULL) { /* might be better to use a counter here instead */
+            addLast(externals, label++);
+        }
+        return next;
+    }
+    if (line.labelProps & dot_entry) {
+        if (line.hasLabel) {
+            newEntry.classification = DOT_CODE;
+            newEntry.value = IC + 100;
+            addLabel(label, newEntry);
+        }
+
+    }
+    /* step 11 in course notebook */
+    if (line.opcode < 0 || line.opcode > 15) {
+        log_error("invalid opcode %d", line.opcode);
+    }
+    IC += IC + wordCounter;
+}
+
 int run(FILE *srcFile) {
     char buffer[81];
-    table entries;
-    table commands;
     list externals;
-    init_table(&entries);
-    init_table(&commands);
     init_list(&externals);
 
     while (fgets(buffer, 81, srcFile)) {
-        entry newEntry;
-
         input_line line = parseLine(buffer);
-        if (line.isEOF) {
-            break;
-        }
-        if (line.labelProps & (dot_data | dot_string) & line.hasLabel) {
-            if (getValue(&entries, line.label) != NULL) {
-                /*perror("label %s already exists", line->label);*/
-                continue;
-            }
-            newEntry.classification = DOT_DATA;
-            newEntry.value = DC;
-            setValue(&entries, line.label, &newEntry);
-
-            /* increase DC according to arguments */
-            switch (line.labelType) {
-                case integer:
-                    DC += sizeof(int);
-                case string:
-                    DC += strlen(*(line.args));
-                case character:
-                    DC += 1;
-            }
-            continue;
-        }
-
-        if (line.labelProps & dot_external) {
-            char *arg = *line.args;
-            while (arg != NULL) { /* might be better to use a counter here instead */
-                addLast(&externals, arg++);
-            }
-            continue;
-        }
-        if (line.labelProps & dot_entry) {
-            if (line.hasLabel) {
-                if (getValue(&entries, line.label) != NULL) {
-                    perror("label already exists");
-                    continue;
-                }
-                newEntry.classification = DOT_CODE;
-                newEntry.value = IC + 100;
-                setValue(&entries, line.label, &newEntry);
-            }
-
-        }
-        /* step 11 in course notebook */
-        if (getValue(&commands, line.label) == NULL) {
-            perror("Expected command to exist in commands table");
-            continue;
-        }
-/*        IC += IC + L; */
+        analyze_line(line, &externals);
     }
 
-    /*if (errored) {
-        return 1000; / custom error code /
-    }*/
+    if (errored) {
+        return 1000; /* custom error code */
+    }
 
     /*update all symbols with data classification to IC + 100 */
     return 0;

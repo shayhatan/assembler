@@ -5,16 +5,18 @@
 #ifndef ASSEMBLER_PARSERS_H
 #define ASSEMBLER_PARSERS_H
 
+#include "./types.h"
+
 /* Absolute == instant */
-char *parseAbsoluteOperand();
+word parseAbsoluteOperand();
 
-char *parseDirectOperand();
+word parseDirectOperand();
 
-char *parseDirectRegisterOperand();
+word parseDirectRegisterOperand();
 
-char *parseConstantIndexOperand();
+word parseRegisterOperand();
 
-char *parseDirectOperand();
+word parseConstantIndexOperand();
 
 
 #endif //ASSEMBLER_PARSERS_H
