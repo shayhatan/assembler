@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+/*if there is '.extern' we will use this and not 'label' structure */
 struct GivenLabel_t {
     char *label_name;
     int assembly_line;
