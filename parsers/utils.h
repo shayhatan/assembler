@@ -7,6 +7,9 @@
 
 #include "./types.h"
 
+
+enum Addressing getAddressingForOperand(Operand operand);
+
 int getOperationWordsCounter(input_line *line);
 
 #endif //ASSEMBLER_PARSERS_UTILS_H

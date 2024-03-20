@@ -36,6 +36,8 @@ typedef void (*iterator_function)(unsigned int index, void *);
 
 void iterate(list *list, iterator_function callback);
 
+int listLength(list *list);
+
 void init_list(list *list);
 
 #endif //ASSEMBLER_LIST_UTILS_H

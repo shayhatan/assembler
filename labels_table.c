@@ -103,7 +103,7 @@ int updateDataLabels(unsigned int IC) {
     }
     free(currentLabel);
     while (mapGetNext(labels_table) != NULL) {
-        currentLabel = mapGetFirst(labels_table);
+        currentLabel = mapGetNext(labels_table);
         currentEntry = mapGet(labels_table, currentLabel);
         if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
             currentEntry->wordsCounter += IC + 100;

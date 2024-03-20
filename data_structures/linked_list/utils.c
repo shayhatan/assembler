@@ -172,6 +172,16 @@ void iterate(list *list, iterator_function callback) {
     }
 }
 
+int listLength(list *list) {
+    int i =0;
+    node *current = getFirst(list);
+    while (current != NULL) {
+        current = current->next;
+        i++;
+    }
+    return i;
+}
+
 void init_list(list *list) {
     list = (list*)malloc(sizeof(list));
     list->root= NULL;

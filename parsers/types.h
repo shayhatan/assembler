@@ -13,6 +13,13 @@ enum labelType {
     integer, character, string
 };
 
+enum Addressing {
+    instant = 1,
+    direct = 2,
+    indirectRegister = 4,
+    directRegister = 8,
+};
+
 enum symbol_flags {
     dot_data = 1, dot_string = 2, dot_external = 4, dot_entry = 8
 };
