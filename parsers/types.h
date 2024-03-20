@@ -17,9 +17,13 @@ enum symbol_flags {
     dot_data = 1, dot_string = 2, dot_external = 4, dot_entry = 8
 };
 
+typedef char *Operand;
+
+
 /* symbol properties (symbol-table metadata) */
 char *DOT_CODE = ".code";
 char *DOT_DATA = ".data";
+char *DOT_EXTERNAL = ".external";
 
 typedef struct {
     char *classification; /* symbol property */

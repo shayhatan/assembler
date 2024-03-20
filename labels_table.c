@@ -8,9 +8,10 @@
 #include "parsers/types.h"
 #include "logs/utils.h"
 #include "data_structures/map/map.h"
+#include "utils.h"
+#include "factory.h"
 
-Map labels_table;
-Map *ptr;
+static Map labels_table;
 
 
 MapDataElement copyElement(MapDataElement existing) {
@@ -23,8 +24,6 @@ MapDataElement copyElement(MapDataElement existing) {
 }
 
 MapKeyElement copyKeyElement(MapKeyElement existing) {
-    char *clone;
-
     return strdup((char *) existing);
 }
 
@@ -35,7 +34,7 @@ void cleanMapDataElements(MapDataElement disposable) {
 }
 
 /** Type of function for deallocating a key element of the map */
-void cleanMapKeyElements(MapKeyElement disposable) {
+void cleanMapKeyElements(MapKeyElement _) {
 }
 
 int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
@@ -47,7 +46,6 @@ int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
 void init() {
     labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                              compareKeyElements);
-    ptr = &labels_table;
 }
 
 void deleteLabelDataCallback(void *value) {
@@ -55,7 +53,7 @@ void deleteLabelDataCallback(void *value) {
     free(valueAsEntry->classification);
 }
 
-void dispose() {
+void disposeLabelsTable() {
     mapDestroy(labels_table);
 }
 
@@ -81,7 +79,40 @@ int incrementLabelWordsCounter(char *label) {
 }
 
 
-int updateDataLabels() {
+int bulkAddExternalOperands(list *o) {
+    node *current = getFirst(o);
+    while (current != NULL) {
+        Operand operand = current->value;
+        /* todo: we might be adding the same label multiple times, perhaps a list is more appropriate? */
+        addLabel(operand, createEntry(DOT_EXTERNAL, -1));
+        current = current->next;
+    }
+}
+
+
+int updateDataLabels(unsigned int IC) {
+    entry *currentEntry;
+    char *currentLabel = mapGetFirst(labels_table);
+    /* no labels */
+    if (currentLabel == NULL) {
+        return 0;
+    }
+    currentEntry = mapGet(labels_table, currentLabel);
+    if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
+        currentEntry->wordsCounter += IC + 100;
+    }
+    free(currentLabel);
+    while (mapGetNext(labels_table) != NULL) {
+        currentLabel = mapGetFirst(labels_table);
+        currentEntry = mapGet(labels_table, currentLabel);
+        if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
+            currentEntry->wordsCounter += IC + 100;
+        }
+        free(currentLabel);
+    }
+
+    mapGetFirst(labels_table);
+
     return 1;
 }
 

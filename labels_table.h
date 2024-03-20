@@ -13,7 +13,9 @@ int addLabel(char *label, entry newEntry);
 /* increments an existing label's words counter by 1 */
 int incrementLabelWordsCounter(char *label);
 
-int updateDataLabels();
+int updateDataLabels(unsigned int IC);
+
+int bulkAddExternalOperands(list *o);
 
 entry *get_data(char *label);
 
