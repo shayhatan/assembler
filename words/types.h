@@ -39,6 +39,6 @@ typedef union {
 /* Encapsulates a parsed token (source word including all of its extra words in that order) */
 typedef struct {
     list words;
-} parsed_word;
+} instruction;
 
 #endif //ASSEMBLER_TYPES_H

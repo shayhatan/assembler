@@ -8,6 +8,9 @@
 #include "labels_table.h"
 #include "./data_structures/linked_list/utils.h"
 #include "logs/utils.h"
+#include "factory.h"
+#include "externals_table.h"
+#include "parsers/utils.h"
 
 unsigned int IC = 0, DC = 0;
 bool errored;
@@ -16,76 +19,95 @@ input_line parseLine(char *line) {
 
 };
 
+input_line disposeLine(input_line *line) {
+
+};
+
+
 enum analyze_status {
     stop, next
 };
 
-enum analyze_status analyze_line(input_line line, list *externals) {
-    entry newEntry;
-    char *label = line.labels[0];
-    /* L */
-    int wordCounter = 0;
+static input_line currentLine;
+
+void countStringWords(unsigned int _, void *data) {
+    char *strPtr = (char *) data;
+    while (strPtr != NULL) {
+        /* each character is one word */
+        incrementLabelWordsCounter(currentLine.label);
+        strPtr++;
+    }
+}
+
+enum analyze_status analyze_line(input_line line) {
     if (line.isEOF) {
         return stop;
     }
-    if (line.labelProps & (dot_data | dot_string) & line.hasLabel) {
-        entry *addedEntry;
-        newEntry.classification = DOT_DATA;
-        newEntry.value = DC;
 
-        if (addLabel(label, newEntry)) {
+    /* step 5 */
+    if (line.labelProps & (dot_data | dot_string) && line.hasLabel) {
+        entry *addedEntry;
+        /* step 6 */
+        if (addLabel(line.label, createEntry(DOT_DATA, DC)) != 0) {
             return next;
         }
-
         /* increase DC according to arguments */
         if (line.labelProps & dot_string) {
-            char *c = line.arg;
-            /* each character is one word */
-            while (c != NULL) {
-                incrementLabelWordsCounter(label);
-                c++;
-            }
-            addedEntry = get_data(label);
-            if (addedEntry != NULL) {
-                DC += addedEntry->wordsCounter;
-            }
+            iterate(line.arguments->strings, countStringWords);
         }
         if (line.labelProps & dot_data) {
-            incrementLabelWordsCounter(label);
-            DC += sizeof(int);
+            incrementLabelWordsCounter(line.label);
         }
+
+        /* it's impossible for addedEntry to be null in this case */
+        addedEntry = get_data(line.label);
+        /* step 7 */
+        DC += addedEntry->wordsCounter;
         return next;
     }
 
+    /* step 8, 9 */
     if (line.labelProps & dot_external) {
-        while (label != NULL) { /* might be better to use a counter here instead */
-            addLast(externals, label++);
-        }
+        bulkAddExternalOperands(line.arguments->strings);
         return next;
     }
-    if (line.labelProps & dot_entry) {
-        if (line.hasLabel) {
-            newEntry.classification = DOT_CODE;
-            newEntry.value = IC + 100;
-            addLabel(label, newEntry);
-        }
 
+    /* step 8, 10 */
+    if ((line.labelProps & dot_entry) && line.hasLabel) {
+        if (!addLabel(line.label, createEntry(DOT_CODE, IC + 100))) {
+            return next;
+        }
     }
-    /* step 11 in course notebook */
+
+    /* step 11 */
     if (line.opcode < 0 || line.opcode > 15) {
-        log_error("invalid opcode %d", line.opcode);
+        log_error("invalid operation %d", line.opcode);
+        return next;
     }
-    IC += IC + wordCounter;
+
+    /* step 12 + 13 */
+    IC += /* L */ getOperationWordsCounter(&line);
+
+    return next;
 }
 
 int run(FILE *srcFile) {
     char buffer[81];
-    list externals;
-    init_list(&externals);
 
     while (fgets(buffer, 81, srcFile)) {
+        bool shouldStop = false;
         input_line line = parseLine(buffer);
-        analyze_line(line, &externals);
+        switch (analyze_line(line)) {
+            case next:
+                break;
+            case stop:
+                shouldStop = true;
+                break;
+        }
+        disposeLine(&line);
+        if (shouldStop) {
+            break;
+        }
     }
 
     if (errored) {
@@ -93,5 +115,6 @@ int run(FILE *srcFile) {
     }
 
     /*update all symbols with data classification to IC + 100 */
+    updateDataLabels();
     return 0;
 }

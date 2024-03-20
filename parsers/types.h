@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include "../words/consts.h"
+#include "data_structures/linked_list/types.h"
 
 enum labelType {
     integer, character, string
@@ -26,15 +27,22 @@ typedef struct {
     unsigned int wordsCounter;
 } entry;
 
+
+typedef union {
+    list *numbers;
+    list *strings;
+} Arguments;
+
 typedef struct {
     bool isEOF;
     bool isAssignment; /* is a .string/.data */
     bool hasLabel; /* does begin with a symbol */
-    char **labels;
-    char *arg; /* consider using other data type */
+    char *label;
+    Arguments *arguments; /* consider using other data type */
     enum labelType labelType;
     enum symbol_flags labelProps;
     enum opcode opcode;
+    int lineNumber;
 } input_line;
 
 

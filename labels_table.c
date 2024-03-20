@@ -31,7 +31,6 @@ int addLabel(char *label, entry newEntry) {
         setValue(ptr, label, &newEntry);
         return 0; /* success */
     }
-
     log_error("Cannot add label, label %s already exists", label);
     return 1; /* already exists */
 }
@@ -44,6 +43,11 @@ int incrementLabelWordsCounter(char *label) {
     }
     existingEntry->wordsCounter += 1;
     return 0; /* success */
+}
+
+
+int updateDataLabels() {
+    return 1;
 }
 
 entry *get_data(char *label) {
