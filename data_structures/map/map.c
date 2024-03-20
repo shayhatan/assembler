@@ -42,8 +42,8 @@ static void destroyNode(Map map, Node node) {
  *  the key and value must be reassign.
  *
  * @param map -  the map is used for the function (copy,free)
- * @param key -  A key to reassign(a copy) to the node
- * @param data - Data to reassign(a copy) to the node
+ * @param key -  A key to reassign(a copy) to the Node
+ * @param data - Data to reassign(a copy) to the Node
  * @return
  *               NULL - If memory allocation, (assuming VALID values (assertion used))
  *               otherwise - new Node of map with the copy

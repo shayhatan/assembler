@@ -12,13 +12,11 @@ void setValue(table *table, char *label, void *value);
 void *getValue(table *table, char *label);
 
 
-typedef void (*delete_function)(void *);
+typedef void (*DeleteFn)(void *);
 
-void deleteKey(table *table, char *label, delete_function callback);
+void deleteKey(table *table, char *label, DeleteFn callback);
 
-void dispose_table(table **table, delete_function callback);
-
-typedef void (*iterator_function)(char *, void *);
+void dispose_table(table **table, DeleteFn callback);
 
 void iterate_table(table *table, iterator_function callback);
 

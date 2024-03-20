@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./types.h"
-#include "../linked_list/utils.h"
+#include "../linked_list/list.h"
 
 bool tableSearchFunction(void *node_value, void *comparedData) {
     key_value *kvPtr = (key_value *) node_value;
@@ -24,7 +24,7 @@ void *getNodeByLabel(table *table, char *label) {
 
 void setValue(table *table, char *label, void *value) {
     key_value kv;
-    node *kv_node = getNodeByLabel(table, label);
+    Node *kv_node = getNodeByLabel(table, label);
     if (kv_node != NULL) {
         ((key_value *) (kv_node->value))->value = value;
         return;
@@ -42,36 +42,36 @@ void setValue(table *table, char *label, void *value) {
 }
 
 void *getValue(table *table, char *label) {
-    node *node = getNodeByLabel(table, label);
+    Node *node = getNodeByLabel(table, label);
     if (node == NULL) {
         return NULL;
     }
     return node->value;
 }
 
-void do_nothing(void* data) {}
+void do_nothing(void *data) {}
 
-void delete_key_value_props(key_value* kv, delete_function callback) {
+void delete_key_value_props(key_value *kv, DeleteFn callback) {
     free(kv->label);
     callback(kv->value);
     free(kv->value);
 }
 
-void deleteKey(table *table, char *label, delete_function callback) {
+void deleteKey(table *table, char *label, DeleteFn callback) {
     key_value *kv = NULL;
-    node *node = getNodeByLabel(table, label);
+    Node *node = getNodeByLabel(table, label);
     if (node == NULL) {
         return;
     }
     kv = node->value;
     delete_key_value_props(kv, callback);
     /* kv will be freed within deleteNode */
-    deleteNode(node, do_nothing);
+    deleteNode(table->list, node);
 }
 
-void dispose_table(table **table, delete_function callback) {
-    node *current;
-    node *next;
+void dispose_table(table **table, DeleteFn callback) {
+    Node *current;
+    Node *next;
     if (table == NULL || *table == NULL) {
         return;
     }
@@ -97,5 +97,5 @@ void iterate_table(table *table, iterator_function callback) {
 }
 
 void init_table(table *table) {
-    *table = (table*)malloc(sizeof(table));
+//    *table = (table*)malloc(sizeof(table));
 };

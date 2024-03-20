@@ -5,7 +5,7 @@
 #ifndef ASSEMBLER_TABLE_TYPES_H
 #define ASSEMBLER_TABLE_TYPES_H
 
-#include "../linked_list/types.h"
+#include "../linked_list/list.h"
 
 typedef struct key_value {
     char *label;
@@ -13,7 +13,7 @@ typedef struct key_value {
 } key_value;
 
 typedef struct {
-    list *list;
+    List list;
 } table;
 
 

@@ -5,7 +5,7 @@
 #ifndef ASSEMBLER_TYPES_H
 #define ASSEMBLER_TYPES_H
 
-#include "../data_structures/linked_list/types.h"
+#include "../data_structures/linked_list/list.h"
 
 
 typedef struct {
@@ -38,7 +38,7 @@ typedef union {
 
 /* Encapsulates a parsed token (source word including all of its extra words in that order) */
 typedef struct {
-    list words;
+    List words;
 } instruction;
 
 #endif //ASSEMBLER_TYPES_H

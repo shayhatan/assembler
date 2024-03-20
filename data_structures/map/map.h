@@ -4,6 +4,7 @@
 
 #ifndef MMN14_MAP_H
 #define MMN14_MAP_H
+
 #include <stdbool.h>
 
 /**
@@ -39,7 +40,7 @@
 *                     each iteration.
 */
 
-/** The node structure is node define here to make the interface hidden */
+/** The Node structure is Node define here to make the interface hidden */
 typedef struct Map_t *Map;
 
 /** Type used for returning error codes from map functions */

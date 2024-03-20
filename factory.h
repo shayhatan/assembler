@@ -12,8 +12,8 @@ entry createEntry(char *classification, /* symbol property */
                   unsigned int value /* IC + 100 || DC */);
 
 
-list *createIntegerList();
+List createIntegerList();
 
-list *createStringList();
+List createStringList();
 
 #endif //ASSEMBLER_FACTORY_H

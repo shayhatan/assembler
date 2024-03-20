@@ -6,10 +6,9 @@
 #include <string.h>
 #include "./parsers/types.h"
 #include "labels_table.h"
-#include "./data_structures/linked_list/utils.h"
+#include "./data_structures/linked_list/list.h"
 #include "logs/utils.h"
 #include "factory.h"
-#include "externals_table.h"
 #include "parsers/utils.h"
 
 unsigned int IC = 0, DC = 0;
@@ -25,7 +24,7 @@ input_line disposeLine(input_line *line) {
 
 
 enum analyze_status {
-    stop, next
+    STOP, NEXT
 };
 
 static input_line currentLine;
@@ -41,7 +40,7 @@ void countStringWords(unsigned int _, void *data) {
 
 enum analyze_status analyze_line(input_line line) {
     if (line.isEOF) {
-        return stop;
+        return STOP;
     }
 
     /* step 5 */
@@ -49,7 +48,7 @@ enum analyze_status analyze_line(input_line line) {
         entry *addedEntry;
         /* step 6 */
         if (addLabel(line.label, createEntry(DOT_DATA, DC)) != 0) {
-            return next;
+            return NEXT;
         }
         /* increase DC according to arguments */
         if (line.labelProps & dot_string) {
@@ -63,32 +62,32 @@ enum analyze_status analyze_line(input_line line) {
         addedEntry = get_data(line.label);
         /* step 7 */
         DC += addedEntry->wordsCounter;
-        return next;
+        return NEXT;
     }
 
     /* step 8, 9 */
     if (line.labelProps & dot_external) {
         bulkAddExternalOperands(line.arguments->strings);
-        return next;
+        return NEXT;
     }
 
     /* step 8, 10 */
     if ((line.labelProps & dot_entry) && line.hasLabel) {
         if (!addLabel(line.label, createEntry(DOT_CODE, IC + 100))) {
-            return next;
+            return NEXT;
         }
     }
 
     /* step 11 */
     if (line.opcode < 0 || line.opcode > 15) {
         log_error("invalid operation %d", line.opcode);
-        return next;
+        return NEXT;
     }
 
     /* step 12 + 13 */
     IC += /* L */ getOperationWordsCounter(&line);
 
-    return next;
+    return NEXT;
 }
 
 int run(FILE *srcFile) {
@@ -98,9 +97,9 @@ int run(FILE *srcFile) {
         bool shouldStop = false;
         input_line line = parseLine(buffer);
         switch (analyze_line(line)) {
-            case next:
+            case NEXT:
                 break;
-            case stop:
+            case STOP:
                 shouldStop = true;
                 break;
         }
@@ -115,6 +114,6 @@ int run(FILE *srcFile) {
     }
 
     /*update all symbols with data classification to IC + 100 */
-    updateDataLabels();
+    updateDataLabels(IC);
     return 0;
 }

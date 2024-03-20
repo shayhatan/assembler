@@ -5,6 +5,7 @@
 #ifndef ASSEMBLER_LABELS_TABLE_H
 #define ASSEMBLER_LABELS_TABLE_H
 
+#include "data_structures/linked_list/list.h"
 #include "parsers/types.h"
 
 /* adds a new label */
@@ -15,7 +16,7 @@ int incrementLabelWordsCounter(char *label);
 
 int updateDataLabels(unsigned int IC);
 
-int bulkAddExternalOperands(list *o);
+int bulkAddExternalOperands(List o);
 
 entry *get_data(char *label);
 

@@ -7,7 +7,7 @@
 
 #include <stdbool.h>
 #include "../words/consts.h"
-#include "data_structures/linked_list/types.h"
+#include "data_structures/linked_list/list.h"
 
 enum labelType {
     integer, character, string
@@ -40,8 +40,8 @@ typedef struct {
 
 
 typedef union {
-    list *numbers;
-    list *strings;
+    List numbers;
+    List strings;
 } Arguments;
 
 typedef struct {

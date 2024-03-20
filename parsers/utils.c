@@ -9,7 +9,7 @@
 #include "parsers/types.h"
 #include "logs/utils.h"
 #include "./utils.h"
-#include "../data_structures/linked_list/utils.h"
+#include "../data_structures/linked_list/list.h"
 
 const int TWO_OPERANDS_OPERATIONS[] = {mov, cmp, add, sub, lea};
 const int ONE_OPERAND_OPERATIONS[] = {not, clr, inc, dec, jmp, bne, red, prn, jsr};

@@ -8,7 +8,7 @@
 #include "parsers/types.h"
 #include "logs/utils.h"
 #include "data_structures/map/map.h"
-#include "utils.h"
+#include "list.h"
 #include "factory.h"
 
 static Map labels_table;
@@ -79,11 +79,11 @@ int incrementLabelWordsCounter(char *label) {
 }
 
 
-int bulkAddExternalOperands(list *o) {
-    node *current = getFirst(o);
+int bulkAddExternalOperands(List o) {
+    Node *current = getFirst(o);
     while (current != NULL) {
         Operand operand = current->value;
-        /* todo: we might be adding the same label multiple times, perhaps a list is more appropriate? */
+        /* todo: we might be adding the same label multiple times, perhaps a List is more appropriate? */
         addLabel(operand, createEntry(DOT_EXTERNAL, -1));
         current = current->next;
     }
