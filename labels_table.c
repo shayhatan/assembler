@@ -3,16 +3,51 @@
 //
 
 #include <stdlib.h>
+#include <string.h>
 #include "./labels_table.h"
-#include "./data_structures/table/utils.h"
 #include "parsers/types.h"
 #include "logs/utils.h"
+#include "data_structures/map/map.h"
 
-table labels_table;
-table *ptr = &labels_table;
+Map labels_table;
+Map *ptr;
+
+
+MapDataElement copyElement(MapDataElement existing) {
+    entry *clone = malloc(sizeof(entry));
+    entry *existingEntry = existing;
+    clone->classification = strdup(existingEntry->classification);
+    clone->wordsCounter = existingEntry->wordsCounter;
+    clone->value = existingEntry->value;
+    return clone;
+}
+
+MapKeyElement copyKeyElement(MapKeyElement existing) {
+    char *clone;
+
+    return strdup((char *) existing);
+}
+
+/** Type of function for deallocating a data element of the map */
+void cleanMapDataElements(MapDataElement disposable) {
+    entry *disposedEntry = disposable;
+    free(disposedEntry->classification);
+}
+
+/** Type of function for deallocating a key element of the map */
+void cleanMapKeyElements(MapKeyElement disposable) {
+}
+
+int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
+    char *s1 = key1;
+    char *s2 = key2;
+    return strcmp(s1, s2) == 0;
+}
 
 void init() {
-    init_table(&labels_table);
+    labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
+                             compareKeyElements);
+    ptr = &labels_table;
 }
 
 void deleteLabelDataCallback(void *value) {
@@ -21,14 +56,14 @@ void deleteLabelDataCallback(void *value) {
 }
 
 void dispose() {
-    dispose_table(&ptr, deleteLabelDataCallback);
+    mapDestroy(labels_table);
 }
 
 int addLabel(char *label, entry newEntry) {
     newEntry.wordsCounter = 0;
 
-    if (getValue(ptr, label) == NULL) {
-        setValue(ptr, label, &newEntry);
+    if (mapContains(labels_table, label)) {
+        mapPut(labels_table, label, &newEntry);
         return 0; /* success */
     }
     log_error("Cannot add label, label %s already exists", label);
@@ -36,7 +71,7 @@ int addLabel(char *label, entry newEntry) {
 }
 
 int incrementLabelWordsCounter(char *label) {
-    entry *existingEntry = getValue(ptr, label);
+    entry *existingEntry = mapGet(labels_table, label);
     if (existingEntry == NULL) {
         log_error("label %s does not exist", label);
         return 1; /* argument out of range */;
@@ -51,5 +86,5 @@ int updateDataLabels() {
 }
 
 entry *get_data(char *label) {
-    return getValue(ptr, label);
+    return mapGet(labels_table, label);
 }
