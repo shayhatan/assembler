@@ -9,10 +9,6 @@
 #include "../words/consts.h"
 #include "data_structures/linked_list/list.h"
 
-enum labelType {
-    integer, character, string
-};
-
 enum Addressing {
     instant = 1,
     direct = 2,
@@ -20,8 +16,8 @@ enum Addressing {
     directRegister = 8,
 };
 
-enum symbol_flags {
-    dot_data = 1, dot_string = 2, dot_external = 4, dot_entry = 8
+enum DirectiveProps {
+    dot_data = 1, dot_string = 2, dot_external = 4, dot_entry = 8, dot_define
 };
 
 typedef char *Operand;
@@ -31,6 +27,7 @@ typedef char *Operand;
 char *DOT_CODE = ".code";
 char *DOT_DATA = ".data";
 char *DOT_EXTERNAL = ".external";
+char *DOT_DEFINE = ".mdefine";
 
 typedef struct {
     char *classification; /* symbol property */
@@ -46,15 +43,27 @@ typedef union {
 
 typedef struct {
     bool isEOF;
-    bool isAssignment; /* is a .string/.data */
     bool hasLabel; /* does begin with a symbol */
     char *label;
-    Arguments *arguments; /* consider using other data type */
-    enum labelType labelType;
-    enum symbol_flags labelProps;
+    Arguments *arguments;
+    enum DirectiveProps directive_props;
     enum opcode opcode;
     int lineNumber;
 } input_line;
+
+enum SentenceType {
+    EMPTY, COMMENT, DIRECTIVE, INSTRUCTION, CONSTANT_DEFINITION,
+    /* reserved for collisions or invalid categorization during parsing */
+    INVALID
+};
+
+enum ArgumentType {
+    NUMERIC_TYPE, STRING_TYPE, LABEL_TYPE
+};
+
+enum ArgumentsCountType {
+    SINGLE, PLURAL
+};
 
 
 #endif //ASSEMBLER_PARSERS_TYPES_H

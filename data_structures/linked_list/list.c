@@ -137,29 +137,29 @@ void deleteNode(List list, Node *node) {
         (node->next)->previous = node->previous;
     }
 
-    /* dispose of data */
+    /* listDispose of data */
     list->freeElement(node->value);
     free(node->value);
     free(node);
 }
 
-void dispose(List listPtr) {
+void listDispose(List list) {
     Node *current;
     Node *next;
-    if (listPtr == NULL) return;
+    if (list == NULL) return;
 
-    current = (listPtr)->root;
+    current = (list)->root;
     while (current != NULL) {
         next = current->next;
 
-        /* dispose of data */
-        listPtr->freeElement(current->value);
+        /* listDispose of data */
+        list->freeElement(current->value);
         free(current->value);
         free(current);
 
         current = next;
     }
-    free(listPtr);
+    free(list);
 }
 
 void iterate(List list, iterator_function callback) {

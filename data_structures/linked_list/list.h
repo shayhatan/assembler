@@ -41,7 +41,7 @@ void deleteNth(List list, unsigned int index);
 
 void deleteNode(List list, Node *node);
 
-void dispose(List list);
+void listDispose(List list);
 
 typedef void (*iterator_function)(unsigned int index, void *);
 

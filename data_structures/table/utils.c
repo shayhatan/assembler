@@ -80,7 +80,7 @@ void dispose_table(table **table, DeleteFn callback) {
     while (current != NULL) {
         next = current->next;
 
-        /* dispose of data */
+        /* listDispose of data */
         delete_key_value_props(current->value, callback);
         /* delete kv */
         free(current->value);
