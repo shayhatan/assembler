@@ -17,7 +17,7 @@ enum Addressing {
 };
 
 enum DirectiveProps {
-    dot_data = 1, dot_string = 2, dot_external = 4, dot_entry = 8, dot_define
+    dot_data = 1, dot_string = 2, dot_external = 4, dot_entry = 8, dot_define = 16
 };
 
 typedef char *Operand;

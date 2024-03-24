@@ -11,4 +11,8 @@ int DC;
 #define CommentLabel = ';';
 
 
+char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
+                      "rts", "stop"};
+
+
 #endif //ASSEMBLER_CONSTS_H

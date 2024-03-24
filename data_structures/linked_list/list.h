@@ -49,6 +49,6 @@ void iterate(List list, iterator_function callback);
 
 int listLength(List list);
 
-List init_list(DeleteFn deleteElementCallback);
+List listCreate(DeleteFn freeElement);
 
 #endif //ASSEMBLER_LIST_UTILS_H

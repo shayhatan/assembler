@@ -15,60 +15,63 @@
 unsigned int IC = 0, DC = 0;
 bool errored;
 
-input_line parseLine(char *line, int lineNumber) {
-    input_line parsed_line;
+enum ParseResult {
+    PARSE_FAILURE, SUCCESS
+};
+
+enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     enum SentenceType sentence_type;
 
-    parsed_line.lineNumber = lineNumber;
-    parsed_line.isEOF = isEOF(line);
-    if (parsed_line.isEOF) {
+    result->lineNumber = lineNumber;
+    result->isEOF = isEOF(line);
+    if (result->isEOF) {
         /* we can stop here */
-        return parsed_line;
+        return SUCCESS;
     }
 
     sentence_type = getSentenceType(line);
 
-    parsed_line.hasLabel = doesContainLabel(line);
-    if (parsed_line.hasLabel) {
-        parsed_line.label = getLabelValue(line);
+    result->hasLabel = doesContainLabel(line);
+    if (result->hasLabel) {
+        result->label = getLabelValue(line);
     }
 
     switch (sentence_type) {
         case EMPTY:
         case COMMENT:
-            return parsed_line;
+            return SUCCESS;
         case DIRECTIVE:
-            parsed_line.directive_props = getDirectiveProps(line);
-            switch (parsed_line.directive_props) {
+            result->directive_props = getDirectiveProps(line);
+            switch (result->directive_props) {
                 case dot_data:
-                    parsed_line.arguments->numbers = getArguments(line, NUMERIC_TYPE, PLURAL);
+                    result->arguments->numbers = getArguments(line, NUMERIC_TYPE, PLURAL);
                     break;
                 case dot_string:
-                    parsed_line.arguments->strings = getArguments(line, STRING_TYPE, SINGLE);
+                    result->arguments->strings = getArguments(line, STRING_TYPE, SINGLE);
                     break;
                 case dot_external:
-                    parsed_line.arguments->strings = getArguments(line, LABEL_TYPE, PLURAL);
+                    result->arguments->strings = getArguments(line, LABEL_TYPE, PLURAL);
                     break;
                 case dot_entry:
-                    parsed_line.arguments->strings = getArguments(line, LABEL_TYPE, SINGLE);
+                    result->arguments->strings = getArguments(line, LABEL_TYPE, SINGLE);
                     break;
                 case dot_define:
-                    parsed_line.arguments->numbers = getArguments(line, NUMERIC_TYPE, SINGLE);
+                    result->arguments->numbers = getArguments(line, NUMERIC_TYPE, SINGLE);
                     break;
             }
             break;
         case INSTRUCTION:
-            parsed_line.opcode = getOpcode(line);
-            parsed_line.arguments = getOperationArguments(line);
+            result->opcode = getOpcode(line);
+            result->arguments = getOperationArguments(line);
             break;
         case CONSTANT_DEFINITION:
             break;
         case INVALID:
             /* todo: need to go into error flow here */
-            break;
+            return PARSE_FAILURE;
     }
 
-    return parsed_line;
+    return SUCCESS;
 };
 
 void disposeLine(input_line *line) {
@@ -162,8 +165,14 @@ int run(FILE *srcFile) {
 
     int index = 0;
     while (fgets(buffer, 81, srcFile)) {
+        input_line line;
+        enum ParseResult parse_result;
         bool shouldStop = false;
-        input_line line = parseLine(buffer, index++);
+        parse_result = parseLine(buffer, index++, &line);
+        if (parse_result == PARSE_FAILURE) {
+            log_error("Failed to parse line %d %s", index - 1, buffer);
+            continue;
+        }
         switch (analyze_line(line)) {
             case NEXT:
                 break;

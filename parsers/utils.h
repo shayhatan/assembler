@@ -22,8 +22,9 @@ char *getLabelValue(char *line);
 
 enum DirectiveProps getDirectiveProps(char *line);
 
-
 enum opcode getOpcode(char *line);
+
+bool isEOF(char *line);
 
 /* needs de-allocation after finalizing */
 List getArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount);

@@ -181,7 +181,7 @@ int listLength(List list) {
     return i;
 }
 
-List init_list(DeleteFn freeElement) {
+List listCreate(DeleteFn freeElement) {
     List list = malloc(sizeof(*list));
     list->root = NULL;
     list->freeElement = freeElement;
