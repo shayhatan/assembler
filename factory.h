@@ -6,10 +6,10 @@
 #ifndef ASSEMBLER_FACTORY_H
 #define ASSEMBLER_FACTORY_H
 
-#include "parsers/types.h"
+#include "parsers/parse_types.h"
 
 entry createEntry(char *classification, /* symbol property */
-                  unsigned int value /* IC + 100 || DC */);
+                  int value /* IC + 100 || DC */);
 
 
 List createIntegerList();

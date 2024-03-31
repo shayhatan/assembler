@@ -23,6 +23,11 @@ enum DirectiveProps {
 typedef char *Operand;
 
 
+typedef struct {
+    char *constant_id;
+    int constant_value;
+} *DefinitionArgument;
+
 /* symbol properties (symbol-table metadata) */
 char *DOT_CODE = ".code";
 char *DOT_DATA = ".data";
@@ -31,7 +36,7 @@ char *DOT_DEFINE = ".mdefine";
 
 typedef struct {
     char *classification; /* symbol property */
-    unsigned int value; /* IC + 100 || DC */
+    int value; /* IC + 100 || DC || constant value */
     unsigned int wordsCounter;
 } entry;
 
@@ -46,9 +51,11 @@ typedef struct {
     bool hasLabel; /* does begin with a symbol */
     char *label;
     Arguments *arguments;
+    DefinitionArgument const_definition_arg;
     enum DirectiveProps directive_props;
     enum opcode opcode;
     int lineNumber;
+    bool isComment;
 } input_line;
 
 enum SentenceType {
@@ -58,7 +65,7 @@ enum SentenceType {
 };
 
 enum ArgumentType {
-    NUMERIC_TYPE, STRING_TYPE, LABEL_TYPE
+    NUMERIC_TYPE, STRING_TYPE, DOUBLE_QUOTE_STRING, LABEL_TYPE
 };
 
 enum ArgumentsCountType {

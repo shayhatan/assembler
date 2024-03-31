@@ -4,11 +4,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "./labels_table.h"
-#include "parsers/types.h"
-#include "logs/utils.h"
+#include "parsers/parse_types.h"
+#include "logs/logging_utils.h"
 #include "data_structures/map/map.h"
-#include "list.h"
 #include "factory.h"
 
 static Map labels_table;
@@ -46,11 +46,6 @@ int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
 void init() {
     labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                              compareKeyElements);
-}
-
-void deleteLabelDataCallback(void *value) {
-    entry *valueAsEntry = value;
-    free(valueAsEntry->classification);
 }
 
 void disposeLabelsTable() {
@@ -114,6 +109,35 @@ int updateDataLabels(unsigned int IC) {
     mapGetFirst(labels_table);
 
     return 1;
+}
+
+
+void printLabelsTable() {
+    entry *currentEntry;
+    printf("============Labels table============\n");
+    char *currentLabel = mapGetFirst(labels_table);
+    /* no labels */
+    if (currentLabel == NULL) {
+        printf("====================================\n");
+        return;
+    }
+    currentEntry = mapGet(labels_table, currentLabel);
+    printf("Label\tValue\tClassification\tExtra Words\n");
+    printf("%s\t%d\t%s\t%d\n", currentLabel, currentEntry->value, currentEntry->classification,
+           currentEntry->wordsCounter);
+    free(currentLabel);
+    while (mapGetNext(labels_table) != NULL) {
+        currentLabel = mapGetNext(labels_table);
+        currentEntry = mapGet(labels_table, currentLabel);
+        printf("%s\t%d\t%s\t%d\n", currentLabel, currentEntry->value, currentEntry->classification,
+               currentEntry->wordsCounter);
+        free(currentLabel);
+    }
+
+    mapGetFirst(labels_table);
+
+    printf("====================================\n");
+
 }
 
 entry *get_data(char *label) {

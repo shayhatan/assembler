@@ -9,11 +9,10 @@
 #include <string.h>
 #include <math.h>
 #include <minmax.h>
-#include "parsers/types.h"
-#include "logs/utils.h"
-#include "./utils.h"
-#include "../data_structures/linked_list/list.h"
-#include "factory.h"
+#include "parsers/parse_types.h"
+#include "./logs/logging_utils.h"
+#include "./parsers_utils.h"
+#include "../factory.h"
 
 const int TWO_OPERANDS_OPERATIONS[] = {mov, cmp, add, sub, lea};
 const int ONE_OPERAND_OPERATIONS[] = {not, clr, inc, dec, jmp, bne, red, prn, jsr};
@@ -24,6 +23,48 @@ char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "d
                       "rts", "stop"};
 
 int OPERATIONS_LENGTHS[] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4};
+/* todo move to consts*/
+char *DIRECTIVE_PROPS[] = {".data", ".string", ".external", ".entry", ".define"};
+int DIRECTIVES_LENGTHS[] = {5, 6, 9, 6, 7};
+
+
+bool isRegisterAddressing(Operand operand) {
+    return ((operand[0] == 'r' && '0' <= operand[1] && operand[1] <= '7' && operand[2] == '\0') ? true : false);
+}
+
+bool isIndirectRegisterAddressing(Operand operand) {
+    return (operand[0] == '*') && isRegisterAddressing(operand + 1);
+}
+
+bool isInstantAddressing(Operand operand) {
+    char *endPtr;
+    if (operand[0] != '#') return false;
+
+    strtol(operand, &endPtr, 10);
+    return endPtr == operand || *endPtr != '\0';
+}
+
+bool isDirectAddressing(Operand operand) {
+    char *current = operand;
+
+    /* must not be a register */
+    if (isRegisterAddressing(operand)) {
+        return false;
+    }
+
+    /* must begin with a letter */
+    if (!isalpha(*current)) {
+        return false;
+    }
+    while (current != NULL) {
+        /* only alphanumeric letters are allowed */
+        if (!isalnum(*current)) {
+            return false;
+        }
+        current++;
+    }
+    return true;
+}
 
 /* internal functions */
 static int _indexOfChar(const char *str, char ch) {
@@ -35,28 +76,6 @@ static int _indexOfChar(const char *str, char ch) {
     }
 }
 
-static int _getFirstDirectiveIndex(char *line) {
-    int i;
-    enum DirectiveProps result = 0;
-    for (i = 0; i < 16; i++) {
-        char *operation_ptr = strstr(line, OPERATIONS[i]);
-        if (operation_ptr != NULL) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-static int _getFirstOpIndex(char *line) {
-    int i;
-    for (i = 0; i < 16; i++) {
-        char *operation_ptr = strstr(line, OPERATIONS[i]);
-        if (operation_ptr != NULL) {
-            return i;
-        }
-    }
-    return -1;
-}
 
 /* returns a dynamically allocated sub-string copy of n chars */
 static char *_strdupn(const char *str, size_t n) {
@@ -81,16 +100,65 @@ static char *_strdupn(const char *str, size_t n) {
 }
 
 
-/* mutates line */
-/* returns a dynamically allocated sub-string copy of n chars */
-static char *_getNextString(char **line) {
-    char *result;
+bool isNumber(char *word) {
+    char *endptr;
+    strtol(word, &endptr, 10);
+    return *endptr != '\0';
+}
 
-    if (line == NULL || *line == NULL) {
-        return NULL;
+bool isQuotedString(char *word) {
+    if (word == NULL) return false;
+    if (*word != '\"') return false;
+    if (*(word + strlen(word) - 1) != '\"') return false;
+
+    return true;
+}
+
+bool isOpcode(char *word) {
+    int i;
+    for (i = 0; i < 16; i++) {
+        if (strcmp(word, OPERATIONS[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isLabelOrConstantString(char *word) {
+    char *iterator = word;
+
+    if (word == NULL) return false;
+
+    if (isRegisterAddressing(word)) return false;
+
+    while (iterator != NULL) {
+        if (!islower(*iterator)) return false;
+        iterator++;
     }
 
-    int index_of_space = _indexOfChar(*line, ' ');
+    if (isOpcode(word)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool getTrue(char *word) {
+    return true;
+}
+
+/* external functions */
+
+/* mutates line */
+/* returns a dynamically allocated sub-string copy of n chars */
+char *readNextString(char **line, char delimiter) {
+    char *result;
+
+    if (line == NULL || *line == NULL || **line == EOF) {
+        return strdup(""); /* empty string means no more words */
+    }
+
+    int index_of_space = _indexOfChar(*line, delimiter);
     if (index_of_space > 0) {
         *line += index_of_space;
         return _strdupn(*line, index_of_space);
@@ -102,7 +170,24 @@ static char *_getNextString(char **line) {
     return result;
 }
 
-/* external functions */
+/* returns a dynamically allocated sub-string copy of n chars */
+char *getNextString(char **line, char delimiter) {
+    char *result;
+
+    if (line == NULL || *line == NULL) {
+        return NULL;
+    }
+
+    int index_of_space = _indexOfChar(*line, delimiter);
+    if (index_of_space > 0) {
+        return _strdupn(*line, index_of_space);
+    }
+
+    result = _strdupn(*line, _indexOfChar(*line, '\0'));
+
+    return result;
+}
+
 
 /* returns an enum flag */
 int getAllowedSourceOperandAddressingsByOpcode(enum opcode op) {
@@ -148,44 +233,6 @@ int getAmountOfOperandsByOperation(enum opcode code) {
     return 0;
 }
 
-
-bool isRegisterAddressing(Operand operand) {
-    return ((operand[0] == 'r' && '0' <= operand[1] && operand[1] <= '7' && operand[2] == '\0') ? true : false);
-}
-
-bool isIndirectRegisterAddressing(Operand operand) {
-    return (operand[0] == '*') && isRegisterAddressing(operand + 1);
-}
-
-bool isInstantAddressing(Operand operand) {
-    char *endPtr;
-    if (operand[0] != '#') return false;
-
-    strtol(operand, &endPtr, 10);
-    return endPtr == operand || *endPtr != '\0';
-}
-
-bool isDirectAddressing(Operand operand) {
-    char *current = operand;
-
-    /* must not be a register */
-    if (isRegisterAddressing(operand)) {
-        return false;
-    }
-
-    /* must begin with a letter */
-    if (!isalpha(*current)) {
-        return false;
-    }
-    while (current != NULL) {
-        /* only alphanumeric letters are allowed */
-        if (!isalnum(*current)) {
-            return false;
-        }
-        current++;
-    }
-    return true;
-}
 
 enum Addressing getAddressingForOperand(Operand operand) {
     if (isInstantAddressing(operand)) return instant;
@@ -273,37 +320,26 @@ bool isEOF(char *ptr) {
 
 enum opcode getOpcode(char *line) {
     int i;
-    enum opcode result = -1;
     for (i = 0; i < 16; i++) {
         char *operation_ptr = strstr(line, OPERATIONS[i]);
         if (operation_ptr != NULL) {
-            if (result == -1) {
-                result = i;
-            } else {
-                log_error("Multiple opcodes were detected within the same line %s %s", OPERATIONS[result],
-                          OPERATIONS[i]);
-                return -2; /* collision detected */
-            }
+            return i;
         }
     }
-    return result; /* either -1 which means nothing detected, or a valid opcode */
+    return -1; /* either -1 which means nothing detected, or a valid opcode */
 }
 
-/* todo move to consts*/
-char *DIRECTIVE_PROPS[] = {".data", ".string", ".external", ".entry", ".define"};
-int DIRECTIVES_LENGTHS[] = {5, 6, 9, 6, 7};
 
 /* collision (overlaps) are handled within first_run */
 enum DirectiveProps getDirectiveProps(char *line) {
     int i;
-    enum DirectiveProps result = 0;
     for (i = 0; i < 16; i++) {
         char *operation_ptr = strstr(line, OPERATIONS[i]);
         if (operation_ptr != NULL) {
-            result += (int) pow(2, i);
+            return (int) pow(2, i);
         }
     }
-    return result;
+    return 0;
 }
 
 char *getLabelValue(char *line) {
@@ -313,7 +349,7 @@ char *getLabelValue(char *line) {
     }
     wordEnd = _indexOfChar(line, ':');
     if (wordEnd > 0) {
-        return _strdupn(line, wordEnd);
+        return _strdupn(line, wordEnd); /* todo: mal-allocation */
     }
     return NULL;
 }
@@ -328,51 +364,18 @@ bool doesContainLabel(char *line) {
     return col_index > 0 && col_index < brace_index;
 }
 
-
-static char *_getArgumentsStartIndex(char *line) {
-    enum SentenceType sentence_type = -1;
-    int dir_or_inst_index;
-    if (doesContainLabel(line)) {
-        /* skip the label part */
-        line += _indexOfChar(line, ':');
-    }
-
-    sentence_type = getSentenceType(line);
-    /* listed only reachable options */
-    /* assumes that directive/instruction checks were made prior to the entry of this function */
-    switch (sentence_type) {
-        case DIRECTIVE:
-            dir_or_inst_index = _getFirstDirectiveIndex(line);
-
-            if (dir_or_inst_index > 4) {
-                /* unreachable */
-                return NULL;
-            }
-            line = strstr(line, DIRECTIVE_PROPS[dir_or_inst_index]) + DIRECTIVES_LENGTHS[dir_or_inst_index];
-            break;
-        case INSTRUCTION:
-            dir_or_inst_index = _getFirstOpIndex(line);
-            line = strstr(line, OPERATIONS[dir_or_inst_index]) + OPERATIONS_LENGTHS[dir_or_inst_index];
-            break;
-        case CONSTANT_DEFINITION:
-            break;
-    }
-
-    return line;
-};
-
-List getArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount) {
-    List args;
+int _tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args,
+                     ValidateArgumentFunction validator) {
     int current_args_amount = 0;
-    line = _getArgumentsStartIndex(line);
     /* todo check if line is still valid */
     if (line == NULL) {
-        return NULL; /* line is out of buffer */
+        return 2; /* line is out of buffer */
     }
     switch (type) {
         case NUMERIC_TYPE:
             args = createIntegerList();
             break;
+        case DOUBLE_QUOTE_STRING:
         case STRING_TYPE:
         case LABEL_TYPE:
             args = createStringList();
@@ -381,23 +384,76 @@ List getArguments(char *line, enum ArgumentType type, enum ArgumentsCountType ex
 
     while (line != NULL) {
         int next_int;
-        char *next_string = _getNextString(&line);
+        char *next_string = readNextString(&line, ',');
         if (next_string == NULL) {
             break;
         }
         /* maybe we should stop here ?? */
         if (current_args_amount > expectedAmount) {
             log_error("too many args detected");
+            return 3;
         }
         if (type == NUMERIC_TYPE) {
-            next_int = atoi(next_string);
-            addLast(args, &next_int);
+            char *endptr;
+            if (!validator(next_string)) {
+                return 1;
+            }
+            next_int = strtol(next_string, &endptr, 10);
+            if (*endptr != '\0') {
+                /*...input is not a decimal number */
+                return 1;
+            } else {
+                addLast(args, &next_int);
+            }
         } else {
+            if (!validator(next_string)) {
+                return 1;
+            }
             addLast(args, next_string);
         }
         free(next_string);
         current_args_amount++;
     }
 
-    return args;
+    return 0;
+}
+
+int tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args) {
+    switch (type) {
+        case NUMERIC_TYPE:
+            return _tryGetArguments(line, type, expectedAmount, args, isNumber) != 0;
+        case DOUBLE_QUOTE_STRING:
+            return _tryGetArguments(line, type, expectedAmount, args, isQuotedString) != 0;
+        case LABEL_TYPE:
+            return _tryGetArguments(line, type, expectedAmount, args, isLabelOrConstantString) != 0;
+        case STRING_TYPE:
+            return _tryGetArguments(line, type, expectedAmount, args, getTrue) != 0;
+    }
+}
+
+int tryGetAssignmentArgument(char *line, DefinitionArgument argument) {
+    char *endptr;
+    /* todo check if line is still valid */
+    if (line == NULL) {
+        return 2; /* line is out of buffer */
+    }
+    argument->constant_id = readNextString(&line, '=');
+
+    if (argument->constant_id == NULL) {
+        log_error("invalid constant id %s\n", line);
+        return 2; /* todo invalid constant name or allocation */
+    }
+
+    /* skip to the constant value string */
+    line += strlen(argument->constant_id) + 1;
+
+    argument->constant_value = strtol(line, &endptr, 10);
+    if (*endptr != '\0') {
+        /*...input is not a decimal number */
+        log_error("invalid numeric constant value %s\n", line);
+        return 1;
+    }
+
+
+    return 0;
 }

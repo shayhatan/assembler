@@ -5,15 +5,15 @@
 #ifndef ASSEMBLER_PARSERS_UTILS_H
 #define ASSEMBLER_PARSERS_UTILS_H
 
-#include "./types.h"
+#include "./parse_types.h"
 
+/* mutates line */
+/* returns a dynamically allocated sub-string copy of n chars */
+char *readNextString(char **line, char delimiter);
 
 enum Addressing getAddressingForOperand(Operand operand);
 
 int getOperationWordsCounter(input_line *line);
-
-
-enum SentenceType getSentenceType(char *line);
 
 bool doesContainLabel(char *line);
 
@@ -26,10 +26,11 @@ enum opcode getOpcode(char *line);
 
 bool isEOF(char *line);
 
-/* needs de-allocation after finalizing */
-List getArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount);
+typedef bool (*ValidateArgumentFunction)(char *data);
 
 /* needs de-allocation after finalizing */
-Arguments *getOperationArguments(char *line);
+int tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args);
+
+int tryGetAssignmentArgument(char *line, DefinitionArgument argument);
 
 #endif //ASSEMBLER_PARSERS_UTILS_H
