@@ -43,9 +43,9 @@ void deleteNode(List list, Node *node);
 
 void listDispose(List list);
 
-typedef void (*iterator_function)(unsigned int index, void *);
+typedef int (*iterator_function)(unsigned int index, void *);
 
-void iterate(List list, iterator_function callback);
+int iterate(List list, iterator_function callback);
 
 int listLength(List list);
 

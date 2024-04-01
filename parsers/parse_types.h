@@ -41,16 +41,11 @@ typedef struct {
 } entry;
 
 
-typedef union {
-    List numbers;
-    List strings;
-} Arguments;
-
 typedef struct {
     bool isEOF;
     bool hasLabel; /* does begin with a symbol */
     char *label;
-    Arguments *arguments;
+    List arguments;
     DefinitionArgument const_definition_arg;
     enum DirectiveProps directive_props;
     enum opcode opcode;

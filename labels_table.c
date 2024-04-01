@@ -74,12 +74,12 @@ int incrementLabelWordsCounter(char *label) {
 }
 
 
-int bulkAddExternalOperands(List o) {
+int bulkAddExternalOperands(List o, bool create_only) {
     Node *current = getFirst(o);
     while (current != NULL) {
         Operand operand = current->value;
         /* todo: we might be adding the same label multiple times, perhaps a List is more appropriate? */
-        addLabel(operand, createEntry(DOT_EXTERNAL, -1));
+        addLabel(operand, createEntry(DOT_EXTERNAL, -1), create_only);
         current = current->next;
     }
 }

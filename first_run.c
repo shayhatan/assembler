@@ -69,7 +69,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 
     /* instruction line */
     if (tryGetOpcode(temp, &result->opcode)) {
-        if (tryGetArguments(line, STRING_TYPE, PLURAL, result->arguments->strings) != 0) {
+        if (tryGetArguments(line, STRING_TYPE, PLURAL, result->arguments) != 0) {
             log_error("invalid string arguments %s\n", line);
         }
         free(temp);
@@ -82,25 +82,25 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
         /* todo handle failure status regarding out of memory */
         switch (result->directive_props) {
             case dot_data:
-                if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, result->arguments->numbers) != 0) {
+                if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, result->arguments) != 0) {
                     log_error("invalid numeric arguments %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_string:
-                if (tryGetArguments(line, DOUBLE_QUOTE_STRING, SINGLE, result->arguments->strings) != 0) {
+                if (tryGetArguments(line, DOUBLE_QUOTE_STRING, SINGLE, result->arguments) != 0) {
                     log_error("invalid quoted string argument %s\n", line);
                 }
                 break;
             case dot_external:
-                if (tryGetArguments(line, LABEL_TYPE, PLURAL, result->arguments->strings) !=
+                if (tryGetArguments(line, LABEL_TYPE, PLURAL, result->arguments) !=
                     0) {
                     log_error("invalid label arguments %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_entry:
-                if (tryGetArguments(line, LABEL_TYPE, SINGLE, result->arguments->strings) !=
+                if (tryGetArguments(line, LABEL_TYPE, SINGLE, result->arguments) !=
                     0) {
                     log_error("invalid label argument %s\n", line);
                     status = PARSE_FAILURE;
@@ -132,10 +132,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 void disposeLine(input_line *line) {
 
     if (line->arguments != NULL) {
-        /* todo we need to determine which of the following needs to be disposed as its a union type*/
-        listDispose(line->arguments->numbers);
-        listDispose(line->arguments->strings);
-        free(line->arguments);
+        listDispose(line->arguments);
     }
 
     if (line->hasLabel)
@@ -163,60 +160,90 @@ void countStringWords(char *strPtr) {
     }
 }
 
+int countDataWords(unsigned int _, void *ptr) {
+    entry *temp;
+    char *strPtr = ptr;
+    if (isNumber(strPtr)) {
+        incrementLabelWordsCounter(currentLine.label);
+        return true;
+    }
+    temp = get_data(strPtr); /* in case we passed a symbol */
+    if (temp == NULL) {
+        log_error("non-existent symbol %s cannot be a .data argument", strPtr);
+        return false;
+    }
+    if (strcmp(temp->classification, DOT_DEFINE) != 0) { /* in case the symbol is not a constant */
+        log_error(".data symbol %s must be a constant definition", strPtr);
+        return false;
+    }
+    incrementLabelWordsCounter(strPtr);
+    return true;
+}
+
 enum analyze_status analyze_line(input_line line) {
     if (line.isEOF) {
         return STOP;
     }
 
+    /* step 4 */
     if (line.directive_props & dot_define) {
         addLabel(line.const_definition_arg.constant_id,
                  createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true);
         return NEXT;
     }
 
-    /* step 5 */
+    /* steps 5, 6, 7 */
     if (line.directive_props & (dot_data | dot_string) && line.hasLabel) {
         entry *addedEntry;
-        /* step 6 */
+        /* step 8 */
         if (addLabel(line.label, createEntry(DOT_DATA, (int) DC), true) != 0) {
             return NEXT;
         }
+        /* step 9 (.string case) */
         /* increase DC according to arguments */
         if (line.directive_props & dot_string) {
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
-            countStringWords(getFirst(line.arguments->strings)->value);
+            countStringWords(getFirst(line.arguments)->value);
         }
+        /* step 9 (.data case) */
         if (line.directive_props & dot_data) {
             incrementLabelWordsCounter(line.label);
+            addedEntry = get_data(line.label);
+            if (!iterate(line.arguments, countDataWords)) {
+                DC += addedEntry->wordsCounter;
+                return NEXT;
+            }
         }
 
         /* it's impossible for addedEntry to be null in this case */
         addedEntry = get_data(line.label);
-        /* step 7 */
         DC += addedEntry->wordsCounter;
         return NEXT;
     }
 
-    /* step 8, 9 */
+    /* step 10, 11 */
     if (line.directive_props & dot_external) {
-        bulkAddExternalOperands(line.arguments->strings);
+        bulkAddExternalOperands(line.arguments, false);
         return NEXT;
     }
 
-    /* step 8, 10 */
-    if ((line.directive_props & dot_entry) && line.hasLabel) {
-        if (!addLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100))) {
-            return NEXT;
-        }
+    /* step 10 (.entry) */
+    if ((line.directive_props & dot_entry)) {
+        return NEXT;
     }
 
-    /* step 11 */
+    /* step 12 */
+    if (line.hasLabel && !addLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true)) {
+        return NEXT;
+    }
+
+    /* step 13 */
     if (line.opcode < 0 || line.opcode > 15) {
         log_error("invalid operation %d", line.opcode);
         return NEXT;
     }
 
-    /* step 12 + 13 */
+    /* steps 14, 15 */
     IC += /* L */ getOperationWordsCounter(&line);
 
     return NEXT;

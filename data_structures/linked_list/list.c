@@ -162,13 +162,16 @@ void listDispose(List list) {
     free(list);
 }
 
-void iterate(List list, iterator_function callback) {
+int iterate(List list, iterator_function callback) {
     unsigned int index = 0;
     Node *current = getFirst(list);
     while (current != NULL) {
-        callback(index++, current->value);
+        if (!callback(index++, current->value)) {
+            return false;
+        }
         current = current->next;
     }
+    return true;
 }
 
 int listLength(List list) {

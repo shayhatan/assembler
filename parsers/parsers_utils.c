@@ -274,7 +274,7 @@ int getOperationWordsCounter(input_line *line) {
     int argsCount;
     int amountOfOperands = getAmountOfOperandsByOperation(line->opcode);
 
-    argsCount = listLength(line->arguments->strings);
+    argsCount = listLength(line->arguments);
     if (argsCount != amountOfOperands) {
         log_error("Arguments count %d does not match expected amount of operands %d", amountOfOperands);
         return -1;
@@ -284,15 +284,15 @@ int getOperationWordsCounter(input_line *line) {
         case 0:
             return 0;
         case 1:
-            operandsAddressing[0] = getAddressingForOperand(getNth(line->arguments->strings, 1)->value);
+            operandsAddressing[0] = getAddressingForOperand(getNth(line->arguments, 1)->value);
             /* single operand operations always involve a target operand */
             if (!isAddressingValid(operandsAddressing[0], line->opcode, target)) {
                 return -1;
             }
             return 1;
         case 2:
-            operandsAddressing[0] = getAddressingForOperand(getNth(line->arguments->strings, 1)->value);
-            operandsAddressing[1] = getAddressingForOperand(getNth(line->arguments->strings, 2)->value);
+            operandsAddressing[0] = getAddressingForOperand(getNth(line->arguments, 1)->value);
+            operandsAddressing[1] = getAddressingForOperand(getNth(line->arguments, 2)->value);
             if (!isAddressingValid(operandsAddressing[0], line->opcode, source) ||
                 !isAddressingValid(operandsAddressing[1], line->opcode, target)) {
                 return -1;
@@ -373,19 +373,9 @@ int _tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType
     if (line == NULL) {
         return 2; /* line is out of buffer */
     }
-    switch (type) {
-        case NUMERIC_TYPE:
-            args = createIntegerList();
-            break;
-        case DOUBLE_QUOTE_STRING:
-        case STRING_TYPE:
-        case LABEL_TYPE:
-            args = createStringList();
-            break;
-    }
+    args = createStringList();
 
     while (line != NULL) {
-        int next_int;
         char *next_string = readNextString(&line, ',');
         if (next_string == NULL) {
             break;
@@ -400,12 +390,12 @@ int _tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType
             if (!validator(next_string)) {
                 return 1;
             }
-            next_int = strtol(next_string, &endptr, 10);
+            strtol(next_string, &endptr, 10);
             if (*endptr != '\0') {
                 /*...input is not a decimal number */
                 return 1;
             } else {
-                addLast(args, &next_int);
+                addLast(args, next_string);
             }
         } else {
             if (!validator(next_string)) {

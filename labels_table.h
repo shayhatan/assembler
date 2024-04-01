@@ -16,7 +16,7 @@ int incrementLabelWordsCounter(char *label);
 
 int updateDataLabels(unsigned int IC);
 
-int bulkAddExternalOperands(List o);
+int bulkAddExternalOperands(List o, bool create_only);
 
 entry *get_data(char *label);
 

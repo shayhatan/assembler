@@ -7,6 +7,8 @@
 
 #include "./parse_types.h"
 
+bool isNumber(char *word);
+
 /* mutates line */
 /* returns a dynamically allocated sub-string copy of n chars */
 char *readNextString(char **line, char delimiter);
