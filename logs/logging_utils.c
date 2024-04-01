@@ -24,8 +24,12 @@ void log_error(char *error_msg, ...) {
         }
         error_msg++;
         switch (*error_msg) {
+            case 'd':
+                putchar(va_arg(lst, int));
+                break;
             case 's':
-                fputs(va_arg(lst, char *), stdout);
+                printf("%s", va_arg(lst, char*));
+//                fputs(va_arg(lst, char *), stdout);
                 break;
             case 'c':
                 putchar(va_arg(lst, int));

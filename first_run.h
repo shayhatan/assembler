@@ -12,13 +12,9 @@
 #include "./factory.h"
 #include "./parsers/parsers_utils.h"
 
-enum ParseResult {
-    PARSE_FAILURE, SUCCESS
-};
-
 enum analyze_status {
     STOP, NEXT
 };
 
 
-int run(FILE *srcFile);
+enum ParseResult run(FILE *srcFile);

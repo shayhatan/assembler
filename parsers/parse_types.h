@@ -34,6 +34,10 @@ typedef struct {
 #define DOT_EXTERNAL ".external"
 #define DOT_DEFINE ".mdefine"
 
+enum ParseResult {
+    PARSE_SUCCESS, PARSE_FAILURE, OUT_OF_MEMORY
+};
+
 typedef struct {
     char *classification; /* symbol property */
     int value; /* IC + 100 || DC || constant value */
@@ -42,10 +46,24 @@ typedef struct {
 
 
 typedef struct {
+    char *content;
+    int size;
+} String;
+
+#define MAX_ARG_CHARS 36
+#define MAX_ARGS 80
+
+typedef struct {
+    /* given that a line size is capped at a certain size, we can limit the size of the arguments it may define, and thus avoid allocations */
+    char args[MAX_ARGS][MAX_ARG_CHARS];
+    int args_count;
+} Arguments;
+
+typedef struct {
     bool isEOF;
     bool hasLabel; /* does begin with a symbol */
     char *label;
-    List arguments;
+    Arguments arguments;
     DefinitionArgument const_definition_arg;
     enum DirectiveProps directive_props;
     enum opcode opcode;
@@ -65,7 +83,7 @@ enum ArgumentType {
 };
 
 enum ArgumentsCountType {
-    SINGLE, PLURAL
+    ANY, SINGLE, PLURAL
 };
 
 

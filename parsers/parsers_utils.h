@@ -9,18 +9,15 @@
 
 bool isNumber(char *word);
 
-/* mutates line */
-/* returns a dynamically allocated sub-string copy of n chars */
-char *readNextString(char **line, char delimiter);
+String readNextString(char **line, char delimiter, char result_buffer[81]);
 
 enum Addressing getAddressingForOperand(Operand operand);
 
-int getOperationWordsCounter(input_line *line);
+enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter);
 
-bool doesContainLabel(char *line);
+bool doesContainLabel(char *line, String *result);
 
-/* needs de-allocation after finalizing */
-char *getLabelValue(char *line);
+enum ParseResult tryGetLabelValue(char *line, char **result);
 
 int tryGetDirectiveProps(char *word, enum DirectiveProps *result);
 
@@ -31,10 +28,13 @@ bool isEOF(char *line);
 typedef bool (*ValidateArgumentFunction)(char *data);
 
 /* needs de-allocation after finalizing */
-int tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args);
+enum ParseResult
+tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, Arguments *args);
 
 int tryGetAssignmentArgument(char *line, DefinitionArgument *argument);
 
 void skipWhitespaces(char **line);
+
+void addArgument(Arguments *args, char arg[MAX_ARG_CHARS], int arg_index, int arg_size);
 
 #endif //ASSEMBLER_PARSERS_UTILS_H

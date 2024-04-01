@@ -31,7 +31,7 @@ Node *getFirst(List list);
 
 Node *getLast(List list);
 
-Node *getNth(List list, unsigned int index);
+Node *listGetNth(List list, unsigned int index);
 
 typedef bool (*search_function)(void *, void *);
 

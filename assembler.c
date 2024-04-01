@@ -19,5 +19,5 @@ int main() {
 
     printf("run finished with status %d", run_result);
 
-    disposeLabelsTable();
+    labelsTableDispose();
 }

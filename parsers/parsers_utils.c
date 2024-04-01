@@ -12,7 +12,7 @@
 #include "parsers/parse_types.h"
 #include "./logs/logging_utils.h"
 #include "./parsers_utils.h"
-#include "../factory.h"
+#include "../string_utils.h"
 
 const int TWO_OPERANDS_OPERATIONS[] = {mov, cmp, add, sub, lea};
 const int ONE_OPERAND_OPERATIONS[] = {not, clr, inc, dec, jmp, bne, red, prn, jsr};
@@ -27,6 +27,27 @@ int OPERATIONS_LENGTHS[] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4};
 char *DIRECTIVE_PROPS[] = {".data", ".string", ".external", ".entry", ".define"};
 int DIRECTIVES_LENGTHS[] = {5, 6, 9, 6, 7};
 
+
+bool isOpcode(char *word) {
+    int i;
+    for (i = 0; i < 16; i++) {
+        if (strcmp(word, OPERATIONS[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool isDirective(char *word) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        if (strcmp(word, DIRECTIVE_PROPS[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
 
 bool isRegisterAddressing(Operand operand) {
     return ((operand[0] == 'r' && '0' <= operand[1] && operand[1] <= '7' && operand[2] == '\0') ? true : false);
@@ -44,105 +65,25 @@ bool isInstantAddressing(Operand operand) {
     return endPtr == operand || *endPtr != '\0';
 }
 
-bool isDirectAddressing(Operand operand) {
-    char *current = operand;
 
-    /* must not be a register */
-    if (isRegisterAddressing(operand)) {
-        return false;
-    }
+bool isValidVariableString(char *word) {
+    return !isRegisterAddressing(word) && !isOpcode(word) && isAlphaNumeric(word) && !isDirective(word);
+}
 
-    /* must begin with a letter */
-    if (!isalpha(*current)) {
-        return false;
-    }
-    while (current != NULL) {
-        /* only alphanumeric letters are allowed */
-        if (!isalnum(*current)) {
-            return false;
-        }
-        current++;
-    }
+
+bool tryGetVariableString(char *word, char *buffer) {
+    if (!isValidVariableString(word)) return false;
+    getStringBetweenSpaces(word, buffer);
     return true;
+}
+
+bool isDirectAddressing(Operand operand) {
+    return isValidVariableString(operand);
 }
 
 /* internal functions */
-static int _indexOfChar(const char *str, char ch) {
-    char *ptr = strchr(str, ch);
-    if (ptr != NULL) {
-        return ptr - str; // Calculate the index by subtracting the pointers
-    } else {
-        return INT_MAX; // Character not found
-    }
-}
-
-
-/* returns a dynamically allocated sub-string copy of n chars */
-static char *_strdupn(const char *str, size_t n) {
-    if (str == NULL) {
-        return NULL;
-    }
-
-    size_t len = strlen(str);
-    if (n > len) {
-        n = len;  // If n is greater than the length of the string, limit it to the string length
-    }
-
-    char *copy = (char *) malloc((n + 1) * sizeof(char)); // Allocate memory for the copy (+1 for null terminator)
-    if (copy == NULL) {
-        return NULL; // Memory allocation failed
-    }
-
-    strncpy(copy, str, n); // Copy at most n characters
-    copy[n] = '\0'; // Null-terminate the copied string
-
-    return copy;
-}
-
-
-bool isNumber(char *word) {
-    char *endptr;
-    strtol(word, &endptr, 10);
-    return *endptr != '\0';
-}
-
-bool isQuotedString(char *word) {
-    if (word == NULL) return false;
-    if (*word != '\"') return false;
-    if (*(word + strlen(word) - 1) != '\"') return false;
-
-    /* todo: validate no 3rd " in between the last and first */
-
-    return true;
-}
-
-bool isOpcode(char *word) {
-    int i;
-    for (i = 0; i < 16; i++) {
-        if (strcmp(word, OPERATIONS[i]) == 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool isLabelOrConstantString(char *word) {
-    char *iterator = word;
-
-    if (word == NULL) return false;
-
-    if (isRegisterAddressing(word)) return false;
-
-    while (iterator != NULL) {
-        if (!islower(*iterator)) return false;
-        iterator++;
-    }
-
-    if (isOpcode(word)) {
-        return false;
-    }
-
-    return true;
+    return isValidVariableString(word);
 }
 
 bool getTrue(char *word) {
@@ -153,37 +94,39 @@ bool getTrue(char *word) {
 
 /* mutates line */
 /* returns a dynamically allocated sub-string copy of n chars */
-char *readNextString(char **line, char delimiter) {
-    char *result;
+String readNextString(char **line, char delimiter, char result_buffer[81]) {
+    String result;
+    result.content = result_buffer;
+    result.size = 0;
+
 
     if (line == NULL || *line == NULL || **line == EOF) {
-        return strdup(""); /* empty string means no more words */
+        return result; /* empty string means no more words */
     }
 
-    int index_of_space = _indexOfChar(*line, delimiter);
-    if (index_of_space > 0) {
-        result = _strdupn(*line, index_of_space);
-        *line += index_of_space + 1;
+    result.size = indexOfChar(*line, delimiter);
+    if (result.size != INT_MAX) {
+        duplicateStr(*line, result_buffer, result.size);
+        *line += result.size + 1;
         return result;
     }
 
-    result = _strdupn(*line, _indexOfChar(*line, '\n'));
+    result.size = min(indexOfChar(*line, '\n'), strlen(*line));
+    duplicateStr(*line, result_buffer, result.size);
+
     *line = NULL;
 
     return result;
 }
 
-char *readTillNewLine(char **line) {
-    char *result;
-
+void readTillNewLine(char **line, char buffer[81]) {
     if (line == NULL || *line == NULL || **line == EOF) {
-        return strdup(""); /* empty string means no more words */
+        buffer[0] = '\0';
+        return;
     }
 
-    result = _strdupn(*line, _indexOfChar(*line, '\n'));
+    duplicateStr(*line, buffer, indexOfChar(*line, '\n'));
     *line = NULL;
-
-    return result;
 }
 
 /* returns an enum flag */
@@ -269,39 +212,45 @@ bool isAddressingValid(enum Addressing operandsAddressing, enum opcode opcode, e
     return true;
 }
 
-int getOperationWordsCounter(input_line *line) {
+char *getNthArgument(Arguments *args_container, int index) {
+    return args_container->args[index];
+}
+
+enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter) {
     enum Addressing operandsAddressing[2] = {-1};
-    int argsCount;
+
     int amountOfOperands = getAmountOfOperandsByOperation(line->opcode);
 
-    argsCount = listLength(line->arguments);
-    if (argsCount != amountOfOperands) {
+    if (line->arguments.args_count != amountOfOperands) {
         log_error("Arguments count %d does not match expected amount of operands %d", amountOfOperands);
-        return -1;
+        return PARSE_FAILURE;
     }
 
     switch (amountOfOperands) {
         case 0:
-            return 0;
+            *words_counter = 1;
+            return PARSE_SUCCESS;
         case 1:
-            operandsAddressing[0] = getAddressingForOperand(getNth(line->arguments, 1)->value);
+            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 1));
             /* single operand operations always involve a target operand */
             if (!isAddressingValid(operandsAddressing[0], line->opcode, target)) {
-                return -1;
+                return PARSE_FAILURE;
             }
-            return 1;
+            *words_counter = 1;
+            return PARSE_SUCCESS;
         case 2:
-            operandsAddressing[0] = getAddressingForOperand(getNth(line->arguments, 1)->value);
-            operandsAddressing[1] = getAddressingForOperand(getNth(line->arguments, 2)->value);
+            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 1));
+            operandsAddressing[1] = getAddressingForOperand(getNthArgument(&line->arguments, 2));
             if (!isAddressingValid(operandsAddressing[0], line->opcode, source) ||
                 !isAddressingValid(operandsAddressing[1], line->opcode, target)) {
-                return -1;
+                return PARSE_FAILURE;
             }
             /* both addressings are valid, check if they are different */
             /* yes --> we need 2 words, otherwise 1 word */
-            return operandsAddressing[0] != operandsAddressing[1] ? 2 : 1;
+            *words_counter = operandsAddressing[0] != operandsAddressing[1] ? 2 : 1;
+            return PARSE_SUCCESS;
         default:
-            return -2; /* unreachable */
+            return PARSE_FAILURE; /* unreachable */
     }
 }
 
@@ -341,119 +290,140 @@ int tryGetDirectiveProps(char *word, enum DirectiveProps *result) {
     return false;
 }
 
-char *getLabelValue(char *line) {
-    int wordEnd;
-    if (!doesContainLabel(line)) {
-        return NULL;
+enum ParseResult tryGetLabelValue(char *line, char **result) {
+    String temp;
+    char buffer[81];
+    temp.content = buffer;
+
+    if (!doesContainLabel(line, &temp)) {
+        return PARSE_FAILURE;
     }
-    wordEnd = _indexOfChar(line, ':');
-    if (wordEnd > 0) {
-        return _strdupn(line, wordEnd); /* todo: mal-allocation */
+
+    duplicateStr(line, buffer, temp.size);
+
+    if (!isLabelOrConstantString(buffer)) {
+        log_error("invalid label syntax %s", line);
+        return PARSE_FAILURE;
     }
-    return NULL;
+
+    *result = allocatedDuplicateString(buffer);
+    if (result == NULL) {
+        return OUT_OF_MEMORY;
+    }
+    return PARSE_SUCCESS;
 }
 
 
-bool doesContainLabel(char *line) {
+bool doesContainLabel(char *line, String *result) {
     int brace_index;
-    int col_index = _indexOfChar(line, ':');
+    int col_index = indexOfChar(line, ':');
     /* : must appear outside of a string or char value and in the beginning of the sentence */
-    brace_index = min(_indexOfChar(line, '\''), _indexOfChar(line, '"'));
+    brace_index = min(indexOfChar(line, '\''), indexOfChar(line, '"'));
 
-    /* todo add validation on label text */
-//    isAlphaWord(line, col_index)
+    result->content = line;
+    result->size = col_index;
 
     return col_index > 0 && col_index < brace_index;
 }
 
-int _tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args,
-                     ValidateArgumentFunction validator) {
-    int current_args_amount = 0;
-    /* todo check if line is still valid */
-    if (line == NULL) {
-        return 2; /* line is out of buffer */
-    }
-    args = createStringList();
 
-    while (line != NULL) {
-        char *next_string = readNextString(&line, ',');
-        if (next_string == NULL) {
-            break;
-        }
-        /* maybe we should stop here ?? */
-        if (current_args_amount > expectedAmount) {
-            log_error("too many args detected");
-            return 3;
-        }
-        if (type == NUMERIC_TYPE) {
-            char *endptr;
-            if (!validator(next_string)) {
-                return 1;
-            }
-            strtol(next_string, &endptr, 10);
-            if (*endptr != '\0') {
-                /*...input is not a decimal number */
-                return 1;
-            } else {
-                addLast(args, next_string);
-            }
-        } else {
-            if (!validator(next_string)) {
-                return 1;
-            }
-            addLast(args, next_string);
-        }
-        free(next_string);
-        current_args_amount++;
-    }
-
-    return 0;
+void addArgument(Arguments *args, char arg[MAX_ARG_CHARS], int arg_index, int arg_size) {
+    duplicateStr(arg, (*args).args[arg_index], arg_size);
 }
 
-int tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args) {
+enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAmount, Arguments args,
+                                  ValidateArgumentFunction validator) {
+    String next_string;
+    char temp[81];
+
+    if (line == NULL) {
+        return PARSE_FAILURE; /* line is out of buffer */
+    }
+
+    while (line != NULL) {
+        next_string = readNextString(&line, ',', temp);
+
+        if (next_string.size == 0) {
+            break;
+        }
+
+        if (validator(temp)) {
+            addArgument(&args, next_string.content, args.args_count, next_string.size);
+        }
+
+        args.args_count++;
+    }
+
+    if (expectedAmount == SINGLE && args.args_count > 1) {
+        log_error("too many args detected");
+        return PARSE_FAILURE;
+    }
+
+    if (expectedAmount == PLURAL) {
+        if (args.args_count > 0) {
+            return PARSE_SUCCESS;
+        }
+        log_error("missing args detected");
+        return PARSE_FAILURE;
+    }
+    return PARSE_SUCCESS;
+}
+
+enum ParseResult
+tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, Arguments *args) {
     switch (type) {
         case NUMERIC_TYPE:
-            return _tryGetArguments(line, type, expectedAmount, args, isNumber) != 0;
+            return _tryGetArguments(line, expectedAmount, *args, isNumber) != 0;
         case DOUBLE_QUOTE_STRING:
-            return _tryGetArguments(line, type, expectedAmount, args, isQuotedString) != 0;
+            return _tryGetArguments(line, expectedAmount, *args, isQuotedString) != 0;
         case LABEL_TYPE:
-            return _tryGetArguments(line, type, expectedAmount, args, isLabelOrConstantString) != 0;
+            return _tryGetArguments(line, expectedAmount, *args, isLabelOrConstantString) != 0;
         case STRING_TYPE:
-            return _tryGetArguments(line, type, expectedAmount, args, getTrue) != 0;
+            return _tryGetArguments(line, expectedAmount, *args, getTrue) != 0;
     }
 }
 
 int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
-    char *temp;
+    char temp_buffer[81];
+    char *ptr = temp_buffer;
+    String temp_string;
     char *endptr;
     /* todo check if line is still valid */
     if (line == NULL) {
-        return 2; /* line is out of buffer */
+        log_error("missing constant definition %s", line);
+        return PARSE_FAILURE; /* line is out of buffer */
     }
-    argument->constant_id = readNextString(&line, '=');
+    temp_string = readNextString(&line, '=', temp_buffer);
 
-    if (argument->constant_id == NULL) {
+    skipWhitespaces(&ptr);
+
+    if (temp_string.size == 0) {
         log_error("invalid constant id %s\n", line);
-        return 2; /* todo invalid constant name or allocation */
+        return PARSE_FAILURE;
     }
+    if (!tryGetVariableString(temp_string.content, ptr)) {
+        log_error("invalid constant id syntax %s\n", line);
+        return PARSE_FAILURE;
+    }
+    argument->constant_id = allocatedDuplicateString(ptr);
+    if (argument->constant_id == NULL) {
+        return OUT_OF_MEMORY;
+    }
+
     /* todo: remove possible lines in the suffix and prefix of constant_id, raise error if there is a space between two words of it for exammple "SSS fff=" (invalid) "    SSSfff   " (valid) */
-    temp = readTillNewLine(&line);
+    readTillNewLine(&line, temp_buffer);
 
-    /* todo handle error deallocations */
-    if (temp == NULL) {
-        log_error("Out of memory");
-        return 3; /* OUT_OF_MEMORY */
+    if (temp_buffer[0] == '\0') {
+        log_error("missing constant value ");
+        return PARSE_FAILURE;
     }
 
-    argument->constant_value = strtol(temp, &endptr, 10);
+    argument->constant_value = strtol(temp_buffer, &endptr, 10);
     if (*endptr != '\0') {
         /*...input is not a decimal number */
         log_error("invalid numeric constant value %s\n", line);
-        free(temp);
         return 1;
     }
-
-    free(temp);
 
     return 0;
 }

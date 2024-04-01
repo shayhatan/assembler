@@ -5,102 +5,101 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+#include <ctype.h>
 #include "./parsers/parse_types.h"
 #include "labels_table.h"
 #include "./logs/logging_utils.h"
 #include "factory.h"
 #include "./parsers/parsers_utils.h"
+#include "first_run.h"
+#include "string_utils.h"
 
 bool errored;
 unsigned int IC = 0, DC = 0;
 
-enum ParseResult {
-    PARSE_FAILURE, SUCCESS
-};
-
-
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
-    char *temp;
-    List temp_args;
+    char temp_buffer[81];
+    String temp_string;
+    enum ParseResult status;
 
     result->lineNumber = lineNumber;
     result->isEOF = isEOF(line);
 
     /* stop only if this line is the EOF and its first char is the actual EOF */
     if (result->isEOF && *line == EOF) {
-        return SUCCESS;
+        return PARSE_SUCCESS;
     }
 
     /* empty line */
     if (strcmp("\n", line) == 0) {
         result->isEmpty = true;
-        return SUCCESS;
+        return PARSE_SUCCESS;
     }
 
     /* ignore comments */
     if (*line == ';') {
         result->isComment = true;
-        return SUCCESS;
+        return PARSE_SUCCESS;
     }
 
     skipWhitespaces(&line);
 
-    result->hasLabel = doesContainLabel(line);
-    if (result->hasLabel) {
-        result->label = getLabelValue(line);
+
+    if (doesContainLabel(line, &temp_string)) {
+        status = tryGetLabelValue(line, &result->label);
+        if (status > PARSE_SUCCESS) {
+            return status;
+        }
+
+        result->hasLabel = true;
         /* skip to the instruction following the label*/
         /* todo: after label empty line */
         line += strlen(result->label) + 1;
-        /* todo: validate that following the label exists a whitespace*/
+
+        if (!isspace(*line)) {
+            log_error("after a label at least one space must appear\n");
+        }
         skipWhitespaces(&line);
     }
 
-    temp = readNextString(&line, ' ');
-    if (temp == NULL) {
-        /* Out of memory */
-        log_error("out of memory");
-        /* todo: allocation error */
-        return PARSE_FAILURE;
-    }
-    if (strcmp(temp, "") == 0) {
+    temp_string = readNextString(&line, ' ', temp_buffer);
+
+    if (strcmp(temp_buffer, "") == 0) {
         /* either an empty line or an empty label */
-        return SUCCESS;
+        return PARSE_SUCCESS;
     }
 
     /* instruction line */
-    if (tryGetOpcode(temp, &result->opcode)) {
-        if (tryGetArguments(line, STRING_TYPE, PLURAL, result->arguments) != 0) {
+    if (tryGetOpcode(temp_buffer, &result->opcode)) {
+        if (tryGetArguments(line, STRING_TYPE, PLURAL, &result->arguments) != 0) {
             log_error("invalid string arguments %s\n", line);
         }
-        free(temp);
-        return SUCCESS;
+        return PARSE_SUCCESS;
     }
 
     /* directive or constant line */
-    if (tryGetDirectiveProps(temp, &result->directive_props)) {
-        enum ParseResult status = SUCCESS;
+    if (tryGetDirectiveProps(temp_buffer, &result->directive_props)) {
         /* todo handle failure status regarding out of memory */
         switch (result->directive_props) {
             case dot_data:
-                if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, result->arguments) != 0) {
+                if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, &result->arguments) != 0) {
                     log_error("invalid numeric arguments %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_string:
-                if (tryGetArguments(line, DOUBLE_QUOTE_STRING, SINGLE, result->arguments) != 0) {
+                if (tryGetArguments(line, DOUBLE_QUOTE_STRING, SINGLE, &result->arguments) != 0) {
                     log_error("invalid quoted string argument %s\n", line);
                 }
                 break;
             case dot_external:
-                if (tryGetArguments(line, LABEL_TYPE, PLURAL, result->arguments) !=
-                    0) {
+                if (tryGetArguments(line, LABEL_TYPE, PLURAL, &result->arguments) != 0) {
                     log_error("invalid label arguments %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_entry:
-                if (tryGetArguments(line, LABEL_TYPE, SINGLE, result->arguments) !=
+                if (tryGetArguments(line, LABEL_TYPE, SINGLE, &result->arguments) !=
                     0) {
                     log_error("invalid label argument %s\n", line);
                     status = PARSE_FAILURE;
@@ -118,36 +117,47 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
                 }
                 break;
         }
-        free(temp);
         return status;
     }
 
     log_error(
             "invalid line definition %s, expected the next word to be an operation or directive but got %s instead",
-            line, temp);
-    free(temp);
+            line, temp_buffer);
     return PARSE_FAILURE;
 };
 
-void disposeLine(input_line *line) {
-
-    if (line->arguments != NULL) {
-        listDispose(line->arguments);
-    }
-
-    if (line->hasLabel)
-        free(line->label);
+void resetLine(input_line *line) {
+    line->label = NULL;
+    line->hasLabel = false;
 
     line->const_definition_arg.constant_id = NULL;
+
+    line->arguments.args_count = 0;
+
     line->const_definition_arg.constant_value = 0;
     line->isComment = false;
     line->isEOF = false;
     line->hasLabel = false;
-};
+}
 
+void disposeLine(input_line *line) {
+    if (line->hasLabel) {
+        free(line->label);
+        line->label = NULL;
+        line->hasLabel = false;
+    }
 
-enum analyze_status {
-    STOP, NEXT
+    if (line->const_definition_arg.constant_id != NULL) {
+        free(line->const_definition_arg.constant_id);
+        line->const_definition_arg.constant_id = NULL;
+    }
+
+    line->arguments.args_count = 0;
+
+    line->const_definition_arg.constant_value = 0;
+    line->isComment = false;
+    line->isEOF = false;
+    line->hasLabel = false;
 };
 
 static input_line currentLine;
@@ -160,7 +170,7 @@ void countStringWords(char *strPtr) {
     }
 }
 
-int countDataWords(unsigned int _, void *ptr) {
+int countDataWords(void *ptr) {
     entry *temp;
     char *strPtr = ptr;
     if (isNumber(strPtr)) {
@@ -181,13 +191,14 @@ int countDataWords(unsigned int _, void *ptr) {
 }
 
 enum analyze_status analyze_line(input_line line) {
+    int L;
     if (line.isEOF) {
         return STOP;
     }
 
     /* step 4 */
     if (line.directive_props & dot_define) {
-        addLabel(line.const_definition_arg.constant_id,
+        setLabel(line.const_definition_arg.constant_id,
                  createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true);
         return NEXT;
     }
@@ -196,22 +207,25 @@ enum analyze_status analyze_line(input_line line) {
     if (line.directive_props & (dot_data | dot_string) && line.hasLabel) {
         entry *addedEntry;
         /* step 8 */
-        if (addLabel(line.label, createEntry(DOT_DATA, (int) DC), true) != 0) {
+        if (setLabel(line.label, createEntry(DOT_DATA, (int) DC), true) != 0) {
             return NEXT;
         }
         /* step 9 (.string case) */
         /* increase DC according to arguments */
         if (line.directive_props & dot_string) {
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
-            countStringWords(getFirst(line.arguments)->value);
+            countStringWords(line.arguments.args[0]);
         }
         /* step 9 (.data case) */
         if (line.directive_props & dot_data) {
+            int index;
             incrementLabelWordsCounter(line.label);
             addedEntry = get_data(line.label);
-            if (!iterate(line.arguments, countDataWords)) {
-                DC += addedEntry->wordsCounter;
-                return NEXT;
+            for (index = 0; index < line.arguments.args_count; index++) {
+                if (!countDataWords(line.arguments.args[index])) {
+                    DC += addedEntry->wordsCounter;
+                    return NEXT;
+                }
             }
         }
 
@@ -223,7 +237,7 @@ enum analyze_status analyze_line(input_line line) {
 
     /* step 10, 11 */
     if (line.directive_props & dot_external) {
-        bulkAddExternalOperands(line.arguments, false);
+        bulkAddExternalOperands(&line.arguments, true);
         return NEXT;
     }
 
@@ -233,7 +247,7 @@ enum analyze_status analyze_line(input_line line) {
     }
 
     /* step 12 */
-    if (line.hasLabel && !addLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true)) {
+    if (line.hasLabel && !setLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true)) {
         return NEXT;
     }
 
@@ -244,28 +258,44 @@ enum analyze_status analyze_line(input_line line) {
     }
 
     /* steps 14, 15 */
-    IC += /* L */ getOperationWordsCounter(&line);
+    if (!tryGetOperationWordsCounter(&line, &L)) {
+        log_error("failed to get operand words");
+    }
+    IC += L;
 
     return NEXT;
 }
 
-int run(FILE *srcFile) {
+enum ParseResult run(FILE *srcFile) {
     char buffer[81];
-
     int index = 0;
-    while (fgets(buffer, 81, srcFile)) {
-        input_line line;
-        line.label = NULL;
 
+    labelsTableInit();
+
+    while (fgets(buffer, 81, srcFile) != 0) {
+        input_line line;
         enum ParseResult parse_result;
         bool shouldStop = false;
+
+        resetLine(&line);
+
         parse_result = parseLine(buffer, index++, &line);
 
-        if (parse_result == PARSE_FAILURE) {
-            log_error("Failed to parse line %d %s\n", index - 1, buffer);
-            continue;
+        switch (parse_result) {
+            case PARSE_FAILURE:
+                log_error("Failed to parse line %d %s\n", index - 1, buffer);
+                disposeLine(&line);
+                continue;
+            case OUT_OF_MEMORY:
+                log_error("gracefully clearing all allocations and shutting down\n");
+                disposeLine(&line);
+                labelsTableDispose();
+                return OUT_OF_MEMORY; /* complete bail out */
         }
+
+
         if (line.isComment || line.isEmpty) {
+            disposeLine(&line);
             continue;
         }
 
@@ -283,7 +313,7 @@ int run(FILE *srcFile) {
     }
 
     if (errored) {
-        return 1000; /* custom error code */
+        return PARSE_FAILURE; /* custom error code */
     }
 
     /*update all symbols with data classification to IC + 100 */

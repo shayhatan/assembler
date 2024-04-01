@@ -72,7 +72,7 @@ void addLast(List list, void *value) {
 }
 
 void *setNth(List list, unsigned int index, void *value) {
-    Node *nthNode = getNth(list, index);
+    Node *nthNode = listGetNth(list, index);
     void *currentData = nthNode->value;
     setNodeValue(nthNode, value);
     return currentData;
@@ -95,7 +95,7 @@ Node *getLast(List list) {
     return current;
 }
 
-Node *getNth(List list, unsigned int index) {
+Node *listGetNth(List list, unsigned int index) {
     Node *current = NULL;
     int currentIndex = 0;
     if (list == NULL || list->root == NULL) {
@@ -122,7 +122,7 @@ Node *search(List list, search_function callback, void *comparedData) {
 }
 
 void deleteNth(List list, unsigned int index) {
-    Node *nthNode = getNth(list, index);
+    Node *nthNode = listGetNth(list, index);
     deleteNode(list, nthNode);
 }
 

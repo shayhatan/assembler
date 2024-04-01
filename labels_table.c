@@ -40,19 +40,19 @@ void cleanMapKeyElements(MapKeyElement _) {
 int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     char *s1 = key1;
     char *s2 = key2;
-    return strcmp(s1, s2) == 0;
+    return strcmp(s1, s2);
 }
 
-void init() {
+void labelsTableInit() {
     labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                              compareKeyElements);
 }
 
-void disposeLabelsTable() {
+void labelsTableDispose() {
     mapDestroy(labels_table);
 }
 
-int addLabel(char *label, entry newEntry, bool create_only) {
+int setLabel(char *label, entry newEntry, bool create_only) {
     newEntry.wordsCounter = 0;
 
     if (create_only && mapContains(labels_table, label)) {
@@ -74,14 +74,12 @@ int incrementLabelWordsCounter(char *label) {
 }
 
 
-int bulkAddExternalOperands(List o, bool create_only) {
-    Node *current = getFirst(o);
-    while (current != NULL) {
-        Operand operand = current->value;
-        /* todo: we might be adding the same label multiple times, perhaps a List is more appropriate? */
-        addLabel(operand, createEntry(DOT_EXTERNAL, -1), create_only);
-        current = current->next;
+int bulkAddExternalOperands(Arguments *args_container, bool create_only) {
+    int index = 0;
+    for (; index < args_container->args_count; index++) {
+        setLabel(args_container->args[index], createEntry(DOT_EXTERNAL, -1), create_only);
     }
+    return true;
 }
 
 
