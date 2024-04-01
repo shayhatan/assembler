@@ -72,7 +72,7 @@ static int _indexOfChar(const char *str, char ch) {
     if (ptr != NULL) {
         return ptr - str; // Calculate the index by subtracting the pointers
     } else {
-        return -1; // Character not found
+        return INT_MAX; // Character not found
     }
 }
 
@@ -110,6 +110,8 @@ bool isQuotedString(char *word) {
     if (word == NULL) return false;
     if (*word != '\"') return false;
     if (*(word + strlen(word) - 1) != '\"') return false;
+
+    /* todo: validate no 3rd " in between the last and first */
 
     return true;
 }
@@ -160,34 +162,29 @@ char *readNextString(char **line, char delimiter) {
 
     int index_of_space = _indexOfChar(*line, delimiter);
     if (index_of_space > 0) {
-        *line += index_of_space;
-        return _strdupn(*line, index_of_space);
+        result = _strdupn(*line, index_of_space);
+        *line += index_of_space + 1;
+        return result;
     }
 
-    result = _strdupn(*line, _indexOfChar(*line, '\0'));
+    result = _strdupn(*line, _indexOfChar(*line, '\n'));
     *line = NULL;
 
     return result;
 }
 
-/* returns a dynamically allocated sub-string copy of n chars */
-char *getNextString(char **line, char delimiter) {
+char *readTillNewLine(char **line) {
     char *result;
 
-    if (line == NULL || *line == NULL) {
-        return NULL;
+    if (line == NULL || *line == NULL || **line == EOF) {
+        return strdup(""); /* empty string means no more words */
     }
 
-    int index_of_space = _indexOfChar(*line, delimiter);
-    if (index_of_space > 0) {
-        return _strdupn(*line, index_of_space);
-    }
-
-    result = _strdupn(*line, _indexOfChar(*line, '\0'));
+    result = _strdupn(*line, _indexOfChar(*line, '\n'));
+    *line = NULL;
 
     return result;
 }
-
 
 /* returns an enum flag */
 int getAllowedSourceOperandAddressingsByOpcode(enum opcode op) {
@@ -308,38 +305,40 @@ int getOperationWordsCounter(input_line *line) {
     }
 }
 
+/* todo fix this function */
 bool isEOF(char *ptr) {
-    while (ptr != NULL) {
-        if (*ptr == EOF) {
-            return true;
-        }
-        ptr++;
-    }
-    return false;
+    return *ptr == EOF;
+//    while (ptr != NULL) {
+//        if (*ptr == EOF) {
+//            return true;
+//        }
+//        ptr++;
+//    }
+//    return false;
 }
 
-enum opcode getOpcode(char *line) {
+int tryGetOpcode(char *word, enum opcode *result) {
     int i;
     for (i = 0; i < 16; i++) {
-        char *operation_ptr = strstr(line, OPERATIONS[i]);
-        if (operation_ptr != NULL) {
-            return i;
+        if (strcmp(word, OPERATIONS[i]) == 0) {
+            *result = i;
+            return true;
         }
     }
-    return -1; /* either -1 which means nothing detected, or a valid opcode */
+    return false; /* either -1 which means nothing detected, or a valid opcode */
 }
 
 
 /* collision (overlaps) are handled within first_run */
-enum DirectiveProps getDirectiveProps(char *line) {
+int tryGetDirectiveProps(char *word, enum DirectiveProps *result) {
     int i;
-    for (i = 0; i < 16; i++) {
-        char *operation_ptr = strstr(line, OPERATIONS[i]);
-        if (operation_ptr != NULL) {
-            return (int) pow(2, i);
+    for (i = 0; i < 5; i++) {
+        if (strcmp(word, DIRECTIVE_PROPS[i]) == 0) {
+            *result = (int) pow(2, i);
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 char *getLabelValue(char *line) {
@@ -360,6 +359,9 @@ bool doesContainLabel(char *line) {
     int col_index = _indexOfChar(line, ':');
     /* : must appear outside of a string or char value and in the beginning of the sentence */
     brace_index = min(_indexOfChar(line, '\''), _indexOfChar(line, '"'));
+
+    /* todo add validation on label text */
+//    isAlphaWord(line, col_index)
 
     return col_index > 0 && col_index < brace_index;
 }
@@ -431,7 +433,8 @@ int tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType 
     }
 }
 
-int tryGetAssignmentArgument(char *line, DefinitionArgument argument) {
+int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
+    char *temp;
     char *endptr;
     /* todo check if line is still valid */
     if (line == NULL) {
@@ -443,17 +446,31 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument argument) {
         log_error("invalid constant id %s\n", line);
         return 2; /* todo invalid constant name or allocation */
     }
+    /* todo: remove possible lines in the suffix and prefix of constant_id, raise error if there is a space between two words of it for exammple "SSS fff=" (invalid) "    SSSfff   " (valid) */
+    temp = readTillNewLine(&line);
 
-    /* skip to the constant value string */
-    line += strlen(argument->constant_id) + 1;
+    /* todo handle error deallocations */
+    if (temp == NULL) {
+        log_error("Out of memory");
+        return 3; /* OUT_OF_MEMORY */
+    }
 
-    argument->constant_value = strtol(line, &endptr, 10);
+    argument->constant_value = strtol(temp, &endptr, 10);
     if (*endptr != '\0') {
         /*...input is not a decimal number */
         log_error("invalid numeric constant value %s\n", line);
+        free(temp);
         return 1;
     }
 
+    free(temp);
 
     return 0;
+}
+
+void skipWhitespaces(char **line) {
+    if (line == NULL || *line == NULL) return;
+    while (isspace(**line)) {
+        (*line)++;
+    }
 }

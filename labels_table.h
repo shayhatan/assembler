@@ -9,7 +9,7 @@
 #include "parsers/parse_types.h"
 
 /* adds a new label */
-int addLabel(char *label, entry newEntry);
+int addLabel(char *label, entry newEntry, bool create_only);
 
 /* increments an existing label's words counter by 1 */
 int incrementLabelWordsCounter(char *label);

@@ -7,7 +7,7 @@
 
 #include <stdbool.h>
 #include "../words/consts.h"
-#include "data_structures/linked_list/list.h"
+#include "../data_structures/linked_list/list.h"
 
 enum Addressing {
     instant = 1,
@@ -26,13 +26,13 @@ typedef char *Operand;
 typedef struct {
     char *constant_id;
     int constant_value;
-} *DefinitionArgument;
+} DefinitionArgument;
 
 /* symbol properties (symbol-table metadata) */
-char *DOT_CODE = ".code";
-char *DOT_DATA = ".data";
-char *DOT_EXTERNAL = ".external";
-char *DOT_DEFINE = ".mdefine";
+#define DOT_CODE ".code"
+#define DOT_DATA ".data"
+#define DOT_EXTERNAL ".external"
+#define DOT_DEFINE ".mdefine"
 
 typedef struct {
     char *classification; /* symbol property */
@@ -56,6 +56,7 @@ typedef struct {
     enum opcode opcode;
     int lineNumber;
     bool isComment;
+    bool isEmpty;
 } input_line;
 
 enum SentenceType {

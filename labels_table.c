@@ -52,15 +52,15 @@ void disposeLabelsTable() {
     mapDestroy(labels_table);
 }
 
-int addLabel(char *label, entry newEntry) {
+int addLabel(char *label, entry newEntry, bool create_only) {
     newEntry.wordsCounter = 0;
 
-    if (mapContains(labels_table, label)) {
-        mapPut(labels_table, label, &newEntry);
-        return 0; /* success */
+    if (create_only && mapContains(labels_table, label)) {
+        log_error("Cannot add label, label %s already exists", label);
+        return 1; /* already exists */
     }
-    log_error("Cannot add label, label %s already exists", label);
-    return 1; /* already exists */
+    mapPut(labels_table, label, &newEntry);
+    return 0; /* success */
 }
 
 int incrementLabelWordsCounter(char *label) {

@@ -21,6 +21,7 @@ enum ParseResult {
 
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     char *temp;
+    List temp_args;
 
     result->lineNumber = lineNumber;
     result->isEOF = isEOF(line);
@@ -30,21 +31,28 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
         return SUCCESS;
     }
 
+    /* empty line */
+    if (strcmp("\n", line) == 0) {
+        result->isEmpty = true;
+        return SUCCESS;
+    }
+
     /* ignore comments */
     if (*line == ';') {
         result->isComment = true;
         return SUCCESS;
     }
 
+    skipWhitespaces(&line);
+
     result->hasLabel = doesContainLabel(line);
     if (result->hasLabel) {
         result->label = getLabelValue(line);
-    }
-
-    if (result->label != NULL) {
         /* skip to the instruction following the label*/
         /* todo: after label empty line */
-        line += strlen(result->label + 1);
+        line += strlen(result->label) + 1;
+        /* todo: validate that following the label exists a whitespace*/
+        skipWhitespaces(&line);
     }
 
     temp = readNextString(&line, ' ');
@@ -60,8 +68,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     }
 
     /* instruction line */
-    result->opcode = getOpcode(temp);
-    if (result->opcode >= 0) {
+    if (tryGetOpcode(temp, &result->opcode)) {
         if (tryGetArguments(line, STRING_TYPE, PLURAL, result->arguments->strings) != 0) {
             log_error("invalid string arguments %s\n", line);
         }
@@ -70,8 +77,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     }
 
     /* directive or constant line */
-    result->directive_props = getDirectiveProps(temp);
-    if (result->directive_props > 0) {
+    if (tryGetDirectiveProps(temp, &result->directive_props)) {
         enum ParseResult status = SUCCESS;
         /* todo handle failure status regarding out of memory */
         switch (result->directive_props) {
@@ -105,8 +111,9 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
                 if (result->hasLabel) {
                     log_error("didn't expect constant definition after a label %s\n", line);
                     status = PARSE_FAILURE;
+                    break;
                 }
-                if (tryGetAssignmentArgument(line, result->const_definition_arg) != 0) {
+                if (tryGetAssignmentArgument(line, &result->const_definition_arg) != 0) {
                     status = PARSE_FAILURE;
                 }
                 break;
@@ -131,8 +138,14 @@ void disposeLine(input_line *line) {
         free(line->arguments);
     }
 
-    if (line->label != NULL)
+    if (line->hasLabel)
         free(line->label);
+
+    line->const_definition_arg.constant_id = NULL;
+    line->const_definition_arg.constant_value = 0;
+    line->isComment = false;
+    line->isEOF = false;
+    line->hasLabel = false;
 };
 
 
@@ -156,8 +169,8 @@ enum analyze_status analyze_line(input_line line) {
     }
 
     if (line.directive_props & dot_define) {
-        addLabel(line.const_definition_arg->constant_id,
-                 createEntry(DOT_DEFINE, line.const_definition_arg->constant_value));
+        addLabel(line.const_definition_arg.constant_id,
+                 createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true);
         return NEXT;
     }
 
@@ -165,7 +178,7 @@ enum analyze_status analyze_line(input_line line) {
     if (line.directive_props & (dot_data | dot_string) && line.hasLabel) {
         entry *addedEntry;
         /* step 6 */
-        if (addLabel(line.label, createEntry(DOT_DATA, (int) DC)) != 0) {
+        if (addLabel(line.label, createEntry(DOT_DATA, (int) DC), true) != 0) {
             return NEXT;
         }
         /* increase DC according to arguments */
@@ -215,13 +228,20 @@ int run(FILE *srcFile) {
     int index = 0;
     while (fgets(buffer, 81, srcFile)) {
         input_line line;
+        line.label = NULL;
+
         enum ParseResult parse_result;
         bool shouldStop = false;
         parse_result = parseLine(buffer, index++, &line);
+
         if (parse_result == PARSE_FAILURE) {
             log_error("Failed to parse line %d %s\n", index - 1, buffer);
             continue;
         }
+        if (line.isComment || line.isEmpty) {
+            continue;
+        }
+
         switch (analyze_line(line)) {
             case NEXT:
                 break;

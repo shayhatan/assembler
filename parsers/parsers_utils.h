@@ -20,9 +20,9 @@ bool doesContainLabel(char *line);
 /* needs de-allocation after finalizing */
 char *getLabelValue(char *line);
 
-enum DirectiveProps getDirectiveProps(char *line);
+int tryGetDirectiveProps(char *word, enum DirectiveProps *result);
 
-enum opcode getOpcode(char *line);
+int tryGetOpcode(char *word, enum opcode *result);
 
 bool isEOF(char *line);
 
@@ -31,6 +31,8 @@ typedef bool (*ValidateArgumentFunction)(char *data);
 /* needs de-allocation after finalizing */
 int tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, List args);
 
-int tryGetAssignmentArgument(char *line, DefinitionArgument argument);
+int tryGetAssignmentArgument(char *line, DefinitionArgument *argument);
+
+void skipWhitespaces(char **line);
 
 #endif //ASSEMBLER_PARSERS_UTILS_H

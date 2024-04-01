@@ -6,11 +6,11 @@
 #include <string.h>
 #include <malloc.h>
 #include "./parsers/parse_types.h"
-#include "labels_table.h"
+#include "./labels_table.h"
 #include "./data_structures/linked_list/list.h"
-#include "logs/logging_utils.h"
-#include "factory.h"
-#include "parsers/parsers_utils.h"
+#include "./logs/logging_utils.h"
+#include "./factory.h"
+#include "./parsers/parsers_utils.h"
 
 enum ParseResult {
     PARSE_FAILURE, SUCCESS
