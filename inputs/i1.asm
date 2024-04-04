@@ -5,14 +5,11 @@ MAIN:
 
 LOOP:
     jmp L1
-    mcr m_mcr
     cmp r3, #sz
     bne END
-endmcr
 prn #-5
 mov STR[5], STR[2]
 sub r1, r4
-m_mcr
 
 L1:
     inc K
@@ -20,6 +17,22 @@ L1:
 
 END:
     hlt
+
+DAM: jrr 15
+
+TEST: mov r1
+TEST1: mov r1, r2
+
+TEST1: jmp r1, r2
+TEST2: jmp r1, r2
+
+.define r1=5
+.define r1
+
+.define len = fdsf
+mov 4, r1
+
+mov #4, r1
 
 .define len = 4
 STR: .string "abcdef"

@@ -23,7 +23,7 @@ char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "d
                       "rts", "hlt"};
 
 /* todo move to consts*/
-char *DIRECTIVE_PROPS[] = {".data", ".string", ".external", ".entry", ".define"};
+char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".entry", ".define"};
 
 
 bool isOpcode(char *word) {
@@ -233,7 +233,8 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
     int amountOfOperands = getAmountOfOperandsByOperation(line->opcode);
 
     if (line->arguments.args_count != amountOfOperands) {
-        log_error("Arguments count %d does not match expected amount of operands %d", amountOfOperands);
+        log_error("Arguments count %d does not match expected amount of operands %d\n", line->arguments.args_count,
+                  amountOfOperands);
         return PARSE_FAILURE;
     }
 
@@ -374,7 +375,6 @@ enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAm
         }
 
         if (validator(temp)) {
-//            duplicateStr(temp, temp, next_string.size);
             extractor(next_string.content, next_string.content);
             addArgument(args, next_string.content, args->args_count, next_string.size);
         } else {

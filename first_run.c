@@ -20,7 +20,7 @@ unsigned int IC = 0, DC = 0;
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     char temp_buffer[81];
     String temp_string;
-    enum ParseResult status;
+    enum ParseResult status = PARSE_SUCCESS;
 
     result->lineNumber = lineNumber;
     result->isEOF = isEOF(line);
@@ -66,7 +66,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 
     if (strcmp(temp_buffer, "") == 0) {
         /* either an empty line or an empty label */
-        return PARSE_SUCCESS;
+        return result->hasLabel ? PARSE_FAILURE : PARSE_SUCCESS;
     }
 
     /* instruction line */
@@ -121,8 +121,8 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     }
 
     log_error(
-            "invalid line definition %s, expected the next word to be an operation or directive but got %s instead\n",
-            line, temp_buffer);
+            "invalid line definition, expected the next word to be an operation or directive but got \"%s\" instead\n",
+            temp_buffer);
     return PARSE_FAILURE;
 };
 
@@ -253,13 +253,13 @@ enum analyze_status analyze_line(input_line line) {
 
     /* step 13 */
     if (line.opcode < 0 || line.opcode > 15) {
-        log_error("invalid operation %d", line.opcode);
+        log_error("invalid operation %d\n", (int) line.opcode);
         return NEXT;
     }
 
     /* steps 14, 15 */
     if (tryGetOperationWordsCounter(&line, &L) != PARSE_SUCCESS) {
-        log_error("failed to get operand words");
+        log_error("failed to get operand words\n");
     }
     IC += L;
 
@@ -278,6 +278,8 @@ enum ParseResult run(FILE *srcFile) {
         bool shouldStop = false;
 
         resetLine(&line);
+
+        setLogLineContext(index, buffer);
 
         parse_result = parseLine(buffer, index++, &line);
 

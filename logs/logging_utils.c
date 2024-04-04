@@ -9,13 +9,25 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "string_utils.h"
 
 extern bool errored;
+
+char prefix[81];
+int line;
+
+void setLogLineContext(int line_number, char *line_text) {
+    line = line_number;
+    duplicateStr(line_text, prefix, indexOfChar(line_text, '\n'));
+}
 
 void log_error(char *error_msg, ...) {
     char *s;
     va_list lst;
     va_start(lst, error_msg);
+
+    printf("[ERROR][line-%d] \"%s\" - failed by: ", line, prefix);
+
     while (*error_msg != '\0') {
         if (*error_msg != '%') {
             putchar(*error_msg);
@@ -25,7 +37,8 @@ void log_error(char *error_msg, ...) {
         error_msg++;
         switch (*error_msg) {
             case 'd':
-                putchar(va_arg(lst, int));
+//                putchar(va_arg(lst, int));
+                printf("%d", va_arg(lst, int));
                 break;
             case 's':
                 printf("%s", va_arg(lst, char*));
@@ -35,6 +48,7 @@ void log_error(char *error_msg, ...) {
                 putchar(va_arg(lst, int));
                 break;
         }
+        error_msg++;
     }
 }
 

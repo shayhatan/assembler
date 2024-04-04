@@ -9,7 +9,7 @@
 int main() {
     int run_result = -3; /* undefined */
 
-    FILE *source_file = fopen("C:\\Documents\\repos\\uni\\programming_lab\\assembler\\inputs\\i2.asm", "r");
+    FILE *source_file = fopen("C:\\Documents\\repos\\uni\\programming_lab\\assembler\\inputs\\i1.asm", "r");
     run_result = run(source_file);
 
     /* first run has finished successfully */
