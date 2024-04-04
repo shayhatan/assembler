@@ -52,15 +52,14 @@ void labelsTableDispose() {
     mapDestroy(labels_table);
 }
 
-int setLabel(char *label, entry newEntry, bool create_only) {
+MapResult setLabel(char *label, entry newEntry, bool create_only) {
     newEntry.wordsCounter = 0;
 
     if (create_only && mapContains(labels_table, label)) {
         log_error("Cannot add label, label %s already exists\n", label);
-        return 1; /* already exists */
+        return MAP_ITEM_ALREADY_EXISTS; /* already exists */
     }
-    mapPut(labels_table, label, &newEntry);
-    return 0; /* success */
+    return mapPut(labels_table, label, &newEntry);
 }
 
 int incrementLabelWordsCounter(char *label) {
@@ -74,10 +73,14 @@ int incrementLabelWordsCounter(char *label) {
 }
 
 
-int bulkAddExternalOperands(Arguments *args_container, bool create_only) {
+MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only) {
     int index = 0;
+    MapResult status = MAP_SUCCESS;
     for (; index < args_container->args_count; index++) {
-        setLabel(args_container->args[index], createEntry(DOT_EXTERNAL, -1), create_only);
+        status = setLabel(args_container->args[index], createEntry(DOT_EXTERNAL, -1), create_only);
+        if (status != MAP_SUCCESS) {
+            return status;
+        }
     }
     return true;
 }

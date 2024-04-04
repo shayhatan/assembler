@@ -192,14 +192,18 @@ int countDataWords(char *label, void *ptr) {
 
 enum analyze_status analyze_line(input_line line) {
     int L;
+    MapResult status = MAP_SUCCESS;
+
     if (line.isEOF) {
         return STOP;
     }
 
     /* step 4 */
     if (line.directive_props & dot_define) {
-        setLabel(line.const_definition_arg.constant_id,
-                 createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true);
+        if (setLabel(line.const_definition_arg.constant_id,
+                     createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true) == MAP_OUT_OF_MEMORY) {
+            return ANALYZE_OUT_OF_MEMORY;
+        }
         return NEXT;
     }
 
@@ -207,8 +211,9 @@ enum analyze_status analyze_line(input_line line) {
     if (line.directive_props & (dot_data | dot_string) && line.hasLabel) {
         entry *addedEntry;
         /* step 8 */
-        if (setLabel(line.label, createEntry(DOT_DATA, (int) DC), true) != 0) {
-            return NEXT;
+        status = setLabel(line.label, createEntry(DOT_DATA, (int) DC), true);
+        if (status != MAP_SUCCESS) {
+            return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
         }
         /* step 9 (.string case) */
         /* increase DC according to arguments */
@@ -237,8 +242,8 @@ enum analyze_status analyze_line(input_line line) {
 
     /* step 10, 11 */
     if (line.directive_props & dot_external) {
-        bulkAddExternalOperands(&line.arguments, true);
-        return NEXT;
+        status = bulkAddExternalOperands(&line.arguments, true);
+        return status != MAP_OUT_OF_MEMORY ? NEXT : ANALYZE_OUT_OF_MEMORY;
     }
 
     /* step 10 (.entry) */
@@ -247,8 +252,11 @@ enum analyze_status analyze_line(input_line line) {
     }
 
     /* step 12 */
-    if (line.hasLabel && setLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true) != 0) {
-        return NEXT;
+    if (line.hasLabel) {
+        status = setLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true);
+        if (status != MAP_SUCCESS) {
+            return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
+        }
     }
 
     /* step 13 */
@@ -306,6 +314,10 @@ enum ParseResult run(FILE *srcFile) {
                 break;
             case STOP:
                 shouldStop = true;
+                break;
+            case ANALYZE_OUT_OF_MEMORY:
+                shouldStop = true;
+                log_error("Out of memory!\n");
                 break;
         }
         disposeLine(&line);

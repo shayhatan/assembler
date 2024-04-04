@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <minmax.h>
 #include "string_utils.h"
 
 extern bool errored;
@@ -17,8 +18,9 @@ char prefix[81];
 int line;
 
 void setLogLineContext(int line_number, char *line_text) {
+    int index = min(indexOfChar(line_text, '\n'), indexOfChar(line_text, '\0'));
     line = line_number;
-    duplicateStr(line_text, prefix, indexOfChar(line_text, '\n'));
+    duplicateStr(line_text, prefix, index);
 }
 
 void log_error(char *error_msg, ...) {

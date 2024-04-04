@@ -7,6 +7,7 @@
 
 #include "data_structures/linked_list/list.h"
 #include "parsers/parse_types.h"
+#include "map.h"
 
 /**
  * allocates a map
@@ -19,14 +20,14 @@ void labelsTableInit();
 void labelsTableDispose();
 
 /* adds a new label */
-int setLabel(char *label, entry newEntry, bool create_only);
+MapResult setLabel(char *label, entry newEntry, bool create_only);
 
 /* increments an existing label's words counter by 1 */
 int incrementLabelWordsCounter(char *label);
 
 int updateDataLabels(unsigned int IC);
 
-int bulkAddExternalOperands(Arguments *args_container, bool create_only);
+MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only);
 
 entry *get_data(char *label);
 

@@ -13,7 +13,7 @@
 #include "./parsers/parsers_utils.h"
 
 enum analyze_status {
-    STOP, NEXT
+    STOP, NEXT, ANALYZE_OUT_OF_MEMORY
 };
 
 

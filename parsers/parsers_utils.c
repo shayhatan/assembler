@@ -200,7 +200,7 @@ enum Destination {
 
 bool isAddressingValid(enum Addressing operandsAddressing, enum opcode opcode, enum Destination destination) {
     if (operandsAddressing == -1) {
-        log_error("Invalid addressing, operands%s, doesn't have a defined addressing", operandsAddressing);
+        log_error("Invalid addressing\n");
         return false;
     }
 
@@ -208,7 +208,7 @@ bool isAddressingValid(enum Addressing operandsAddressing, enum opcode opcode, e
     switch (destination) {
         case source:
             if (!(operandsAddressing & getAllowedSourceOperandAddressingsByOpcode(opcode))) {
-                log_error("Invalid addressing, operand %s, is not allowed for opcode %d as source addressing",
+                log_error("Invalid addressing, operand %d, is not allowed for opcode %d as source addressing\n",
                           operandsAddressing, opcode);
                 return false;
             }
