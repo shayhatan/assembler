@@ -16,16 +16,14 @@
 
 const int TWO_OPERANDS_OPERATIONS[] = {mov, cmp, add, sub, lea};
 const int ONE_OPERAND_OPERATIONS[] = {not, clr, inc, dec, jmp, bne, red, prn, jsr};
-const int ZERO_OPERANDS_OPERATIONS[] = {rts, stop};
+const int ZERO_OPERANDS_OPERATIONS[] = {rts, hlt};
 
 /* todo move to consts*/
 char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
-                      "rts", "stop"};
+                      "rts", "hlt"};
 
-int OPERATIONS_LENGTHS[] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4};
 /* todo move to consts*/
 char *DIRECTIVE_PROPS[] = {".data", ".string", ".external", ".entry", ".define"};
-int DIRECTIVES_LENGTHS[] = {5, 6, 9, 6, 7};
 
 
 bool isOpcode(char *word) {
@@ -68,6 +66,15 @@ bool isInstantAddressing(Operand operand) {
 
 bool isValidVariableString(char *word) {
     return !isRegisterAddressing(word) && !isOpcode(word) && isAlphaNumeric(word) && !isDirective(word);
+}
+
+bool isConstantIndexString(Operand operand) {
+    char arrName[MAX_ARG_CHARS], indexStr[MAX_ARG_CHARS];
+    if (operand == NULL || *operand == '\0' || !isalpha(*operand)) return false;
+    if (sscanf(operand, "%[a-zA-Z0-9_] [%[^]]]", arrName, indexStr) != 2) {
+        return false;
+    }
+    return isAlphaNumeric(arrName) && (isAlphaNumeric(indexStr) || isNumber(indexStr));
 }
 
 
@@ -132,13 +139,14 @@ void readTillNewLine(char **line, char buffer[81]) {
 /* returns an enum flag */
 int getAllowedSourceOperandAddressingsByOpcode(enum opcode op) {
     if (op == lea) {
-        return direct;
+        return direct | constantIndex;
     }
     if (op == mov || op == cmp || op == add || op == sub) {
         return instant |
                direct |
-               indirectRegister |
-               directRegister; /* all addressings are valid */
+               //               indirectRegister |
+               directRegister |
+               constantIndex; /* all addressings are valid */
     }
     return 0; /* no source operand thus no addressings */
 }
@@ -148,23 +156,25 @@ int getAllowedTargetOperandAddressingsByOpcode(enum opcode op) {
     if (op == cmp || op == prn) {
         return instant |
                direct |
-               indirectRegister |
-               directRegister; /* all addressings are valid */
+               //               indirectRegister |
+               directRegister |
+               constantIndex; /* all addressings are valid */
     }
-    if (op == jsr) {
+    if (op == jsr || op == bne || op == jmp) {
         return direct |
-               indirectRegister;
+               directRegister;
     }
-    if (op == rts || op == stop) {
+    if (op == rts || op == hlt) {
         return 0; /* no target operand thus no addressings */
     }
     return direct |
-           indirectRegister |
+           //           indirectRegister |
+           constantIndex |
            directRegister;
 }
 
 int getAmountOfOperandsByOperation(enum opcode code) {
-    if (code < 5) {
+    if (code < 4 || code == lea) {
         return 2;
     }
     if (code < 14) {
@@ -177,8 +187,9 @@ int getAmountOfOperandsByOperation(enum opcode code) {
 enum Addressing getAddressingForOperand(Operand operand) {
     if (isInstantAddressing(operand)) return instant;
     if (isDirectAddressing(operand)) return direct;
-    if (isIndirectRegisterAddressing(operand)) return indirectRegister;
+//    if (isIndirectRegisterAddressing(operand)) return indirectRegister;
     if (isRegisterAddressing(operand)) return directRegister;
+    if (isConstantIndexString(operand)) return constantIndex;
 
     return -1;
 }
@@ -231,23 +242,36 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
             *words_counter = 1;
             return PARSE_SUCCESS;
         case 1:
-            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 1));
+            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 0));
             /* single operand operations always involve a target operand */
             if (!isAddressingValid(operandsAddressing[0], line->opcode, target)) {
                 return PARSE_FAILURE;
             }
             *words_counter = 1;
+            /* constant index addressing adds 2 extra words */
+            *words_counter += operandsAddressing[0] == constantIndex ? 2 : 1;
             return PARSE_SUCCESS;
         case 2:
-            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 1));
-            operandsAddressing[1] = getAddressingForOperand(getNthArgument(&line->arguments, 2));
+            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 0));
+            operandsAddressing[1] = getAddressingForOperand(getNthArgument(&line->arguments, 1));
             if (!isAddressingValid(operandsAddressing[0], line->opcode, source) ||
                 !isAddressingValid(operandsAddressing[1], line->opcode, target)) {
                 return PARSE_FAILURE;
             }
-            /* both addressings are valid, check if they are different */
-            /* yes --> we need 2 words, otherwise 1 word */
-            *words_counter = operandsAddressing[0] != operandsAddressing[1] ? 2 : 1;
+            *words_counter = 1;
+            if (operandsAddressing[0] == constantIndex) {
+                *words_counter += 2;
+                /* in case both are constant index we can't ever unify the extra words unlike other addressings */
+                *words_counter += operandsAddressing[1] == constantIndex ? 2 : 1;
+                return PARSE_SUCCESS;
+            }
+            /* src is not a constant index but target is -- we need 3 words to represent both */
+            if (operandsAddressing[1] == constantIndex) {
+                *words_counter += 3;
+                return PARSE_SUCCESS;
+            }
+            /* neither addressings are constant index unify if possible otherwise use 2 words */
+            *words_counter += operandsAddressing[0] == operandsAddressing[1] ? 1 : 2;
             return PARSE_SUCCESS;
         default:
             return PARSE_FAILURE; /* unreachable */
@@ -331,13 +355,15 @@ void addArgument(Arguments *args, char arg[MAX_ARG_CHARS], int arg_index, int ar
     duplicateStr(arg, (*args).args[arg_index], arg_size);
 }
 
-enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAmount, Arguments args,
-                                  ValidateArgumentFunction validator) {
+typedef void ((ExtractArgumentFunction)(char *, char *));
+
+enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAmount, Arguments *args,
+                                  ValidateArgumentFunction validator, ExtractArgumentFunction extractor) {
     String next_string;
     char temp[81];
 
     if (line == NULL) {
-        return PARSE_FAILURE; /* line is out of buffer */
+        return expectedAmount == ANY ? PARSE_SUCCESS : PARSE_FAILURE; /* line is out of buffer */
     }
 
     while (line != NULL) {
@@ -348,19 +374,24 @@ enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAm
         }
 
         if (validator(temp)) {
-            addArgument(&args, next_string.content, args.args_count, next_string.size);
+//            duplicateStr(temp, temp, next_string.size);
+            extractor(next_string.content, next_string.content);
+            addArgument(args, next_string.content, args->args_count, next_string.size);
+        } else {
+            log_error("argument %s doesn't match the expected format\n", temp);
+            return PARSE_FAILURE;
         }
 
-        args.args_count++;
+        args->args_count++;
     }
 
-    if (expectedAmount == SINGLE && args.args_count > 1) {
+    if (expectedAmount == SINGLE && args->args_count > 1) {
         log_error("too many args detected");
         return PARSE_FAILURE;
     }
 
     if (expectedAmount == PLURAL) {
-        if (args.args_count > 0) {
+        if (args->args_count > 0) {
             return PARSE_SUCCESS;
         }
         log_error("missing args detected");
@@ -369,17 +400,23 @@ enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAm
     return PARSE_SUCCESS;
 }
 
+void extractQuote(char *src, char *target) {
+    sscanf(src, "%*[\"]%[^\"\n]%*[\"]", target);
+}
+
+bool isIntegerOrVariableName(char *word) { return isNumber(word) || isValidVariableString(word); }
+
 enum ParseResult
 tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, Arguments *args) {
     switch (type) {
         case NUMERIC_TYPE:
-            return _tryGetArguments(line, expectedAmount, *args, isNumber) != 0;
+            return _tryGetArguments(line, expectedAmount, args, isIntegerOrVariableName, getStringBetweenSpaces) != 0;
         case DOUBLE_QUOTE_STRING:
-            return _tryGetArguments(line, expectedAmount, *args, isQuotedString) != 0;
+            return _tryGetArguments(line, expectedAmount, args, isQuotedString, extractQuote) != 0;
         case LABEL_TYPE:
-            return _tryGetArguments(line, expectedAmount, *args, isLabelOrConstantString) != 0;
+            return _tryGetArguments(line, expectedAmount, args, isLabelOrConstantString, getStringBetweenSpaces) != 0;
         case STRING_TYPE:
-            return _tryGetArguments(line, expectedAmount, *args, getTrue) != 0;
+            return _tryGetArguments(line, expectedAmount, args, getTrue, getStringBetweenSpaces) != 0;
     }
 }
 

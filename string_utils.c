@@ -2,6 +2,7 @@
 // Created by User on 01/04/2024.
 //
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -94,9 +95,27 @@ void strcpy_n(const char *src, char *target, int len) {
 }
 
 bool isNumber(char *word) {
-    char *endptr;
-    strtol(word, &endptr, 10);
-    return *endptr != '\0';
+    char *current = word;
+    bool hadTrailingSpaces = false;
+    if (word == NULL) return false;
+
+    while (isspace(*current)) current++;
+
+    if (*current == '-')
+        current++;
+
+    while (*current != '\0') {
+        if (isspace(*current)) {
+            hadTrailingSpaces = true;
+            current++;
+            continue;
+        }
+        if (!isdigit(*current)) return false;
+        if (hadTrailingSpaces) return false;
+        current++;
+    }
+
+    return true;
 }
 
 bool isQuotedString(char *word) {

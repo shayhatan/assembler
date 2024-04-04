@@ -56,7 +56,7 @@ int setLabel(char *label, entry newEntry, bool create_only) {
     newEntry.wordsCounter = 0;
 
     if (create_only && mapContains(labels_table, label)) {
-        log_error("Cannot add label, label %s already exists", label);
+        log_error("Cannot add label, label %s already exists\n", label);
         return 1; /* already exists */
     }
     mapPut(labels_table, label, &newEntry);
@@ -66,7 +66,7 @@ int setLabel(char *label, entry newEntry, bool create_only) {
 int incrementLabelWordsCounter(char *label) {
     entry *existingEntry = mapGet(labels_table, label);
     if (existingEntry == NULL) {
-        log_error("label %s does not exist", label);
+        log_error("label %s does not exist\n", label);
         return 1; /* argument out of range */;
     }
     existingEntry->wordsCounter += 1;
@@ -90,21 +90,17 @@ int updateDataLabels(unsigned int IC) {
     if (currentLabel == NULL) {
         return 0;
     }
-    currentEntry = mapGet(labels_table, currentLabel);
-    if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
-        currentEntry->wordsCounter += IC + 100;
-    }
-    free(currentLabel);
-    while (mapGetNext(labels_table) != NULL) {
-        currentLabel = mapGetNext(labels_table);
-        currentEntry = mapGet(labels_table, currentLabel);
-        if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
-            currentEntry->wordsCounter += IC + 100;
+    MAP_FOREACH(int *, iter, labels_table) {
+        if (iter == NULL) {
+            log_error("Out of memory\n");
+            return OUT_OF_MEMORY;
         }
-        free(currentLabel);
+        currentEntry = mapGet(labels_table, iter);
+        if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
+            currentEntry->value += ((int) IC) + 100;
+        }
+        free(iter);
     }
-
-    mapGetFirst(labels_table);
 
     return 1;
 }
@@ -119,20 +115,14 @@ void printLabelsTable() {
         printf("====================================\n");
         return;
     }
-    currentEntry = mapGet(labels_table, currentLabel);
     printf("Label\tValue\tClassification\tExtra Words\n");
-    printf("%s\t%d\t%s\t%d\n", currentLabel, currentEntry->value, currentEntry->classification,
-           currentEntry->wordsCounter);
-    free(currentLabel);
-    while (mapGetNext(labels_table) != NULL) {
-        currentLabel = mapGetNext(labels_table);
-        currentEntry = mapGet(labels_table, currentLabel);
-        printf("%s\t%d\t%s\t%d\n", currentLabel, currentEntry->value, currentEntry->classification,
-               currentEntry->wordsCounter);
-        free(currentLabel);
-    }
 
-    mapGetFirst(labels_table);
+    MAP_FOREACH(char*, iter, labels_table) {
+        currentEntry = mapGet(labels_table, iter);
+        printf("%s\t%d\t%s\t%d\n", (char *) iter, currentEntry->value, currentEntry->classification,
+               currentEntry->wordsCounter);
+        free(iter);
+    }
 
     printf("====================================\n");
 

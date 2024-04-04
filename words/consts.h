@@ -28,7 +28,7 @@ enum opcode {
     prn = 12,
     jsr = 13,
     rts = 14,
-    stop = 15
+    hlt = 15
 };
 
 #endif //ASSEMBLER_CONSTS_H

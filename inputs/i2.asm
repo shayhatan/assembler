@@ -12,8 +12,7 @@ LOOP: jmp L1,
 L1:     inc K
         bne LOOP
 
-END:    hlt
-
+END:   hlt
 .define len = 4
 STR: .string "abcdef"
 LIST: .data 6,-9,len

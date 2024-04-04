@@ -12,8 +12,9 @@
 enum Addressing {
     instant = 1,
     direct = 2,
-    indirectRegister = 4,
+//    indirectRegister = 4,
     directRegister = 8,
+    constantIndex = 16,
 };
 
 enum DirectiveProps {

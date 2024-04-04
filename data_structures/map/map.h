@@ -243,7 +243,8 @@ MapResult mapClear(Map map);
 * iterator needs to be deallocated (freed) each iteration
 */
 #define MAP_FOREACH(type, iterator, map) \
-    for(type iterator = (type) mapGetFirst(map) ; \
+    type iterator;\
+    for(iterator = (type) mapGetFirst(map) ; \
         iterator ;\
         iterator = mapGetNext(map))
 #endif //MMN14_MAP_H

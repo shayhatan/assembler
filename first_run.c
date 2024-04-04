@@ -71,7 +71,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 
     /* instruction line */
     if (tryGetOpcode(temp_buffer, &result->opcode)) {
-        if (tryGetArguments(line, STRING_TYPE, PLURAL, &result->arguments) != 0) {
+        if (tryGetArguments(line, STRING_TYPE, ANY, &result->arguments) != 0) {
             log_error("invalid string arguments %s\n", line);
         }
         return PARSE_SUCCESS;
@@ -121,7 +121,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     }
 
     log_error(
-            "invalid line definition %s, expected the next word to be an operation or directive but got %s instead",
+            "invalid line definition %s, expected the next word to be an operation or directive but got %s instead\n",
             line, temp_buffer);
     return PARSE_FAILURE;
 };
@@ -129,13 +129,12 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 void resetLine(input_line *line) {
     line->label = NULL;
     line->hasLabel = false;
-
+    line->directive_props = 0;
     line->const_definition_arg.constant_id = NULL;
-
     line->arguments.args_count = 0;
-
     line->const_definition_arg.constant_value = 0;
     line->isComment = false;
+    line->isEmpty = false;
     line->isEOF = false;
     line->hasLabel = false;
 }
@@ -160,21 +159,22 @@ void disposeLine(input_line *line) {
     line->hasLabel = false;
 };
 
-static input_line currentLine;
 
-void countStringWords(char *strPtr) {
-    while (strPtr != NULL) {
+void countStringWords(char *label, char *strPtr) {
+    while (*strPtr != '\0') {
         /* each character is one word */
-        incrementLabelWordsCounter(currentLine.label);
+        incrementLabelWordsCounter(label);
         strPtr++;
     }
+    /* also increment for '\0' */
+    incrementLabelWordsCounter(label);
 }
 
-int countDataWords(void *ptr) {
+int countDataWords(char *label, void *ptr) {
     entry *temp;
     char *strPtr = ptr;
     if (isNumber(strPtr)) {
-        incrementLabelWordsCounter(currentLine.label);
+        incrementLabelWordsCounter(label);
         return true;
     }
     temp = get_data(strPtr); /* in case we passed a symbol */
@@ -214,7 +214,7 @@ enum analyze_status analyze_line(input_line line) {
         /* increase DC according to arguments */
         if (line.directive_props & dot_string) {
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
-            countStringWords(line.arguments.args[0]);
+            countStringWords(line.label, line.arguments.args[0]);
         }
         /* step 9 (.data case) */
         if (line.directive_props & dot_data) {
@@ -222,7 +222,7 @@ enum analyze_status analyze_line(input_line line) {
             incrementLabelWordsCounter(line.label);
             addedEntry = get_data(line.label);
             for (index = 0; index < line.arguments.args_count; index++) {
-                if (!countDataWords(line.arguments.args[index])) {
+                if (!countDataWords(line.label, line.arguments.args[index])) {
                     DC += addedEntry->wordsCounter;
                     return NEXT;
                 }
@@ -247,7 +247,7 @@ enum analyze_status analyze_line(input_line line) {
     }
 
     /* step 12 */
-    if (line.hasLabel && !setLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true)) {
+    if (line.hasLabel && setLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true) != 0) {
         return NEXT;
     }
 
@@ -258,7 +258,7 @@ enum analyze_status analyze_line(input_line line) {
     }
 
     /* steps 14, 15 */
-    if (!tryGetOperationWordsCounter(&line, &L)) {
+    if (tryGetOperationWordsCounter(&line, &L) != PARSE_SUCCESS) {
         log_error("failed to get operand words");
     }
     IC += L;
