@@ -1,6 +1,7 @@
-//
-// Created by User on 20/03/2024.
-//
+/*
+ Created by User on 20/03/2024.
+*/
+
 
 #ifndef ASSEMBLER_PARSERS_UTILS_H
 #define ASSEMBLER_PARSERS_UTILS_H
@@ -37,4 +38,4 @@ void skipWhitespaces(char **line);
 
 void addArgument(Arguments *args, char arg[MAX_ARG_CHARS], int arg_index, int arg_size);
 
-#endif //ASSEMBLER_PARSERS_UTILS_H
+#endif /*ASSEMBLER_PARSERS_UTILS_H*/

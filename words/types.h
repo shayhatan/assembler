@@ -1,6 +1,6 @@
-//
-// Created by User on 28/02/2024.
-//
+/*
+ Created by User on 28/02/2024.
+*/
 
 #ifndef ASSEMBLER_TYPES_H
 #define ASSEMBLER_TYPES_H
@@ -41,4 +41,4 @@ typedef struct {
     List words;
 } instruction;
 
-#endif //ASSEMBLER_TYPES_H
+#endif /*ASSEMBLER_TYPES_H*/

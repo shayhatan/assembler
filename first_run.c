@@ -1,6 +1,6 @@
-//
-// Created by User on 17/03/2024.
-//
+/*
+ Created by User on 17/03/2024.
+*/
 
 #include <stdio.h>
 #include <malloc.h>

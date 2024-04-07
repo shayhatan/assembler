@@ -1,6 +1,7 @@
-//
-// Created by User on 17/03/2024.
-//
+/*
+ Created by User on 17/03/2024.
+*/
+
 
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,7 @@
 #include "logs/logging_utils.h"
 #include "data_structures/map/map.h"
 #include "factory.h"
+#include "string_utils.h"
 
 static Map labels_table;
 
@@ -17,6 +19,10 @@ static Map labels_table;
 MapDataElement copyElement(MapDataElement existing) {
     entry *clone = malloc(sizeof(entry));
     entry *existingEntry = existing;
+
+    if (clone == NULL || existing == NULL) {
+        return NULL;
+    }
     clone->classification = strdup(existingEntry->classification);
     clone->wordsCounter = existingEntry->wordsCounter;
     clone->value = existingEntry->value;
@@ -24,17 +30,21 @@ MapDataElement copyElement(MapDataElement existing) {
 }
 
 MapKeyElement copyKeyElement(MapKeyElement existing) {
-    return strdup((char *) existing);
+    char *existing_str = (char *) existing;
+    if (existing == NULL) return NULL;
+    return allocatedDuplicateString(existing_str);
 }
 
 /** Type of function for deallocating a data element of the map */
 void cleanMapDataElements(MapDataElement disposable) {
     entry *disposedEntry = disposable;
     free(disposedEntry->classification);
+    free(disposable);
 }
 
 /** Type of function for deallocating a key element of the map */
-void cleanMapKeyElements(MapKeyElement _) {
+void cleanMapKeyElements(MapKeyElement key) {
+    free(key);
 }
 
 int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
@@ -44,6 +54,7 @@ int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
 }
 
 void labelsTableInit() {
+    if (labels_table != NULL) return;
     labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                              compareKeyElements);
 }
@@ -88,11 +99,6 @@ MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only) {
 
 int updateDataLabels(unsigned int IC) {
     entry *currentEntry;
-    char *currentLabel = mapGetFirst(labels_table);
-    /* no labels */
-    if (currentLabel == NULL) {
-        return 0;
-    }
     MAP_FOREACH(int *, iter, labels_table) {
         if (iter == NULL) {
             log_error("Out of memory\n");
@@ -105,25 +111,30 @@ int updateDataLabels(unsigned int IC) {
         free(iter);
     }
 
-    return 1;
+    return MAP_SUCCESS;
 }
 
 
 void printLabelsTable() {
-    entry *currentEntry;
+    entry *currentEntry = NULL;
+    if (labels_table == NULL) return;
     printf("============Labels table============\n");
-    char *currentLabel = mapGetFirst(labels_table);
-    /* no labels */
-    if (currentLabel == NULL) {
-        printf("====================================\n");
-        return;
-    }
     printf("Label\tValue\tClassification\tExtra Words\n");
-
     MAP_FOREACH(char*, iter, labels_table) {
+        if (iter == NULL) {
+            printf("====================================\n");
+            break;
+        }
         currentEntry = mapGet(labels_table, iter);
+        if (currentEntry == NULL) {
+            log_error("unreachable code had been reached");
+            free(iter);
+            return;
+        }
         printf("%s\t%d\t%s\t%d\n", (char *) iter, currentEntry->value, currentEntry->classification,
                currentEntry->wordsCounter);
+
+
         free(iter);
     }
 

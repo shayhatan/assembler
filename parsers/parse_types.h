@@ -1,18 +1,18 @@
-//
-// Created by User on 17/03/2024.
-//
+/*
+ Created by User on 17/03/2024.
+*/
+
 
 #ifndef ASSEMBLER_PARSERS_TYPES_H
 #define ASSEMBLER_PARSERS_TYPES_H
 
 #include <stdbool.h>
 #include "../words/consts.h"
-#include "../data_structures/linked_list/list.h"
 
 enum Addressing {
     instant = 1,
     direct = 2,
-//    indirectRegister = 4,
+/*  indirectRegister = 4, */
     directRegister = 8,
     constantIndex = 16,
 };
@@ -88,4 +88,4 @@ enum ArgumentsCountType {
 };
 
 
-#endif //ASSEMBLER_PARSERS_TYPES_H
+#endif /*ASSEMBLER_PARSERS_TYPES_H*/

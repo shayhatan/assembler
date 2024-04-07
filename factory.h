@@ -1,6 +1,7 @@
-//
-// Created by User on 20/03/2024.
-//
+/*
+ Created by User on 20/03/2024.
+*/
+
 
 
 #ifndef ASSEMBLER_FACTORY_H
@@ -11,9 +12,4 @@
 entry createEntry(char *classification, /* symbol property */
                   int value /* IC + 100 || DC */);
 
-
-List createIntegerList();
-
-List createStringList();
-
-#endif //ASSEMBLER_FACTORY_H
+#endif /*ASSEMBLER_FACTORY_H*/

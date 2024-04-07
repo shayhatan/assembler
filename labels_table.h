@@ -1,13 +1,13 @@
-//
-// Created by User on 17/03/2024.
-//
+/*
+ Created by User on 17/03/2024.
+*/
+
 
 #ifndef ASSEMBLER_LABELS_TABLE_H
 #define ASSEMBLER_LABELS_TABLE_H
 
-#include "data_structures/linked_list/list.h"
 #include "parsers/parse_types.h"
-#include "map.h"
+#include "data_structures/map/map.h"
 
 /**
  * allocates a map
@@ -33,4 +33,4 @@ entry *get_data(char *label);
 
 void printLabelsTable();
 
-#endif //ASSEMBLER_LABELS_TABLE_H
+#endif /*ASSEMBLER_LABELS_TABLE_H*/

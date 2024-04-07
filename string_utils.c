@@ -1,14 +1,16 @@
-//
-// Created by User on 01/04/2024.
-//
+/*
+ Created by User on 01/04/2024.
+*/
 
-#include <errno.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <minmax.h>
+#include <limits.h>
 #include "logs/logging_utils.h"
+
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 /* duplicate str without allocation */
 void duplicateStr(const char *original, char *target, int length) {
@@ -19,12 +21,20 @@ void duplicateStr(const char *original, char *target, int length) {
     target[i] = '\0';
 }
 
-char *allocatedDuplicateString(char *s1) {
-    char *s2 = strdup(s1);
-    if (s2 == NULL) {
+char *allocatedDuplicateString(char *str) {
+    if (str == NULL)
+        return NULL;
+
+    size_t len = strlen(str) + 1;
+    char *copy = (char *) malloc(len);
+    if (copy == NULL)
+        return NULL;
+
+    memcpy(copy, str, len);
+    if (copy == NULL) {
         log_error("Error: Unable to allocate memory.\n");
     }
-    return s2;
+    return copy;
 }
 
 bool isAlphaNumeric(char *word) {
@@ -63,9 +73,9 @@ bool isAlphaNumeric(char *word) {
 int indexOfChar(const char *str, char ch) {
     char *ptr = strchr(str, ch);
     if (ptr != NULL) {
-        return ptr - str; // Calculate the index by subtracting the pointers
+        return ptr - str; /* Calculate the index by subtracting the pointers */
     } else {
-        return INT_MAX; // Character not found
+        return INT_MAX; /* Character not found */
     }
 }
 

@@ -1,6 +1,7 @@
-//
-// Created by User on 20/03/2024.
-//
+/*
+ Created by User on 20/03/2024.
+*/
+
 
 
 #include <stdio.h>
@@ -8,11 +9,13 @@
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
-#include <minmax.h>
-#include "parsers/parse_types.h"
-#include "./logs/logging_utils.h"
+#include <limits.h>
+#include "./parse_types.h"
+#include "../logs/logging_utils.h"
 #include "./parsers_utils.h"
 #include "../string_utils.h"
+
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 const int TWO_OPERANDS_OPERATIONS[] = {mov, cmp, add, sub, lea};
 const int ONE_OPERAND_OPERATIONS[] = {not, clr, inc, dec, jmp, bne, red, prn, jsr};
@@ -144,7 +147,6 @@ int getAllowedSourceOperandAddressingsByOpcode(enum opcode op) {
     if (op == mov || op == cmp || op == add || op == sub) {
         return instant |
                direct |
-               //               indirectRegister |
                directRegister |
                constantIndex; /* all addressings are valid */
     }
@@ -156,7 +158,6 @@ int getAllowedTargetOperandAddressingsByOpcode(enum opcode op) {
     if (op == cmp || op == prn) {
         return instant |
                direct |
-               //               indirectRegister |
                directRegister |
                constantIndex; /* all addressings are valid */
     }
@@ -168,7 +169,6 @@ int getAllowedTargetOperandAddressingsByOpcode(enum opcode op) {
         return 0; /* no target operand thus no addressings */
     }
     return direct |
-           //           indirectRegister |
            constantIndex |
            directRegister;
 }
@@ -187,7 +187,6 @@ int getAmountOfOperandsByOperation(enum opcode code) {
 enum Addressing getAddressingForOperand(Operand operand) {
     if (isInstantAddressing(operand)) return instant;
     if (isDirectAddressing(operand)) return direct;
-//    if (isIndirectRegisterAddressing(operand)) return indirectRegister;
     if (isRegisterAddressing(operand)) return directRegister;
     if (isConstantIndexString(operand)) return constantIndex;
 
@@ -282,13 +281,13 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
 /* todo fix this function */
 bool isEOF(char *ptr) {
     return *ptr == EOF;
-//    while (ptr != NULL) {
-//        if (*ptr == EOF) {
-//            return true;
-//        }
-//        ptr++;
-//    }
-//    return false;
+/*    while (ptr != NULL) {
+        if (*ptr == EOF) {
+            return true;
+        }
+        ptr++;
+    }
+    return false;*/
 }
 
 int tryGetOpcode(char *word, enum opcode *result) {

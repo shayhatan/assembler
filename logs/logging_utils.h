@@ -1,6 +1,7 @@
-//
-// Created by User on 17/03/2024.
-//
+/*
+ Created by User on 17/03/2024.
+*/
+
 
 #ifndef ASSEMBLER_UTILS_LOGS_H
 #define ASSEMBLER_UTILS_LOGS_H
@@ -15,4 +16,4 @@ void setLogLineContext(int line_number, char *line_text);
 
 void log_error(char *error_msg, ...);
 
-#endif //ASSEMBLER_UTILS_LOGS_H
+#endif /*ASSEMBLER_UTILS_LOGS_H*/

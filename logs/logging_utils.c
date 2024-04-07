@@ -1,6 +1,8 @@
-//
-// Created by User on 17/03/2024.
-//
+
+/*
+ Created by User on 17/03/2024.
+*/
+
 
 #ifndef ASSEMBLER_UTILS_LOGS_H
 #define ASSEMBLER_UTILS_LOGS_H
@@ -9,8 +11,9 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <minmax.h>
-#include "string_utils.h"
+#include "../string_utils.h"
+
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 extern bool errored;
 
@@ -39,12 +42,12 @@ void log_error(char *error_msg, ...) {
         error_msg++;
         switch (*error_msg) {
             case 'd':
-//                putchar(va_arg(lst, int));
+                /*putchar(va_arg(lst, int));*/
                 printf("%d", va_arg(lst, int));
                 break;
             case 's':
                 printf("%s", va_arg(lst, char*));
-//                fputs(va_arg(lst, char *), stdout);
+                /*fputs(va_arg(lst, char *), stdout);*/
                 break;
             case 'c':
                 putchar(va_arg(lst, int));
@@ -52,6 +55,7 @@ void log_error(char *error_msg, ...) {
         }
         error_msg++;
     }
+    va_end(lst);
 }
 
-#endif //ASSEMBLER_UTILS_LOGS_H
+#endif /*ASSEMBLER_UTILS_LOGS_H*/

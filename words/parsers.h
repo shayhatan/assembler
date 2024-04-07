@@ -1,6 +1,7 @@
-//
-// Created by User on 28/02/2024.
-//
+/*
+ Created by User on 28/02/2024.
+*/
+
 
 #ifndef ASSEMBLER_PARSERS_H
 #define ASSEMBLER_PARSERS_H
@@ -19,4 +20,4 @@ word parseRegisterOperand();
 word parseConstantIndexOperand();
 
 
-#endif //ASSEMBLER_PARSERS_H
+#endif /*ASSEMBLER_PARSERS_H*/

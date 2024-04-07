@@ -1,6 +1,6 @@
-//
-// Created by shayh on 18/03/2024.
-//
+/*
+ Created by shayh on 18/03/2024.
+*/
 
 #ifndef MMN14_MAP_H
 #define MMN14_MAP_H
@@ -243,8 +243,8 @@ MapResult mapClear(Map map);
 * iterator needs to be deallocated (freed) each iteration
 */
 #define MAP_FOREACH(type, iterator, map) \
-    type iterator;\
+    type iterator = NULL;\
     for(iterator = (type) mapGetFirst(map) ; \
-        iterator ;\
+        iterator != NULL ;\
         iterator = mapGetNext(map))
-#endif //MMN14_MAP_H
+#endif /*MMN14_MAP_H*/
