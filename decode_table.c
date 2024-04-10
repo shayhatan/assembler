@@ -151,6 +151,26 @@ void base4ToEncrypted(char *base4, char *encrypted) {
     encrypted[i] = '\0'; // Add null terminator
 }
 
+void binaryToBase4(const char binary[], char base4[]) {
+    int binaryLength = strlen(binary);
+    int base4Index = 0;
+    int remainder = binaryLength % 2; // To handle cases with odd number of digits
+    int base4Digit = 0;
+
+    // Check if the binary length is odd and prepend a zero if necessary
+    if (remainder != 0) {
+        base4[base4Index++] = '0';
+    }
+    int i;
+    // Iterate over the binary string
+    for (i = remainder; i < binaryLength; i += 2) {
+        // Convert each pair of bits to base-4 digit
+        base4Digit = (binary[i] - '0') * 2 + (binary[i + 1] - '0');
+        base4[base4Index++] = base4Digit + '0'; // Convert to character and store
+    }
+    base4[base4Index] = '\0'; // Null-terminate the base4 string
+}
+
 /* need to add doc */
 MapResult wordUpdateDecode(int to_concat) {
     int *iter = mapGetFirst(words_map);
