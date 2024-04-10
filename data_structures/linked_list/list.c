@@ -6,10 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types.h"
-#include "utils.h"
+#include "list.h"
 
-void setNodeValue(node* node, void* value){
+void setNodeValue(Node *node, void *value) {
     if (node->value != NULL) {
         free(node->value);
     }
@@ -21,12 +20,12 @@ void setNodeValue(node* node, void* value){
     memcpy(node->value, value, sizeof(*value));
 }
 
-void addFirst(list *list, void *value) {
-    node *newNode = NULL;
+void addFirst(List list, void *value) {
+    Node *newNode = NULL;
     if (list == NULL) {
         return;
     }
-    newNode = (node *) malloc(sizeof(node));
+    newNode = (Node *) malloc(sizeof(Node));
     if (newNode == NULL) {
         printf("Out of memory");
         exit(0);
@@ -47,13 +46,13 @@ void addFirst(list *list, void *value) {
     list->root = newNode;
 }
 
-void addLast(list *list, void *value) {
-    node *newNode = NULL;
-    node *last = NULL;
+void addLast(List list, void *value) {
+    Node *newNode = NULL;
+    Node *last = NULL;
     if (list == NULL) {
         return;
     }
-    newNode = (node *) malloc(sizeof(node));
+    newNode = (Node *) malloc(sizeof(Node));
     if (newNode == NULL) {
         printf("Out of memory");
         exit(0);
@@ -72,32 +71,32 @@ void addLast(list *list, void *value) {
     newNode->previous = last;
 }
 
-void *setNth(list *list, unsigned int index, void *value) {
-    node *nthNode = getNth(list, index);
+void *setNth(List list, unsigned int index, void *value) {
+    Node *nthNode = listGetNth(list, index);
     void *currentData = nthNode->value;
     setNodeValue(nthNode, value);
     return currentData;
 }
 
-node *getFirst(list *list) {
+Node *getFirst(List list) {
     if (list == NULL) {
         return NULL;
     }
     return list->root;
 }
 
-node *getLast(list *list) {
-    node *current = NULL;
+Node *getLast(List list) {
+    Node *current = NULL;
     if (list == NULL || list->root == NULL) {
         return NULL;
     }
     current = list->root;
-    while (current->next != NULL) {current = current->next;}
+    while (current->next != NULL) { current = current->next; }
     return current;
 }
 
-node *getNth(list *list, unsigned int index) {
-    node *current = NULL;
+Node *listGetNth(List list, unsigned int index) {
+    Node *current = NULL;
     int currentIndex = 0;
     if (list == NULL || list->root == NULL) {
         return NULL;
@@ -114,20 +113,20 @@ node *getNth(list *list, unsigned int index) {
     return NULL;
 }
 
-node *search(list *list, search_function callback, void *comparedData) {
-    node *current = getFirst(list);
+Node *search(List list, search_function callback, void *comparedData) {
+    Node *current = getFirst(list);
     while (current && callback(current->value, comparedData) == false) {
         current = current->next;
     }
     return current;
 }
 
-void deleteNth(list *list, unsigned int index, delete_function callback) {
-    node *nthNode = getNth(list, index);
-    deleteNode(nthNode, callback);
+void deleteNth(List list, unsigned int index) {
+    Node *nthNode = listGetNth(list, index);
+    deleteNode(list, nthNode);
 }
 
-void deleteNode(node *node, delete_function callback) {
+void deleteNode(List list, Node *node) {
     if (!node) {
         return;
     }
@@ -138,41 +137,56 @@ void deleteNode(node *node, delete_function callback) {
         (node->next)->previous = node->previous;
     }
 
-    /* dispose of data */
-    callback(node->value);
+    /* listDispose of data */
+    list->freeElement(node->value);
     free(node->value);
     free(node);
 }
 
-void dispose(list **listPtr, delete_function callback) {
-    node *current;
-    node *next;
-    if (listPtr == NULL || *listPtr == NULL) return;
+void listDispose(List list) {
+    Node *current;
+    Node *next;
+    if (list == NULL) return;
 
-    current = (*listPtr)->root;
+    current = (list)->root;
     while (current != NULL) {
         next = current->next;
 
-        /* dispose of data */
-        callback(current->value);
+        /* listDispose of data */
+        list->freeElement(current->value);
         free(current->value);
         free(current);
 
         current = next;
     }
-    free(*listPtr);
+    free(list);
 }
 
-void iterate(list *list, iterator_function callback) {
+int iterate(List list, iterator_function callback) {
     unsigned int index = 0;
-    node *current = getFirst(list);
+    Node *current = getFirst(list);
     while (current != NULL) {
-        callback(index++, current->value);
+        if (!callback(index++, current->value)) {
+            return false;
+        }
         current = current->next;
     }
+    return true;
 }
 
-void init_list(list *list) {
-    list = (list*)malloc(sizeof(list));
-    list->root= NULL;
+int listLength(List list) {
+    int i = 0;
+    Node *current = getFirst(list);
+    while (current != NULL) {
+        current = current->next;
+        i++;
+    }
+    return i;
+}
+
+List listCreate(DeleteFn freeElement) {
+    List list = malloc(sizeof(*list));
+    list->root = NULL;
+    list->freeElement = freeElement;
+    return list;
 }
