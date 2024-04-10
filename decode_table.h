@@ -14,4 +14,6 @@ void wordsMapDispose();
 MapResult addWord(int address, word *word);
 void printWordsMap();
 
+MapResult wordUpdateDecode(int to_concat);
+
 #endif //ASSEMBLER_DECODE_TABLE_H

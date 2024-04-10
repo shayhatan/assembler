@@ -101,6 +101,30 @@ void base10ToBase2(int x, char *ptr) {
     }
 }
 
+/* need to add doc */
+MapResult wordUpdateDecode(int to_concat) {
+    int *iter = mapGetFirst(words_map);
+    int key;
+    word *current_word;
+    if (words_map == NULL) {
+        return MAP_NULL_ARGUMENT;
+    }
+
+    while (iter != NULL && *iter < 100) {
+        current_word = mapGet(words_map, iter);
+        key = *iter + to_concat;
+        mapPut(words_map, &key, current_word);
+        mapRemove(words_map, iter);
+        free(iter);
+        iter = mapGetFirst(words_map);
+    }
+
+    if(!iter)
+        free(iter);
+
+    return MAP_SUCCESS;
+}
+
 void printWordsMap() {
     int * iter;
     word *current_word;
