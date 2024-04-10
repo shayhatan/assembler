@@ -101,6 +101,31 @@ void base10ToBase2(int x, char *ptr) {
     }
 }
 
+void encryptedToBase4(char *encrypted, char *base4) {
+    int i;
+
+    for (i = 0; encrypted[i] != '\0'; i++) {
+        switch (encrypted[i]) {
+            case '*':
+                base4[i] = '0';
+                break;
+            case '#':
+                base4[i] = '1';
+                break;
+            case '%':
+                base4[i] = '2';
+                break;
+            case '!':
+                base4[i] = '3';
+                break;
+            default:
+                // If the input is invalid, keep it unchanged
+                base4[i] = encrypted[i];
+        }
+    }
+    base4[i] = '\0'; // Add null terminator
+}
+
 /* need to add doc */
 MapResult wordUpdateDecode(int to_concat) {
     int *iter = mapGetFirst(words_map);
