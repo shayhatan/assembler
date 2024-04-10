@@ -1,7 +1,7 @@
 /*
  Created by User on 09/04/2024.
 */
-#include "./parsers/parse_types.h"
+#include "./parse_types.h"
 
 #ifndef ASSEMBLER_LINE_UTILS_H
 #define ASSEMBLER_LINE_UTILS_H

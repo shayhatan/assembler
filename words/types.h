@@ -5,9 +5,6 @@
 #ifndef ASSEMBLER_TYPES_H
 #define ASSEMBLER_TYPES_H
 
-#include "../data_structures/linked_list/list.h"
-
-
 typedef struct {
     unsigned int decode: 2;
     unsigned int targetOperand: 2;
@@ -64,10 +61,5 @@ typedef union {
     /* used to translate the value whatever it may be, and print it, */
     int print: 15;
 } word;
-
-/* Encapsulates a parsed token (source word including all of its extra words_map in that order) */
-typedef struct {
-    List words;
-} instruction;
 
 #endif /*ASSEMBLER_TYPES_H*/

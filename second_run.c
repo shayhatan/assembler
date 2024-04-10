@@ -1,15 +1,16 @@
-//
-// Created by User on 17/03/2024.
-//
+/*
+ Created by User on 17/03/2024.
+*/
+
 
 #include <stdio.h>
-#include "parsers/parse_types.h"
-#include "logs/logging_utils.h"
-#include "parsers/line_utils.h"
 #include "labels_table.h"
-#include "decoders.h"
+#include "parsers/parse_types.h"
+#include "parsers/line_utils.h"
+#include "logs/logging_utils.h"
+#include "words/decoders.h"
 
-static int IC = 0, address = 100;
+static int address = 100;
 
 enum ParseResult analyzeLine(input_line *line) {
     MapResult status;
@@ -19,7 +20,7 @@ enum ParseResult analyzeLine(input_line *line) {
     }
 
     if (line->directive_props & dot_entry) {
-        status = setEntryLabel(line->label);
+        status = setEntryLabel(line->arguments.args[0]);
         if (status != MAP_SUCCESS) {
             log_error("Failed to set %s as entry label", line->label);
             return status == MAP_OUT_OF_MEMORY ? OUT_OF_MEMORY : PARSE_FAILURE;
@@ -41,6 +42,8 @@ enum ParseResult analyzeLine(input_line *line) {
         case MAP_OUT_OF_MEMORY:
             return OUT_OF_MEMORY;
     }
+
+    return PARSE_SUCCESS;
 }
 
 enum ParseResult secondRun(FILE *srcFile) {

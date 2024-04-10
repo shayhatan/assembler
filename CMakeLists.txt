@@ -9,8 +9,6 @@ include_directories(data_structures/map)
 include_directories(words)
 
 add_executable(assembler
-        data_structures/linked_list/list.c
-        data_structures/linked_list/list.h
         words/consts.h
         words/parsers.h
         words/types.h

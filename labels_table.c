@@ -109,6 +109,7 @@ int updateDataLabels(unsigned int IC) {
         if (strcmp(currentEntry->classification, DOT_DATA) == 0) {
             currentEntry->value += ((int) IC) + 100;
         }
+
         free(iter);
     }
 

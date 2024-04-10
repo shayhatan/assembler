@@ -1,6 +1,7 @@
-//
-// Created by shayh on 18/03/2024.
-//
+/*
+ Created by shayh on 18/03/2024.
+*/
+
 
 #ifndef MMN14_MACRO_H
 #define MMN14_MACRO_H
@@ -9,4 +10,4 @@ typedef struct macro {
     char *content;      /* Content stored in the node */
     int line;
 } Macro;
-#endif //MMN14_MACRO_H
+#endif /*MMN14_MACRO_H*/

@@ -20,4 +20,4 @@ typedef struct label {
 
 
 
-#endif //MMN14_LABEL_H
+#endif /*MMN14_LABEL_H*/

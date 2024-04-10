@@ -85,7 +85,7 @@ enum analyze_status analyze_line(input_line line) {
 
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
             countStringWords(line.label, line.arguments.args[0]);
-            status = decodeString(&temp, line.arguments);
+            status = decodeString(&temp, &line.arguments);
             if (status != MAP_SUCCESS) {
                 return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
             }
@@ -106,7 +106,7 @@ enum analyze_status analyze_line(input_line line) {
                     return NEXT;
                 }
             }
-            status = decodeData(&temp, line.arguments);
+            status = decodeData(&temp, &line.arguments);
             if (status != MAP_SUCCESS) {
                 return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
             }
@@ -210,5 +210,6 @@ enum ParseResult run(FILE *srcFile) {
 
     /*update all symbols with data classification to IC + 100 */
     updateDataLabels(IC);
-    return 0;
+    wordUpdateDecode((int)IC + 100);
+    return PARSE_SUCCESS;
 }

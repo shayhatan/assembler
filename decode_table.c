@@ -1,6 +1,6 @@
-//
-// Created by User on 08/04/2024.
-//
+/*
+ Created by User on 08/04/2024.
+*/
 
 #ifndef ASSEMBLER_DECODE_TABLE_H
 #define ASSEMBLER_DECODE_TABLE_H
@@ -58,9 +58,7 @@ static void cleanMapKeyElements(MapKeyElement key) {
 }
 
 static int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
-    int *x = key1;
-    int *y = key2;
-    return *x == *y ? 0 : 1;
+    return *(int*)key1 - *(int*)key2;
 }
 
 void wordsMapInit () {
@@ -89,13 +87,13 @@ void base10ToBase2(int x, char *ptr) {
 
     ptr[15] = '\0';
 
-    // If negative number, get two's complement
+    /*If negative number, get two's complement*/
     if (x < 0) {
-        x = 16384 + x; // 2^14 = 16384
+        x = 16384 + x; /*2^14 = 16384*/
     }
 
-    // Convert the integer to binary
-    for (i = 14; i >= 0; i--) {
+    /*Convert the integer to binary*/
+    for (i = 13; i >= 0; i--) {
         ptr[i] = (x & 1) ? '1' : '0';
         x >>= 1;
     }
@@ -119,11 +117,11 @@ void encryptedToBase4(char *encrypted, char *base4) {
                 base4[i] = '3';
                 break;
             default:
-                // If the input is invalid, keep it unchanged
+                /* If the input is invalid, keep it unchanged */
                 base4[i] = encrypted[i];
         }
     }
-    base4[i] = '\0'; // Add null terminator
+    base4[i] = '\0'; /* Add null terminator */
 }
 
 void base4ToEncrypted(char *base4, char *encrypted) {
@@ -144,53 +142,53 @@ void base4ToEncrypted(char *base4, char *encrypted) {
                 encrypted[i] = '!';
                 break;
             default:
-                // If the input is invalid, keep it unchanged
+                /* If the input is invalid, keep it unchanged */
                 encrypted[i] = base4[i];
         }
     }
-    encrypted[i] = '\0'; // Add null terminator
+    encrypted[i] = '\0'; /* Add null terminator */
 }
 
 void binaryToBase4(const char binary[], char base4[]) {
+    int i;
     int binaryLength = strlen(binary);
     int base4Index = 0;
-    int remainder = binaryLength % 2; // To handle cases with odd number of digits
+    int remainder = binaryLength % 2; /*To handle cases with odd number of digits*/
     int base4Digit = 0;
 
-    // Check if the binary length is odd and prepend a zero if necessary
+    /*Check if the binary length is odd and prepend a zero if necessary*/
     if (remainder != 0) {
         base4[base4Index++] = '0';
     }
-    int i;
-    // Iterate over the binary string
+    /* Iterate over the binary string */
     for (i = remainder; i < binaryLength; i += 2) {
-        // Convert each pair of bits to base-4 digit
+        /* Convert each pair of bits to base-4 digit */
         base4Digit = (binary[i] - '0') * 2 + (binary[i + 1] - '0');
-        base4[base4Index++] = base4Digit + '0'; // Convert to character and store
+        base4[base4Index++] = base4Digit + '0'; /* Convert to character and store */
     }
-    base4[base4Index] = '\0'; // Null-terminate the base4 string
+    base4[base4Index] = '\0'; /* Null-terminate the base4 string */
 }
 
 /* need to add doc */
-MapResult wordUpdateDecode(int to_concat) {
-    int *iter = mapGetFirst(words_map);
+MapResult wordUpdateDecode(int IC) {
+    int *iter;
     int key;
     word *current_word;
     if (words_map == NULL) {
         return MAP_NULL_ARGUMENT;
     }
+    iter = mapGetFirst(words_map);
 
     while (iter != NULL && *iter < 100) {
         current_word = mapGet(words_map, iter);
-        key = *iter + to_concat;
+        key = *iter + IC;
         mapPut(words_map, &key, current_word);
         mapRemove(words_map, iter);
         free(iter);
         iter = mapGetFirst(words_map);
     }
 
-    if(!iter)
-        free(iter);
+    if (iter != NULL)   free(iter);
 
     return MAP_SUCCESS;
 }
@@ -199,13 +197,21 @@ void printWordsMap() {
     int * iter;
     word *current_word;
     MAP_FOREACH(int *, iter, words_map) {
-        char buffer[15];
+        char base2_buffer[15];
+        char base4_buffer[15];
+        char encrypted_buffer[15];
 
         current_word = mapGet(words_map, iter);
-        base10ToBase2(current_word->print, buffer);
-        printf("%d\t%s\n", *iter, buffer);
+
+        base10ToBase2(current_word->print, base2_buffer);
+        binaryToBase4(base2_buffer, base4_buffer);
+        base4ToEncrypted(base4_buffer, encrypted_buffer);
+
+        printf("%04i\t%s\n", *iter, encrypted_buffer);
+
         free(iter);
     }
 }
 
-#endif //ASSEMBLER_DECODE_TABLE_H
+#endif /*ASSEMBLER_DECODE_TABLE_H*/
+

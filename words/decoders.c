@@ -1,14 +1,17 @@
-//
-// Created by User on 08/04/2024.
-//
+/*
+ Created by User on 08/04/2024.
+*/
+
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "types.h"
 #include "../parsers/parse_types.h"
 #include "../parsers/parsers_utils.h"
 #include "../labels_table.h"
 #include "../string_utils.h"
 #include "../decode_table.h"
+#include "decoders.h"
 
 
 typedef enum OperandType {
@@ -51,9 +54,12 @@ MapResult decodeAndAddCommand(int *address, Opcode code, char operands[2][MAX_AR
     cmd_word.cmd.decode=0;
     switch (length) {
         case 0:
+            cmd_word.cmd.sourceOperand = 0;
+            cmd_word.cmd.targetOperand = 0;
             break;
         case 1:
-            cmd_word.cmd.targetOperand = getAddressingForOperand(operands[1]);
+            cmd_word.cmd.targetOperand = getAddressingForOperand(operands[0]);
+            cmd_word.cmd.sourceOperand = 0;
             break;
         case 2:
             cmd_word.cmd.sourceOperand = getAddressingForOperand(operands[0]);
@@ -86,17 +92,17 @@ MapResult tryDecodeDirectOperand(Operand operand, word* word) {
         return MAP_ERROR;
     }
 
-    if (strcmp(label_entry->classification, RAW_DOT_DATA) == 0 || strcmp(label_entry->classification, RAW_DOT_STRING) == 0) {
+    if (strcmp(label_entry->classification, RAW_DOT_DATA) == 0 || strcmp(label_entry->classification, RAW_DOT_STRING) == 0 || strcmp(label_entry->classification, DOT_CODE) == 0) {
         /*if (label_entry->wordsCounter >1) {
             *//* error *//*
                     }*/
-        word->direct.decode = 2;
+        word->direct.decode = RELATIVE_DECODING;
         word->direct.value = label_entry->value;
         return MAP_SUCCESS;
     }
-    if (strcmp(label_entry->classification, RAW_DOT_EXTERN) == 0) {
-        word->direct.decode = 1;
-        word->direct.value = label_entry->value;
+    if (strcmp(label_entry->classification, DOT_EXTERNAL) == 0) {
+        word->direct.decode = EXTERNAL_DECODING;
+        word->direct.value = 0;
         return MAP_SUCCESS;
     }
 
@@ -122,7 +128,7 @@ MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
     }
 
     array_word.direct.value = label_entry->value;
-    array_word.direct.decode = strcmp(label_entry->classification, RAW_DOT_EXTERN) == 0 ? 2 : 1;
+    array_word.direct.decode = strcmp(label_entry->classification, RAW_DOT_EXTERN) == 0 ? EXTERNAL_DECODING : RELATIVE_DECODING;
 
     status = addWord(*address,&array_word);
     if (status != MAP_SUCCESS) {
@@ -153,10 +159,12 @@ MapResult tryDecodeDirectRegisterOperand(Operand operand, word* word, OperandTyp
 
     switch (type) {
         case SOURCE:
-            word->reg.sourceOperand=(unsigned int)*(operand+1);
+            word->reg.sourceOperand = (unsigned int)*(operand+1);
+            word->reg.targetOperand = 0;
             break;
         case TARGET:
-            word->reg.targetOperand=(unsigned int)*(operand+1);
+            word->reg.targetOperand = (unsigned int)*(operand+1);
+            word->reg.sourceOperand = 0;
             break;
     }
 
@@ -179,6 +187,8 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
             getAddressingFlagForOperand(operands[1]) == directRegister) {
         new_word.reg.sourceOperand=(unsigned int)*(operands[0]+1);
         new_word.reg.targetOperand=(unsigned int)*(operands[1]+1);
+        new_word.reg.unused = 0;
+        new_word.reg.decode = ABSOLUTE_DECODING;
         status = addWord((*address)++,&new_word);
         if (status != MAP_SUCCESS) {
             return status;
@@ -206,7 +216,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
                 status = tryDecodeDirectOperand(operands[i], &new_word);
                 break;
             case directRegister:
-                status = tryDecodeDirectRegisterOperand(operands[i], &new_word, length);
+                status = tryDecodeDirectRegisterOperand(operands[i], &new_word, type);
                 break;
             default:
                 return MAP_ERROR;
@@ -243,9 +253,9 @@ MapResult decodeData(int *address, Arguments *args) {
     return MAP_SUCCESS;
 }
 
-MapResult decodeString(int * address, Arguments args) {
+MapResult decodeString(int * address, Arguments *args) {
     word new_word;
-    char* ptr = args.args[0];
+    char* ptr = args->args[0];
     MapResult status = MAP_SUCCESS;
 
     while(*ptr != '\0') {

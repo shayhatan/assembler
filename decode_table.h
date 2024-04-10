@@ -1,6 +1,6 @@
-//
-// Created by User on 08/04/2024.
-//
+/*
+ Created by User on 08/04/2024.
+*/
 
 #ifndef ASSEMBLER_DECODE_TABLE_H
 #define ASSEMBLER_DECODE_TABLE_H
@@ -14,6 +14,6 @@ void wordsMapDispose();
 MapResult addWord(int address, word *word);
 void printWordsMap();
 
-MapResult wordUpdateDecode(int to_concat);
+MapResult wordUpdateDecode(int IC);
 
-#endif //ASSEMBLER_DECODE_TABLE_H
+#endif /*ASSEMBLER_DECODE_TABLE_H*/

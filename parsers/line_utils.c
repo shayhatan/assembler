@@ -2,15 +2,14 @@
  Created by User on 09/04/2024.
 */
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 #include <ctype.h>
-#include "./parsers/parse_types.h"
-#include "./logs/logging_utils.h"
-#include "./parsers/parsers_utils.h"
-#include "string_utils.h"
+#include <stdlib.h>
+#include "./parse_types.h"
+#include "./parsers_utils.h"
 #include "./line_utils.h"
-
+#include "../logs/logging_utils.h"
+#include "../string_utils.h"
 
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     char temp_buffer[81];
