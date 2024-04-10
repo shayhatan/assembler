@@ -14,7 +14,7 @@ enum Addressing {
     direct = 2,
 /*  indirectRegister = 4, */
     directRegister = 8,
-    constantIndex = 16,
+    constantIndex = 16
 };
 
 enum DirectiveProps {
@@ -35,6 +35,12 @@ typedef struct {
 #define DOT_EXTERNAL ".external"
 #define DOT_DEFINE ".mdefine"
 
+/* raw directives */
+#define RAW_DOT_STRING ".string"
+#define RAW_DOT_DATA ".data"
+#define RAW_DOT_EXTERN ".extern"
+
+
 enum ParseResult {
     PARSE_SUCCESS, PARSE_FAILURE, OUT_OF_MEMORY
 };
@@ -43,6 +49,7 @@ typedef struct {
     char *classification; /* symbol property */
     int value; /* IC + 100 || DC || constant value */
     unsigned int wordsCounter;
+    bool isEntry;
 } entry;
 
 
@@ -67,7 +74,7 @@ typedef struct {
     Arguments arguments;
     DefinitionArgument const_definition_arg;
     enum DirectiveProps directive_props;
-    enum opcode opcode;
+    enum Opcode opcode;
     int lineNumber;
     bool isComment;
     bool isEmpty;

@@ -1,3 +1,103 @@
 //
 // Created by User on 17/03/2024.
 //
+
+#include <stdio.h>
+#include "parsers/parse_types.h"
+#include "logs/logging_utils.h"
+#include "parsers/line_utils.h"
+#include "labels_table.h"
+#include "decoders.h"
+
+static int IC = 0, address = 100;
+
+enum ParseResult analyzeLine(input_line *line) {
+    MapResult status;
+    if (line->directive_props & (dot_data | dot_string | dot_external | dot_define))
+    {
+        return PARSE_SUCCESS;
+    }
+
+    if (line->directive_props & dot_entry) {
+        status = setEntryLabel(line->label);
+        if (status != MAP_SUCCESS) {
+            log_error("Failed to set %s as entry label", line->label);
+            return status == MAP_OUT_OF_MEMORY ? OUT_OF_MEMORY : PARSE_FAILURE;
+        }
+        return PARSE_SUCCESS;
+    }
+
+    status = decodeInstruction(&address, line->opcode, line->arguments.args, line->arguments.args_count);
+
+    switch (status) {
+
+        case MAP_SUCCESS:
+            return PARSE_SUCCESS;
+        case MAP_ERROR:
+        case MAP_NULL_ARGUMENT:
+        case MAP_ITEM_ALREADY_EXISTS:
+        case MAP_ITEM_DOES_NOT_EXIST:
+            return PARSE_FAILURE;
+        case MAP_OUT_OF_MEMORY:
+            return OUT_OF_MEMORY;
+    }
+}
+
+enum ParseResult secondRun(FILE *srcFile) {
+    char buffer[81];
+    int index = 0;
+
+    while (fgets(buffer, 81, srcFile) != 0) {
+        input_line line;
+        enum ParseResult parse_result;
+        bool shouldStop = false;
+
+        resetLine(&line);
+
+        setLogLineContext(index, buffer);
+
+        parse_result = parseLine(buffer, index++, &line);
+
+        switch (parse_result) {
+            case PARSE_FAILURE:
+                log_error("Failed to parse line %d %s\n", index - 1, buffer);
+                disposeLine(&line);
+                continue;
+            case OUT_OF_MEMORY:
+                log_error("gracefully clearing all allocations and shutting down\n");
+                disposeLine(&line);
+                labelsTableDispose();
+                return OUT_OF_MEMORY; /* complete bail out */
+            case PARSE_SUCCESS: /* do nothing */
+                break;
+        }
+
+
+        if (line.isComment || line.isEmpty) {
+            disposeLine(&line);
+            continue;
+        }
+
+        switch (analyzeLine(&line)) {
+            case PARSE_SUCCESS:
+                break;
+            case PARSE_FAILURE:
+                shouldStop = true;
+                break;
+            case OUT_OF_MEMORY:
+                shouldStop = true;
+                log_error("Out of memory!\n");
+                break;
+        }
+        disposeLine(&line);
+        if (shouldStop) {
+            break;
+        }
+    }
+
+    if (errored) {
+        return PARSE_FAILURE; /* custom error code */
+    }
+
+    return PARSE_SUCCESS;
+}

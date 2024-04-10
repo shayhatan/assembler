@@ -3,161 +3,22 @@
 */
 
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
-#include <ctype.h>
 #include "./parsers/parse_types.h"
-#include "labels_table.h"
+#include "./labels_table.h"
 #include "./logs/logging_utils.h"
-#include "factory.h"
+#include "./factory.h"
 #include "./parsers/parsers_utils.h"
-#include "first_run.h"
-#include "string_utils.h"
+#include "./first_run.h"
+#include "./string_utils.h"
+#include "./parsers/line_utils.h"
+#include "./decode_table.h"
+#include "./words/decoders.h"
+
 
 bool errored;
 unsigned int IC = 0, DC = 0;
 
-enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
-    char temp_buffer[81];
-    String temp_string;
-    enum ParseResult status = PARSE_SUCCESS;
-
-    result->lineNumber = lineNumber;
-    result->isEOF = isEOF(line);
-
-    /* stop only if this line is the EOF and its first char is the actual EOF */
-    if (result->isEOF && *line == EOF) {
-        return PARSE_SUCCESS;
-    }
-
-    /* empty line */
-    if (strcmp("\n", line) == 0) {
-        result->isEmpty = true;
-        return PARSE_SUCCESS;
-    }
-
-    /* ignore comments */
-    if (*line == ';') {
-        result->isComment = true;
-        return PARSE_SUCCESS;
-    }
-
-    skipWhitespaces(&line);
-
-
-    if (doesContainLabel(line, &temp_string)) {
-        status = tryGetLabelValue(line, &result->label);
-        if (status > PARSE_SUCCESS) {
-            return status;
-        }
-
-        result->hasLabel = true;
-        /* skip to the instruction following the label*/
-        /* todo: after label empty line */
-        line += strlen(result->label) + 1;
-
-        if (!isspace(*line)) {
-            log_error("after a label at least one space must appear\n");
-        }
-        skipWhitespaces(&line);
-    }
-
-    temp_string = readNextString(&line, ' ', temp_buffer);
-
-    if (strcmp(temp_buffer, "") == 0) {
-        /* either an empty line or an empty label */
-        return result->hasLabel ? PARSE_FAILURE : PARSE_SUCCESS;
-    }
-
-    /* instruction line */
-    if (tryGetOpcode(temp_buffer, &result->opcode)) {
-        if (tryGetArguments(line, STRING_TYPE, ANY, &result->arguments) != 0) {
-            log_error("invalid string arguments %s\n", line);
-        }
-        return PARSE_SUCCESS;
-    }
-
-    /* directive or constant line */
-    if (tryGetDirectiveProps(temp_buffer, &result->directive_props)) {
-        /* todo handle failure status regarding out of memory */
-        switch (result->directive_props) {
-            case dot_data:
-                if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, &result->arguments) != 0) {
-                    log_error("invalid numeric arguments %s\n", line);
-                    status = PARSE_FAILURE;
-                }
-                break;
-            case dot_string:
-                if (tryGetArguments(line, DOUBLE_QUOTE_STRING, SINGLE, &result->arguments) != 0) {
-                    log_error("invalid quoted string argument %s\n", line);
-                }
-                break;
-            case dot_external:
-                if (tryGetArguments(line, LABEL_TYPE, PLURAL, &result->arguments) != 0) {
-                    log_error("invalid label arguments %s\n", line);
-                    status = PARSE_FAILURE;
-                }
-                break;
-            case dot_entry:
-                if (tryGetArguments(line, LABEL_TYPE, SINGLE, &result->arguments) !=
-                    0) {
-                    log_error("invalid label argument %s\n", line);
-                    status = PARSE_FAILURE;
-                }
-                break;
-            case dot_define:
-                /* .define must not be under a label scope */
-                if (result->hasLabel) {
-                    log_error("didn't expect constant definition after a label %s\n", line);
-                    status = PARSE_FAILURE;
-                    break;
-                }
-                if (tryGetAssignmentArgument(line, &result->const_definition_arg) != 0) {
-                    status = PARSE_FAILURE;
-                }
-                break;
-        }
-        return status;
-    }
-
-    log_error(
-            "invalid line definition, expected the next word to be an operation or directive but got \"%s\" instead\n",
-            temp_buffer);
-    return PARSE_FAILURE;
-};
-
-void resetLine(input_line *line) {
-    line->label = NULL;
-    line->hasLabel = false;
-    line->directive_props = 0;
-    line->const_definition_arg.constant_id = NULL;
-    line->arguments.args_count = 0;
-    line->const_definition_arg.constant_value = 0;
-    line->isComment = false;
-    line->isEmpty = false;
-    line->isEOF = false;
-    line->hasLabel = false;
-}
-
-void disposeLine(input_line *line) {
-    if (line->hasLabel) {
-        free(line->label);
-        line->label = NULL;
-        line->hasLabel = false;
-    }
-
-    if (line->const_definition_arg.constant_id != NULL) {
-        free(line->const_definition_arg.constant_id);
-        line->const_definition_arg.constant_id = NULL;
-    }
-
-    line->arguments.args_count = 0;
-
-    line->const_definition_arg.constant_value = 0;
-    line->isComment = false;
-    line->isEOF = false;
-    line->hasLabel = false;
-};
 
 
 void countStringWords(char *label, char *strPtr) {
@@ -218,19 +79,36 @@ enum analyze_status analyze_line(input_line line) {
         /* step 9 (.string case) */
         /* increase DC according to arguments */
         if (line.directive_props & dot_string) {
+            int temp;
+            addedEntry = get_data(line.label);
+            temp = addedEntry->value;
+
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
             countStringWords(line.label, line.arguments.args[0]);
+            status = decodeString(&temp, line.arguments);
+            if (status != MAP_SUCCESS) {
+                return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
+            }
         }
         /* step 9 (.data case) */
         if (line.directive_props & dot_data) {
             int index;
+            int temp;
+
             incrementLabelWordsCounter(line.label);
             addedEntry = get_data(line.label);
+            temp = addedEntry->value;
+
             for (index = 0; index < line.arguments.args_count; index++) {
+
                 if (!countDataWords(line.label, line.arguments.args[index])) {
                     DC += addedEntry->wordsCounter;
                     return NEXT;
                 }
+            }
+            status = decodeData(&temp, line.arguments);
+            if (status != MAP_SUCCESS) {
+                return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
             }
         }
 
@@ -267,7 +145,7 @@ enum analyze_status analyze_line(input_line line) {
 
     /* steps 14, 15 */
     if (tryGetOperationWordsCounter(&line, &L) != PARSE_SUCCESS) {
-        log_error("failed to get operand words\n");
+        log_error("failed to get operand words_map\n");
     }
     IC += L;
 
@@ -277,8 +155,6 @@ enum analyze_status analyze_line(input_line line) {
 enum ParseResult run(FILE *srcFile) {
     char buffer[81];
     int index = 0;
-
-    labelsTableInit();
 
     while (fgets(buffer, 81, srcFile) != 0) {
         input_line line;
@@ -301,6 +177,8 @@ enum ParseResult run(FILE *srcFile) {
                 disposeLine(&line);
                 labelsTableDispose();
                 return OUT_OF_MEMORY; /* complete bail out */
+            case PARSE_SUCCESS: /* do nothing */
+                break;
         }
 
 

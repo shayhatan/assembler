@@ -8,11 +8,15 @@
 
 #include "./parse_types.h"
 
-bool isNumber(char *word);
+
+bool isInstantAddressing(Operand operand);
+bool isValidVariableString(char *word);
 
 String readNextString(char **line, char delimiter, char result_buffer[81]);
 
-enum Addressing getAddressingForOperand(Operand operand);
+enum Addressing getAddressingFlagForOperand(Operand operand);
+
+int getAddressingForOperand(Operand operand);
 
 enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter);
 
@@ -22,7 +26,7 @@ enum ParseResult tryGetLabelValue(char *line, char **result);
 
 int tryGetDirectiveProps(char *word, enum DirectiveProps *result);
 
-int tryGetOpcode(char *word, enum opcode *result);
+int tryGetOpcode(char *word, enum Opcode *result);
 
 bool isEOF(char *line);
 

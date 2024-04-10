@@ -27,7 +27,6 @@ void setLogLineContext(int line_number, char *line_text) {
 }
 
 void log_error(char *error_msg, ...) {
-    char *s;
     va_list lst;
     va_start(lst, error_msg);
 

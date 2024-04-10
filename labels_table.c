@@ -23,7 +23,7 @@ MapDataElement copyElement(MapDataElement existing) {
     if (clone == NULL || existing == NULL) {
         return NULL;
     }
-    clone->classification = strdup(existingEntry->classification);
+    clone->classification = allocatedDuplicateString(existingEntry->classification);
     clone->wordsCounter = existingEntry->wordsCounter;
     clone->value = existingEntry->value;
     return clone;
@@ -99,7 +99,8 @@ MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only) {
 
 int updateDataLabels(unsigned int IC) {
     entry *currentEntry;
-    MAP_FOREACH(int *, iter, labels_table) {
+    char* iter;
+    MAP_FOREACH(char *, iter, labels_table) {
         if (iter == NULL) {
             log_error("Out of memory\n");
             return OUT_OF_MEMORY;
@@ -117,6 +118,7 @@ int updateDataLabels(unsigned int IC) {
 
 void printLabelsTable() {
     entry *currentEntry = NULL;
+    char* iter;
     if (labels_table == NULL) return;
     printf("============Labels table============\n");
     printf("Label\tValue\tClassification\tExtra Words\n");
@@ -142,6 +144,42 @@ void printLabelsTable() {
 
 }
 
+enum MapResult_t setEntryLabel(char* label) {
+    entry *labelEntry = NULL;
+
+    if (labels_table == NULL) {
+        return MAP_ERROR;
+    }
+    if (label == NULL) {
+        return MAP_NULL_ARGUMENT;
+    }
+    if (!mapContains(labels_table,label)) {
+        return MAP_ITEM_DOES_NOT_EXIST;
+    }
+
+    labelEntry = mapGet(labels_table, label);
+    if (labelEntry == NULL) {
+        return MAP_ERROR; /* shouldn't be possible as we have just verified that the label does exist */
+    }
+
+    labelEntry->isEntry = true;
+
+    return MAP_SUCCESS;
+}
+
 entry *get_data(char *label) {
     return mapGet(labels_table, label);
+}
+
+MapResult getConstantByLabel(char* label, unsigned int* result) {
+    entry *constant_entry = NULL;
+    constant_entry =  mapGet(labels_table, label);
+    if (constant_entry == NULL) {
+        return MAP_ITEM_DOES_NOT_EXIST;
+    }
+    if (strcmp(constant_entry->classification, DOT_DEFINE) != 0) {
+        return MAP_ERROR;
+    }
+    *result = (unsigned) constant_entry->value;
+    return MAP_SUCCESS;
 }

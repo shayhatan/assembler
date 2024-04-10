@@ -59,11 +59,9 @@ bool isIndirectRegisterAddressing(Operand operand) {
 }
 
 bool isInstantAddressing(Operand operand) {
-    char *endPtr;
     if (operand[0] != '#') return false;
 
-    strtol(operand, &endPtr, 10);
-    return endPtr == operand || *endPtr != '\0';
+    return isNumber(operand+1) || isValidVariableString(operand+1);
 }
 
 
@@ -111,7 +109,7 @@ String readNextString(char **line, char delimiter, char result_buffer[81]) {
 
 
     if (line == NULL || *line == NULL || **line == EOF) {
-        return result; /* empty string means no more words */
+        return result; /* empty string means no more words_map */
     }
 
     result.size = indexOfChar(*line, delimiter);
@@ -140,7 +138,7 @@ void readTillNewLine(char **line, char buffer[81]) {
 }
 
 /* returns an enum flag */
-int getAllowedSourceOperandAddressingsByOpcode(enum opcode op) {
+int getAllowedSourceOperandAddressingsByOpcode(enum Opcode op) {
     if (op == lea) {
         return direct | constantIndex;
     }
@@ -154,7 +152,7 @@ int getAllowedSourceOperandAddressingsByOpcode(enum opcode op) {
 }
 
 /* returns an enum flag */
-int getAllowedTargetOperandAddressingsByOpcode(enum opcode op) {
+int getAllowedTargetOperandAddressingsByOpcode(enum Opcode op) {
     if (op == cmp || op == prn) {
         return instant |
                direct |
@@ -173,7 +171,7 @@ int getAllowedTargetOperandAddressingsByOpcode(enum opcode op) {
            directRegister;
 }
 
-int getAmountOfOperandsByOperation(enum opcode code) {
+int getAmountOfOperandsByOperation(enum Opcode code) {
     if (code < 4 || code == lea) {
         return 2;
     }
@@ -184,7 +182,7 @@ int getAmountOfOperandsByOperation(enum opcode code) {
 }
 
 
-enum Addressing getAddressingForOperand(Operand operand) {
+enum Addressing getAddressingFlagForOperand(Operand operand) {
     if (isInstantAddressing(operand)) return instant;
     if (isDirectAddressing(operand)) return direct;
     if (isRegisterAddressing(operand)) return directRegister;
@@ -193,11 +191,20 @@ enum Addressing getAddressingForOperand(Operand operand) {
     return -1;
 }
 
+int getAddressingForOperand(Operand operand) {
+    if (isInstantAddressing(operand)) return 0;
+    if (isDirectAddressing(operand)) return 1;
+    if (isConstantIndexString(operand)) return 2;
+    if (isRegisterAddressing(operand)) return 3;
+
+    return -1;
+}
+
 enum Destination {
     source, target
 };
 
-bool isAddressingValid(enum Addressing operandsAddressing, enum opcode opcode, enum Destination destination) {
+bool isAddressingValid(enum Addressing operandsAddressing, enum Opcode opcode, enum Destination destination) {
     if (operandsAddressing == -1) {
         log_error("Invalid addressing\n");
         return false;
@@ -207,14 +214,14 @@ bool isAddressingValid(enum Addressing operandsAddressing, enum opcode opcode, e
     switch (destination) {
         case source:
             if (!(operandsAddressing & getAllowedSourceOperandAddressingsByOpcode(opcode))) {
-                log_error("Invalid addressing, operand %d, is not allowed for opcode %d as source addressing\n",
+                log_error("Invalid addressing, operand %d, is not allowed for Opcode %d as source addressing\n",
                           operandsAddressing, opcode);
                 return false;
             }
             break;
         case target:
             if (!(operandsAddressing & getAllowedTargetOperandAddressingsByOpcode(opcode))) {
-                log_error("Invalid addressing, operand %s, is not allowed for opcode %d as target addressing",
+                log_error("Invalid addressing, operand %s, is not allowed for Opcode %d as target addressing",
                           operandsAddressing, opcode);
                 return false;
             }
@@ -242,18 +249,18 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
             *words_counter = 1;
             return PARSE_SUCCESS;
         case 1:
-            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 0));
+            operandsAddressing[0] = getAddressingFlagForOperand(getNthArgument(&line->arguments, 0));
             /* single operand operations always involve a target operand */
             if (!isAddressingValid(operandsAddressing[0], line->opcode, target)) {
                 return PARSE_FAILURE;
             }
             *words_counter = 1;
-            /* constant index addressing adds 2 extra words */
+            /* constant index addressing adds 2 extra words_map */
             *words_counter += operandsAddressing[0] == constantIndex ? 2 : 1;
             return PARSE_SUCCESS;
         case 2:
-            operandsAddressing[0] = getAddressingForOperand(getNthArgument(&line->arguments, 0));
-            operandsAddressing[1] = getAddressingForOperand(getNthArgument(&line->arguments, 1));
+            operandsAddressing[0] = getAddressingFlagForOperand(getNthArgument(&line->arguments, 0));
+            operandsAddressing[1] = getAddressingFlagForOperand(getNthArgument(&line->arguments, 1));
             if (!isAddressingValid(operandsAddressing[0], line->opcode, source) ||
                 !isAddressingValid(operandsAddressing[1], line->opcode, target)) {
                 return PARSE_FAILURE;
@@ -261,16 +268,16 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
             *words_counter = 1;
             if (operandsAddressing[0] == constantIndex) {
                 *words_counter += 2;
-                /* in case both are constant index we can't ever unify the extra words unlike other addressings */
+                /* in case both are constant index we can't ever unify the extra words_map unlike other addressings */
                 *words_counter += operandsAddressing[1] == constantIndex ? 2 : 1;
                 return PARSE_SUCCESS;
             }
-            /* src is not a constant index but target is -- we need 3 words to represent both */
+            /* src is not a constant index but target is -- we need 3 words_map to represent both */
             if (operandsAddressing[1] == constantIndex) {
                 *words_counter += 3;
                 return PARSE_SUCCESS;
             }
-            /* neither addressings are constant index unify if possible otherwise use 2 words */
+            /* neither addressings are constant index unify if possible otherwise use 2 words_map */
             *words_counter += operandsAddressing[0] == operandsAddressing[1] ? 1 : 2;
             return PARSE_SUCCESS;
         default:
@@ -290,7 +297,7 @@ bool isEOF(char *ptr) {
     return false;*/
 }
 
-int tryGetOpcode(char *word, enum opcode *result) {
+int tryGetOpcode(char *word, enum Opcode *result) {
     int i;
     for (i = 0; i < 16; i++) {
         if (strcmp(word, OPERATIONS[i]) == 0) {
@@ -298,7 +305,7 @@ int tryGetOpcode(char *word, enum opcode *result) {
             return true;
         }
     }
-    return false; /* either -1 which means nothing detected, or a valid opcode */
+    return false; /* either -1 which means nothing detected, or a valid Opcode */
 }
 
 
@@ -417,6 +424,7 @@ tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expe
         case STRING_TYPE:
             return _tryGetArguments(line, expectedAmount, args, getTrue, getStringBetweenSpaces) != 0;
     }
+    return PARSE_FAILURE;
 }
 
 int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
@@ -446,7 +454,7 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
         return OUT_OF_MEMORY;
     }
 
-    /* todo: remove possible lines in the suffix and prefix of constant_id, raise error if there is a space between two words of it for exammple "SSS fff=" (invalid) "    SSSfff   " (valid) */
+    /* todo: remove possible lines in the suffix and prefix of constant_id, raise error if there is a space between two words_map of it for exammple "SSS fff=" (invalid) "    SSSfff   " (valid) */
     readTillNewLine(&line, temp_buffer);
 
     if (temp_buffer[0] == '\0') {

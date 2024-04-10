@@ -24,6 +24,7 @@ void strcpy_n(const char *src, char *target, int len);
 int indexOfChar(const char *str, char ch);
 
 bool isNumber(char *word);
+bool tryGetNumber(char *word, int * number);
 
 bool isQuotedString(char *word);
 

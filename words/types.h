@@ -18,8 +18,13 @@ typedef struct {
 
 typedef struct {
     unsigned int decode: 2;
+    int value: 12;
+} InstantWord;
+
+typedef struct {
+    unsigned int decode: 2;
     unsigned int value: 12;
-} argument_word;
+} DirectWord;
 
 
 typedef struct {
@@ -30,13 +35,37 @@ typedef struct {
 } register_word;
 
 
+typedef struct {
+    /* first word */
+    DirectWord list_word;
+
+    /* second word */
+    InstantWord index_word;
+} ConstantIndex;
+
+typedef struct {
+    int value: 14;
+} DataWord;
+
+
 typedef union {
+    /* opcode */
     command_word cmd;
+
+    /* operands */
+    InstantWord instant;
+    DirectWord direct;
+    ConstantIndex constant_index;
     register_word reg;
-    argument_word arg;
+
+    /* data */
+    DataWord data;
+
+    /* used to translate the value whatever it may be, and print it, */
+    int print: 15;
 } word;
 
-/* Encapsulates a parsed token (source word including all of its extra words in that order) */
+/* Encapsulates a parsed token (source word including all of its extra words_map in that order) */
 typedef struct {
     List words;
 } instruction;

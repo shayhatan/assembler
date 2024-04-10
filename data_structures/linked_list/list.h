@@ -21,31 +21,40 @@ typedef struct {
     DeleteFn freeElement;
 } *List;
 
-void addFirst(List list, void *value);
 
-void addLast(List list, void *value);
+typedef enum ListResult {
+    LIST_SUCCESS,
+    LIST_OUT_OF_MEMORY,
+    LIST_ERROR,
+    LIST_NOT_INITIALIZED,
+    LIST_NULL_NODE
+} ListResult;
 
-void *setNth(List list, unsigned int index, void *value);
+enum ListResult listEnqueue(List list, void *value);
 
-Node *getFirst(List list);
+enum ListResult listPush(List list, void *value);
 
-Node *getLast(List list);
+enum ListResult listSetNth(List list, unsigned int index, void *value);
+
+Node *listGetFirst(List list);
+
+Node *listGetLast(List list);
 
 Node *listGetNth(List list, unsigned int index);
 
 typedef bool (*search_function)(void *, void *);
 
-Node *search(List list, search_function callback, void *comparedData);
+Node *listSearch(List list, search_function callback, void *comparedData);
 
-void deleteNth(List list, unsigned int index);
+enum ListResult listDeleteNth(List list, unsigned int index);
 
-void deleteNode(List list, Node *node);
+enum ListResult listDeleteNode(List list, Node *node);
 
-void listDispose(List list);
+enum ListResult listDispose(List list);
 
 typedef int (*iterator_function)(unsigned int index, void *);
 
-int iterate(List list, iterator_function callback);
+int listIterate(List list, iterator_function callback);
 
 int listLength(List list);
 

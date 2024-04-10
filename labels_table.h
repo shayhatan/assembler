@@ -22,7 +22,7 @@ void labelsTableDispose();
 /* adds a new label */
 MapResult setLabel(char *label, entry newEntry, bool create_only);
 
-/* increments an existing label's words counter by 1 */
+/* increments an existing label's words_map counter by 1 */
 int incrementLabelWordsCounter(char *label);
 
 int updateDataLabels(unsigned int IC);
@@ -32,5 +32,9 @@ MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only);
 entry *get_data(char *label);
 
 void printLabelsTable();
+
+MapResult setEntryLabel(char *label);
+
+MapResult getConstantByLabel(char* label, unsigned int* result);
 
 #endif /*ASSEMBLER_LABELS_TABLE_H*/

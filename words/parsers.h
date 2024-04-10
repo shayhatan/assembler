@@ -7,17 +7,21 @@
 #define ASSEMBLER_PARSERS_H
 
 #include "./types.h"
+#include "parsers/parse_types.h"
 
 /* Absolute == instant */
-word parseAbsoluteOperand();
+word decodeAbsoluteOperand();
 
-word parseDirectOperand();
+word decodeDirectOperand();
 
-word parseDirectRegisterOperand();
+word decodeDirectRegisterOperand();
 
-word parseRegisterOperand();
+word decodeRegisterOperand();
 
-word parseConstantIndexOperand();
+word decodeConstantIndexOperand();
+
+
+word decodeOperands(Operand operand[]);
 
 
 #endif /*ASSEMBLER_PARSERS_H*/

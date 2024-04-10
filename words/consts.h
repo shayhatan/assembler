@@ -13,7 +13,7 @@
 #define external = "10"
 
 /* instructions */
-enum opcode {
+typedef enum Opcode {
     mov = 0,
     cmp = 1,
     add = 2,
@@ -30,6 +30,6 @@ enum opcode {
     jsr = 13,
     rts = 14,
     hlt = 15
-};
+} Opcode;
 
 #endif /*ASSEMBLER_CONSTS_H*/

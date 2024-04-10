@@ -138,7 +138,7 @@ int mapGetSize(Map map);
 * considered in the map if one of the key elements in the map it determined equal
 * using the comparison function used to initialize the map.
 *
-* @param map - The map to search in
+* @param map - The map to listSearch in
 * @param element - The element to look for. Will be compared using the
 * 		comparison function.
 * @return
@@ -243,7 +243,6 @@ MapResult mapClear(Map map);
 * iterator needs to be deallocated (freed) each iteration
 */
 #define MAP_FOREACH(type, iterator, map) \
-    type iterator = NULL;\
     for(iterator = (type) mapGetFirst(map) ; \
         iterator != NULL ;\
         iterator = mapGetNext(map))
