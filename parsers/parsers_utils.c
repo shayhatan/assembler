@@ -133,7 +133,7 @@ void readTillNewLine(char **line, char buffer[81]) {
         return;
     }
 
-    duplicateStr(*line, buffer, indexOfChar(*line, '\n'));
+    duplicateStr(*line, buffer, min(indexOfChar(*line, '\n'), strlen(*line)));
     *line = NULL;
 }
 
@@ -431,7 +431,7 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     char temp_buffer[81];
     char *ptr = temp_buffer;
     String temp_string;
-    char *endptr;
+    char *endptr = NULL;
     /* todo check if line is still valid */
     if (line == NULL) {
         log_error("missing constant definition %s", line);
@@ -463,7 +463,7 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     }
 
     argument->constant_value = strtol(temp_buffer, &endptr, 10);
-    if (*endptr != '\0') {
+    if (endptr == temp_buffer) {
         /*...input is not a decimal number */
         log_error("invalid numeric constant value %s\n", line);
         return 1;

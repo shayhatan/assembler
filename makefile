@@ -1,7 +1,7 @@
 # Compiler
 CC = gcc
 # Compiler flags
-CFLAGS = -ansi -pedantic -Wall
+CFLAGS = -ansi -pedantic -Wall -g
 # Directories
 SRC_DIR = .
 OBJ_DIR = ./obj

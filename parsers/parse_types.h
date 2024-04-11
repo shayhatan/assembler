@@ -1,5 +1,5 @@
 /*
- Created by User on 17/03/2024.
+ parse_types.h
 */
 
 
@@ -39,7 +39,8 @@ typedef struct {
 #define RAW_DOT_STRING ".string"
 #define RAW_DOT_DATA ".data"
 #define RAW_DOT_EXTERN ".extern"
-
+#define MAX_ARG_CHARS 36
+#define MAX_ARGS 80
 
 enum ParseResult {
     PARSE_SUCCESS, PARSE_FAILURE, OUT_OF_MEMORY
@@ -58,8 +59,7 @@ typedef struct {
     int size;
 } String;
 
-#define MAX_ARG_CHARS 36
-#define MAX_ARGS 80
+
 
 typedef struct {
     /* given that a line size is capped at a certain size, we can limit the size of the arguments it may define, and thus avoid allocations */

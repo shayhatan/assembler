@@ -12,7 +12,8 @@
 int main() {
     int run_result = -3; /* undefined */
 
-    FILE *source_file = fopen("C:\\Documents\\repos\\uni\\programming_lab\\assembler\\inputs\\h1.asm", "r");
+    FILE *source_file = fopen("/mnt/c/Users/shayh/CLionProjects/untitled/assembler/inputs/h1.asm", "r");
+
     if (source_file == NULL) return -1;
 
     labelsTableInit();

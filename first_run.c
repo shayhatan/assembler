@@ -14,6 +14,7 @@
 #include "./parsers/line_utils.h"
 #include "./decode_table.h"
 #include "./words/decoders.h"
+#include <ctype.h>
 
 
 bool errored;
@@ -152,15 +153,43 @@ enum analyze_status analyze_line(input_line line) {
     return NEXT;
 }
 
+
+
+static void removeExcessSpaces(char *input) {
+    int i = 0, j = 0;
+    bool space_flag = false;
+    /* avoid use cases where it starts with space */
+    while (isspace(input[i])) {
+        ++i;
+    }
+
+    for (; input[i] != '\0'; i++) {
+
+        if (isspace(input[i])) {
+            space_flag = true;
+        } else {
+            if (space_flag && input[i] != ' ') {
+                input[j++] = ' ';
+                space_flag = false;
+
+            }
+            input[j++] = input[i];
+        }
+    }
+
+    input[j] = '\n';
+    input[j++] = '\0';
+}
+
 enum ParseResult run(FILE *srcFile) {
-    char buffer[81];
+    char buffer[81] = "";
     int index = 0;
 
     while (fgets(buffer, 81, srcFile) != 0) {
         input_line line;
         enum ParseResult parse_result;
         bool shouldStop = false;
-
+        removeExcessSpaces(buffer);
         resetLine(&line);
 
         setLogLineContext(index, buffer);
@@ -199,6 +228,7 @@ enum ParseResult run(FILE *srcFile) {
                 break;
         }
         disposeLine(&line);
+        memset(buffer, 0, sizeof(buffer)); /* clear buffer */
         if (shouldStop) {
             break;
         }
