@@ -431,8 +431,6 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     char temp_buffer[81];
     char *ptr = temp_buffer;
     String temp_string;
-    char *endptr = NULL;
-    /* todo check if line is still valid */
     if (line == NULL) {
         log_error("missing constant definition %s", line);
         return PARSE_FAILURE; /* line is out of buffer */
@@ -458,18 +456,17 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     readTillNewLine(&line, temp_buffer);
 
     if (temp_buffer[0] == '\0') {
-        log_error("missing constant value ");
+        log_error("missing constant value\n");
+        return PARSE_FAILURE;
+    }
+    
+    if (!tryGetNumber(temp_buffer, &argument->constant_value)) {
+        /*...input is not a decimal number */
+        log_error("invalid numeric constant value %s\n", line);
         return PARSE_FAILURE;
     }
 
-    argument->constant_value = strtol(temp_buffer, &endptr, 10);
-    if (endptr == temp_buffer) {
-        /*...input is not a decimal number */
-        log_error("invalid numeric constant value %s\n", line);
-        return 1;
-    }
-
-    return 0;
+    return PARSE_SUCCESS;
 }
 
 void skipWhitespaces(char **line) {

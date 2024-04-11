@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <stdbool.h>
 #include "types.h"
 #include "../parsers/parse_types.h"
 #include "../parsers/parsers_utils.h"
@@ -51,7 +52,7 @@ MapResult decodeAndAddCommand(int *address, Opcode code, char operands[2][MAX_AR
     word cmd_word;
 
     cmd_word.cmd.opcode = (int) code;
-    cmd_word.cmd.decode=0;
+    cmd_word.cmd.decode = ABSOLUTE_DECODING;
     switch (length) {
         case 0:
             cmd_word.cmd.sourceOperand = 0;
@@ -76,7 +77,7 @@ MapResult decodeAndAddCommand(int *address, Opcode code, char operands[2][MAX_AR
 
 MapResult tryDecodeInstantOperand(Operand operand, word* word) {
     int s_temp;
-    word->instant.decode = 0;
+    word->instant.decode = ABSOLUTE_DECODING;
     if (!tryGetNumberFromConstantSymbolOrSting(operand+1, &s_temp)) {
         return MAP_ERROR;
     }
@@ -142,7 +143,7 @@ MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
     }
 
     index_word.instant.value = s_temp;
-    index_word.instant.decode = 0;
+    index_word.instant.decode = ABSOLUTE_DECODING;
 
     status = addWord(*address,&index_word);
     if (status != MAP_SUCCESS) {
@@ -154,7 +155,7 @@ MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
 }
 
 MapResult tryDecodeDirectRegisterOperand(Operand operand, word* word, OperandType type) {
-    word->reg.decode = 0;
+    word->reg.decode = ABSOLUTE_DECODING;
     word->reg.unused = 0;
 
     switch (type) {
@@ -185,8 +186,8 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
 
     if (length ==2 && getAddressingFlagForOperand(operands[0]) == directRegister &&
             getAddressingFlagForOperand(operands[1]) == directRegister) {
-        new_word.reg.sourceOperand=(unsigned int)*(operands[0]+1);
-        new_word.reg.targetOperand=(unsigned int)*(operands[1]+1);
+        new_word.reg.sourceOperand = (unsigned int)*(operands[0]+1);
+        new_word.reg.targetOperand = (unsigned int)*(operands[1]+1);
         new_word.reg.unused = 0;
         new_word.reg.decode = ABSOLUTE_DECODING;
         status = addWord((*address)++,&new_word);

@@ -11,10 +11,8 @@
 #include "../logs/logging_utils.h"
 #include "../string_utils.h"
 
-
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     char temp_buffer[81];
-
 
     String temp_string;
     enum ParseResult status = PARSE_SUCCESS;
@@ -129,6 +127,7 @@ void resetLine(input_line *line) {
     line->directive_props = 0;
     line->const_definition_arg.constant_id = NULL;
     line->arguments.args_count = 0;
+    line->opcode = -1;
     line->const_definition_arg.constant_value = 0;
     line->isComment = false;
     line->isEmpty = false;
@@ -152,5 +151,4 @@ void disposeLine(input_line *line) {
     line->const_definition_arg.constant_value = 0;
     line->isComment = false;
     line->isEOF = false;
-    line->hasLabel = false;
 }
