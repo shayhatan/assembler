@@ -1,0 +1,50 @@
+#include "precompile.h"
+#include "macro/macros.h"
+#include "macro/macro_parser.h"
+
+bool preCompile(char *arr[], char* am_file, int dex) {
+    Macros *macros;
+    char temp_file1[PRE_MAX_LINE] = "";
+    char temp_file2[PRE_MAX_LINE] = "";
+
+    /* Step 1: Removing unnecessary white spaces */
+    if (!formatFile(arr[dex], temp_file1)) {
+        return false;
+    }
+
+    /* For scanning and saving all the macros */
+    macros = createMacros();
+    if (macros == NULL) {
+        return false;
+    }
+
+    /* processing Macros into macros and remove macros blocks where declared */
+    if (!processMacroLines(macros, temp_file1) || !removeMacros(temp_file1, temp_file2, macros)) {
+        freeMacros(macros);
+        remove(temp_file1);
+        return false;
+    }
+    /* no need for temp_file1 */
+    remove(temp_file1);
+    if (!replaceMacrosInFile(temp_file2, macros, am_file)) {
+        freeMacros(macros);
+        remove(temp_file2);
+        /* if file created */
+        if (!am_file[0])
+            remove(am_file);
+        return false;
+    }
+
+    remove(temp_file2);
+    freeMacros(macros);
+    return true;
+}
+/*
+
+
+ Step 4: Replacing all macro calls with their definitions
+replaceMacrosInFile("temp2.txt", macros);
+
+Step 5: Freeing allocated memory and cleaning up
+freeMacros(macros);
+remove("temp2.txt");*/
