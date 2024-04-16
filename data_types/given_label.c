@@ -22,7 +22,7 @@ GivenLabel givenLabelCreate(char *label_name, int assembly_line) {
     /* Allocate memory for label_name and copy the provided label_name*/
     given_label->label_name = malloc(strlen(label_name) + 1); /* +1 for the null terminator*/
     if (!given_label->label_name) {
-        free(given_label); // Free the memory allocated for the struct
+        free(given_label); /* Free the memory allocated for the struct */
         return NULL;
     }
     strcpy(given_label->label_name, label_name);
@@ -43,7 +43,7 @@ GivenLabel givenLabelCopy(GivenLabel given_label) {
     /* Allocate memory for the label_name and copy the data */
     copied_label->label_name = malloc(strlen(given_label->label_name) + 1); /* +1 for the null terminator */
     if (!copied_label->label_name) {
-        free(copied_label); // Free the memory allocated for the struct
+        free(copied_label); /* Free the memory allocated for the struct */
         return NULL;
     }
     strcpy(copied_label->label_name, given_label->label_name);

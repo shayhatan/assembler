@@ -22,11 +22,11 @@ void duplicateStr(const char *original, char *target, int length) {
 }
 
 char *allocatedDuplicateString(char *str) {
+    size_t len = strlen(str) + 1;
+    char *copy = (char *) malloc(len);
     if (str == NULL)
         return NULL;
 
-    size_t len = strlen(str) + 1;
-    char *copy = (char *) malloc(len);
     if (copy == NULL)
         return NULL;
 
@@ -38,9 +38,9 @@ char *allocatedDuplicateString(char *str) {
 }
 
 bool isAlphaNumeric(char *word) {
+    char *current = word;
     bool trailingSpaces = false;
     if (word == NULL) return false;
-    char *current = word;
 
     /* skip initial spaces */
     while (isspace(*current)) current++;
@@ -125,6 +125,12 @@ bool isNumber(char *word) {
         current++;
     }
 
+    return true;
+}
+
+bool tryGetNumber(char *word, int * number) {
+    if (!isNumber(word)) return false;
+    *number = atoi(word);
     return true;
 }
 

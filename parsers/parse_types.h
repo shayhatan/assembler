@@ -1,5 +1,5 @@
 /*
- Created by User on 17/03/2024.
+ parse_types.h
 */
 
 
@@ -14,7 +14,7 @@ enum Addressing {
     direct = 2,
 /*  indirectRegister = 4, */
     directRegister = 8,
-    constantIndex = 16,
+    constantIndex = 16
 };
 
 enum DirectiveProps {
@@ -35,6 +35,13 @@ typedef struct {
 #define DOT_EXTERNAL ".external"
 #define DOT_DEFINE ".mdefine"
 
+/* raw directives */
+#define RAW_DOT_STRING ".string"
+#define RAW_DOT_DATA ".data"
+#define RAW_DOT_EXTERN ".extern"
+#define MAX_ARG_CHARS 36
+#define MAX_ARGS 80
+
 enum ParseResult {
     PARSE_SUCCESS, PARSE_FAILURE, OUT_OF_MEMORY
 };
@@ -43,6 +50,7 @@ typedef struct {
     char *classification; /* symbol property */
     int value; /* IC + 100 || DC || constant value */
     unsigned int wordsCounter;
+    bool isEntry;
 } entry;
 
 
@@ -51,8 +59,7 @@ typedef struct {
     int size;
 } String;
 
-#define MAX_ARG_CHARS 36
-#define MAX_ARGS 80
+
 
 typedef struct {
     /* given that a line size is capped at a certain size, we can limit the size of the arguments it may define, and thus avoid allocations */
@@ -67,7 +74,7 @@ typedef struct {
     Arguments arguments;
     DefinitionArgument const_definition_arg;
     enum DirectiveProps directive_props;
-    enum opcode opcode;
+    enum Opcode opcode;
     int lineNumber;
     bool isComment;
     bool isEmpty;

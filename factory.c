@@ -16,6 +16,7 @@ entry createEntry(char *classification, /* symbol property */
     e.value = value;
     e.classification = classification;
     e.wordsCounter = 0;
+    e.isEntry = false;
 
     return e;
 }

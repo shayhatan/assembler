@@ -5,9 +5,6 @@
 #ifndef ASSEMBLER_TYPES_H
 #define ASSEMBLER_TYPES_H
 
-#include "../data_structures/linked_list/list.h"
-
-
 typedef struct {
     unsigned int decode: 2;
     unsigned int targetOperand: 2;
@@ -18,8 +15,13 @@ typedef struct {
 
 typedef struct {
     unsigned int decode: 2;
+    int value: 12;
+} InstantWord;
+
+typedef struct {
+    unsigned int decode: 2;
     unsigned int value: 12;
-} argument_word;
+} DirectWord;
 
 
 typedef struct {
@@ -30,15 +32,34 @@ typedef struct {
 } register_word;
 
 
-typedef union {
-    command_word cmd;
-    register_word reg;
-    argument_word arg;
-} word;
-
-/* Encapsulates a parsed token (source word including all of its extra words in that order) */
 typedef struct {
-    List words;
-} instruction;
+    /* first word */
+    DirectWord list_word;
+
+    /* second word */
+    InstantWord index_word;
+} ConstantIndex;
+
+typedef struct {
+    int value: 14;
+} DataWord;
+
+
+typedef union {
+    /* opcode */
+    command_word cmd;
+
+    /* operands */
+    InstantWord instant;
+    DirectWord direct;
+    ConstantIndex constant_index;
+    register_word reg;
+
+    /* data */
+    DataWord data;
+
+    /* used to translate the value whatever it may be, and print it, */
+    int print: 15;
+} word;
 
 #endif /*ASSEMBLER_TYPES_H*/
