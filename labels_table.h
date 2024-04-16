@@ -29,9 +29,9 @@ int updateDataLabels(unsigned int IC);
 
 MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only);
 
-entry *get_data(char *label);
+entry *getEntry(char *label);
 
-void printLabelsTable();
+void printLabelsTable(void);
 
 MapResult setEntryLabel(char *label);
 

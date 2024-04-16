@@ -21,8 +21,6 @@
 bool errored;
 unsigned int IC = 0, DC = 0;
 
-
-
 void countStringWords(char *label, char *strPtr) {
     while (*strPtr != '\0') {
         /* each character is one word */
@@ -40,20 +38,20 @@ int countDataWords(char *label, void *ptr) {
         incrementLabelWordsCounter(label);
         return true;
     }
-    temp = get_data(strPtr); /* in case we passed a symbol */
+    temp = getEntry(strPtr); /* in case we passed a symbol */
     if (temp == NULL) {
-        log_error("non-existent symbol %s cannot be a .data argument", strPtr);
+        logError("non-existent symbol %s cannot be a .data argument", strPtr);
         return false;
     }
     if (strcmp(temp->classification, DOT_DEFINE) != 0) { /* in case the symbol is not a constant */
-        log_error(".data symbol %s must be a constant definition", strPtr);
+        logError(".data symbol %s must be a constant definition", strPtr);
         return false;
     }
     incrementLabelWordsCounter(strPtr);
     return true;
 }
 
-enum analyze_status analyze_line(input_line line) {
+static AnalyzeStatus analyzeLine(input_line line) {
     int L;
     MapResult status = MAP_SUCCESS;
 
@@ -82,7 +80,7 @@ enum analyze_status analyze_line(input_line line) {
         /* increase DC according to arguments */
         if (line.directive_props & dot_string) {
             int temp;
-            addedEntry = get_data(line.label);
+            addedEntry = getEntry(line.label);
             temp = addedEntry->value;
 
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
@@ -98,7 +96,7 @@ enum analyze_status analyze_line(input_line line) {
             int temp;
 
             incrementLabelWordsCounter(line.label);
-            addedEntry = get_data(line.label);
+            addedEntry = getEntry(line.label);
             temp = addedEntry->value;
 
             for (index = 0; index < line.arguments.args_count; index++) {
@@ -115,7 +113,7 @@ enum analyze_status analyze_line(input_line line) {
         }
 
         /* it's impossible for addedEntry to be null in this case */
-        addedEntry = get_data(line.label);
+        addedEntry = getEntry(line.label);
         DC += addedEntry->wordsCounter;
         return NEXT;
     }
@@ -141,26 +139,26 @@ enum analyze_status analyze_line(input_line line) {
 
     /* step 13 */
     if (line.opcode < 0 || line.opcode > 15) {
-        log_error("invalid operation %d\n", (int) line.opcode);
+        logError("invalid operation %d\n", (int) line.opcode);
         return NEXT;
     }
 
     /* steps 14, 15 */
     if (tryGetOperationWordsCounter(&line, &L) != PARSE_SUCCESS) {
-        log_error("failed to get operand words_map\n");
+        logError("failed to get operand words_map\n");
     }
     IC += L;
 
     return NEXT;
 }
 
-enum ParseResult run(FILE *srcFile) {
+ParseResult run(FILE *srcFile) {
     char buffer[81] = "";
     int index = 0;
 
     while (fgets(buffer, 81, srcFile) != 0) {
         input_line line;
-        enum ParseResult parse_result;
+        ParseResult parse_result;
         bool shouldStop = false;
         removeExcessSpaces(buffer);
         resetLine(&line);
@@ -171,11 +169,11 @@ enum ParseResult run(FILE *srcFile) {
 
         switch (parse_result) {
             case PARSE_FAILURE:
-                log_error("Failed to parse line %d %s\n", index - 1, buffer);
+                logError("Failed to parse line %d %s\n", index - 1, buffer);
                 disposeLine(&line);
                 continue;
             case OUT_OF_MEMORY:
-                log_error("gracefully clearing all allocations and shutting down\n");
+                logError("gracefully clearing all allocations and shutting down\n");
                 disposeLine(&line);
                 labelsTableDispose();
                 return OUT_OF_MEMORY; /* complete bail out */
@@ -189,7 +187,7 @@ enum ParseResult run(FILE *srcFile) {
             continue;
         }
 
-        switch (analyze_line(line)) {
+        switch (analyzeLine(line)) {
             case NEXT:
                 break;
             case STOP:
@@ -197,7 +195,7 @@ enum ParseResult run(FILE *srcFile) {
                 break;
             case ANALYZE_OUT_OF_MEMORY:
                 shouldStop = true;
-                log_error("Out of memory!\n");
+                logError("Out of memory!\n");
                 break;
         }
         disposeLine(&line);

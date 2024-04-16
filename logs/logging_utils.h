@@ -14,6 +14,6 @@ extern bool errored;
 
 void setLogLineContext(int line_number, char *line_text);
 
-void log_error(char *error_msg, ...);
+void logError(char *error_msg, ...);
 
 #endif /*ASSEMBLER_UTILS_LOGS_H*/

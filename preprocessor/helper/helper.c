@@ -16,7 +16,7 @@ Pointer allocateMemory(size_t size) {
     Pointer ptr;
 
     if (current_allocated_memory + size >= MAX_MEMORY_POOL) {
-        log_error("max allowed memory encountered");
+        logError("max allowed memory encountered");
         return NULL;
     }
     ptr = malloc(size);

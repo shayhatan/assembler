@@ -33,7 +33,7 @@ char *allocatedDuplicateString(char *str) {
 
     memcpy(copy, str, len);
     if (copy == NULL) {
-        log_error("Error: Unable to allocate memory.\n");
+        logError("Error: Unable to allocate memory.\n");
     }
     return copy;
 }

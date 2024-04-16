@@ -14,7 +14,7 @@
 
 static int address = 100;
 
-enum ParseResult analyzeLine(input_line *line) {
+static enum ParseResult analyzeLine(input_line *line) {
     MapResult status;
     if (line->directive_props & (dot_data | dot_string | dot_external | dot_define))
     {
@@ -24,7 +24,7 @@ enum ParseResult analyzeLine(input_line *line) {
     if (line->directive_props & dot_entry) {
         status = setEntryLabel(line->arguments.args[0]);
         if (status != MAP_SUCCESS) {
-            log_error("Failed to set %s as entry label", line->label);
+            logError("Failed to set %s as entry label", line->label);
             return status == MAP_OUT_OF_MEMORY ? OUT_OF_MEMORY : PARSE_FAILURE;
         }
         return PARSE_SUCCESS;
@@ -40,10 +40,10 @@ enum ParseResult analyzeLine(input_line *line) {
         case MAP_NULL_ARGUMENT:
         case MAP_ITEM_ALREADY_EXISTS:
         case MAP_ITEM_DOES_NOT_EXIST:
-            log_error("failed to analyze line\n");
+            logError("failed to analyze line\n");
             return PARSE_FAILURE;
         case MAP_OUT_OF_MEMORY:
-            log_error("out of memory\n");
+            logError("out of memory\n");
             return OUT_OF_MEMORY;
     }
 
@@ -69,11 +69,11 @@ enum ParseResult secondRun(FILE *srcFile) {
 
         switch (parse_result) {
             case PARSE_FAILURE:
-                log_error("Failed to parse line %d %s\n", index - 1, buffer);
+                logError("Failed to parse line %d %s\n", index - 1, buffer);
                 disposeLine(&line);
                 continue;
             case OUT_OF_MEMORY:
-                log_error("gracefully clearing all allocations and shutting down\n");
+                logError("gracefully clearing all allocations and shutting down\n");
                 disposeLine(&line);
                 labelsTableDispose();
                 return OUT_OF_MEMORY; /* complete bail out */
@@ -95,7 +95,7 @@ enum ParseResult secondRun(FILE *srcFile) {
                 break;
             case OUT_OF_MEMORY:
                 shouldStop = true;
-                log_error("Out of memory!\n");
+                logError("Out of memory!\n");
                 break;
         }
         disposeLine(&line);

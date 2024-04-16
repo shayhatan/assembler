@@ -206,7 +206,7 @@ enum Destination {
 
 bool isAddressingValid(enum Addressing operandsAddressing, enum Opcode opcode, enum Destination destination) {
     if (operandsAddressing == -1) {
-        log_error("Invalid addressing\n");
+        logError("Invalid addressing\n");
         return false;
     }
 
@@ -214,15 +214,15 @@ bool isAddressingValid(enum Addressing operandsAddressing, enum Opcode opcode, e
     switch (destination) {
         case source:
             if (!(operandsAddressing & getAllowedSourceOperandAddressingsByOpcode(opcode))) {
-                log_error("Invalid addressing, operand %d, is not allowed for Opcode %d as source addressing\n",
-                          operandsAddressing, opcode);
+                logError("Invalid addressing, operand %d, is not allowed for Opcode %d as source addressing\n",
+                         operandsAddressing, opcode);
                 return false;
             }
             break;
         case target:
             if (!(operandsAddressing & getAllowedTargetOperandAddressingsByOpcode(opcode))) {
-                log_error("Invalid addressing, operand %s, is not allowed for Opcode %d as target addressing",
-                          operandsAddressing, opcode);
+                logError("Invalid addressing, operand %s, is not allowed for Opcode %d as target addressing",
+                         operandsAddressing, opcode);
                 return false;
             }
     }
@@ -239,8 +239,8 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
     int amountOfOperands = getAmountOfOperandsByOperation(line->opcode);
 
     if (line->arguments.args_count != amountOfOperands) {
-        log_error("Arguments count %d does not match expected amount of operands %d\n", line->arguments.args_count,
-                  amountOfOperands);
+        logError("Arguments count %d does not match expected amount of operands %d\n", line->arguments.args_count,
+                 amountOfOperands);
         return PARSE_FAILURE;
     }
 
@@ -333,7 +333,7 @@ enum ParseResult tryGetLabelValue(char *line, char **result) {
     duplicateStr(line, buffer, temp.size);
 
     if (!isLabelOrConstantString(buffer)) {
-        log_error("invalid label syntax %s", line);
+        logError("invalid label syntax %s", line);
         return PARSE_FAILURE;
     }
 
@@ -384,7 +384,7 @@ enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAm
             extractor(next_string.content, next_string.content);
             addArgument(args, next_string.content, args->args_count, next_string.size);
         } else {
-            log_error("argument %s doesn't match the expected format\n", temp);
+            logError("argument %s doesn't match the expected format\n", temp);
             return PARSE_FAILURE;
         }
 
@@ -392,7 +392,7 @@ enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAm
     }
 
     if (expectedAmount == SINGLE && args->args_count > 1) {
-        log_error("too many args detected");
+        logError("too many args detected");
         return PARSE_FAILURE;
     }
 
@@ -400,7 +400,7 @@ enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAm
         if (args->args_count > 0) {
             return PARSE_SUCCESS;
         }
-        log_error("missing args detected");
+        logError("missing args detected");
         return PARSE_FAILURE;
     }
     return PARSE_SUCCESS;
@@ -432,7 +432,7 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     char *ptr = temp_buffer;
     String temp_string;
     if (line == NULL) {
-        log_error("missing constant definition %s", line);
+        logError("missing constant definition %s", line);
         return PARSE_FAILURE; /* line is out of buffer */
     }
     temp_string = readNextString(&line, '=', temp_buffer);
@@ -440,11 +440,11 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     skipWhitespaces(&ptr);
 
     if (temp_string.size == 0) {
-        log_error("invalid constant id %s\n", line);
+        logError("invalid constant id %s\n", line);
         return PARSE_FAILURE;
     }
     if (!tryGetVariableString(temp_string.content, ptr)) {
-        log_error("invalid constant id syntax %s\n", line);
+        logError("invalid constant id syntax %s\n", line);
         return PARSE_FAILURE;
     }
     argument->constant_id = allocatedDuplicateString(ptr);
@@ -456,13 +456,13 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     readTillNewLine(&line, temp_buffer);
 
     if (temp_buffer[0] == '\0') {
-        log_error("missing constant value\n");
+        logError("missing constant value\n");
         return PARSE_FAILURE;
     }
     
     if (!tryGetNumber(temp_buffer, &argument->constant_value)) {
         /*...input is not a decimal number */
-        log_error("invalid numeric constant value %s\n", line);
+        logError("invalid numeric constant value %s\n", line);
         return PARSE_FAILURE;
     }
 

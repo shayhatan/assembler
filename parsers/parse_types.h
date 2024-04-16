@@ -42,9 +42,9 @@ typedef struct {
 #define MAX_ARG_CHARS 36
 #define MAX_ARGS 80
 
-enum ParseResult {
+typedef enum ParseResult {
     PARSE_SUCCESS, PARSE_FAILURE, OUT_OF_MEMORY
-};
+} ParseResult;
 
 typedef struct {
     char *classification; /* symbol property */

@@ -26,7 +26,7 @@ void setLogLineContext(int line_number, char *line_text) {
     duplicateStr(line_text, prefix, index);
 }
 
-void log_error(char *error_msg, ...) {
+void logError(char *error_msg, ...) {
     va_list lst;
     va_start(lst, error_msg);
 

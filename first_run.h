@@ -4,9 +4,9 @@
 
 #include "./parsers/parse_types.h"
 
-enum analyze_status {
+typedef enum {
     STOP, NEXT, ANALYZE_OUT_OF_MEMORY
-};
+} AnalyzeStatus;
 
 
 enum ParseResult run(FILE *srcFile);

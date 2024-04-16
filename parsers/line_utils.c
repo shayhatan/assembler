@@ -52,7 +52,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
         line += strlen(result->label) + 1;
 
         if (!isspace(*line)) {
-            log_error("a label must be followed by at least one space character\n");
+            logError("a label must be followed by at least one space character\n");
         }
         skipWhitespaces(&line);
     }
@@ -67,7 +67,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     /* instruction line */
     if (tryGetOpcode(temp_buffer, &result->opcode)) {
         if (tryGetArguments(line, STRING_TYPE, ANY, &result->arguments) != 0) {
-            log_error("invalid string arguments %s\n", line);
+            logError("invalid string arguments %s\n", line);
         }
         return PARSE_SUCCESS;
     }
@@ -78,32 +78,32 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
         switch (result->directive_props) {
             case dot_data:
                 if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, &result->arguments) != 0) {
-                    log_error("invalid numeric arguments %s\n", line);
+                    logError("invalid numeric arguments %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_string:
                 if (tryGetArguments(line, DOUBLE_QUOTE_STRING, SINGLE, &result->arguments) != 0) {
-                    log_error("invalid quoted string argument %s\n", line);
+                    logError("invalid quoted string argument %s\n", line);
                 }
                 break;
             case dot_external:
                 if (tryGetArguments(line, LABEL_TYPE, PLURAL, &result->arguments) != 0) {
-                    log_error("invalid label arguments %s\n", line);
+                    logError("invalid label arguments %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_entry:
                 if (tryGetArguments(line, LABEL_TYPE, SINGLE, &result->arguments) !=
                     0) {
-                    log_error("invalid label argument %s\n", line);
+                    logError("invalid label argument %s\n", line);
                     status = PARSE_FAILURE;
                 }
                 break;
             case dot_define:
                 /* .define must not be under a label scope */
                 if (result->hasLabel) {
-                    log_error("didn't expect constant definition after a label %s\n", line);
+                    logError("didn't expect constant definition after a label %s\n", line);
                     status = PARSE_FAILURE;
                     break;
                 }
@@ -115,7 +115,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
         return status;
     }
 
-    log_error(
+    logError(
             "invalid line definition, expected the next word to be an operation or directive but got \"%s\" instead\n",
             temp_buffer);
     return PARSE_FAILURE;

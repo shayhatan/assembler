@@ -95,7 +95,7 @@ MapResult tryDecodeInstantOperand(Operand operand, word* word) {
 
 MapResult tryDecodeDirectOperand(Operand operand, word* word) {
     entry *label_entry = NULL;
-    label_entry = get_data(operand);
+    label_entry = getEntry(operand);
 
     if (label_entry == NULL) {
         return MAP_ERROR;
@@ -131,7 +131,7 @@ MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
         return MAP_ERROR;
     }
 
-    label_entry = get_data(list_name);
+    label_entry = getEntry(list_name);
     if (label_entry == NULL) {
         return MAP_ERROR;
     }
@@ -190,7 +190,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
 
     
     if (status != MAP_SUCCESS) {
-        log_error("failed to decode or add an instruction opcode, status: %s\n", mapResultToString(status));
+        logError("failed to decode or add an instruction opcode, status: %s\n", mapResultToString(status));
         return status;
     }
 
@@ -202,7 +202,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
         new_word.reg.decode = ABSOLUTE_DECODING;
         status = addWord((*address)++,&new_word);
         if (status != MAP_SUCCESS) {
-            log_error("failed to decode or add a dual regex operands, status: %s\n", mapResultToString(status));
+            logError("failed to decode or add a dual regex operands, status: %s\n", mapResultToString(status));
             return status;
         }
         return MAP_SUCCESS;
@@ -214,7 +214,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
         if (addressing == constantIndex) {
             status = tryDecodeConstantIndexOperand(address, operands[i]);
             if (status != MAP_SUCCESS) {
-                log_error("failed to decode or add a constant index operand, status: %s\n", mapResultToString(status));
+                logError("failed to decode or add a constant index operand, status: %s\n", mapResultToString(status));
                 return status;
             }
             type++;
@@ -235,12 +235,14 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
                 return MAP_ERROR;
         }
         if (status != MAP_SUCCESS) {
-            log_error("failed to decode a direct/instant/single register operand, status: %s\n", mapResultToString(status));
+            logError("failed to decode a direct/instant/single register operand, status: %s\n",
+                     mapResultToString(status));
             return status;
         }
         status = addWord((*address)++, &new_word);
         if (status != MAP_SUCCESS) {
-            log_error("failed to add a decoded direct/instant/single register operand, status: %s\n", mapResultToString(status));
+            logError("failed to add a decoded direct/instant/single register operand, status: %s\n",
+                     mapResultToString(status));
             return status;
         }
         type++;

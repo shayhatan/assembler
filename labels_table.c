@@ -68,7 +68,7 @@ MapResult setLabel(char *label, entry newEntry, bool create_only) {
     newEntry.wordsCounter = 0;
 
     if (create_only && mapContains(labels_table, label)) {
-        log_error("Cannot add label, label %s already exists\n", label);
+        logError("Cannot add label, label %s already exists\n", label);
         return MAP_ITEM_ALREADY_EXISTS; /* already exists */
     }
     return mapPut(labels_table, label, &newEntry);
@@ -77,7 +77,7 @@ MapResult setLabel(char *label, entry newEntry, bool create_only) {
 int incrementLabelWordsCounter(char *label) {
     entry *existingEntry = mapGet(labels_table, label);
     if (existingEntry == NULL) {
-        log_error("label %s does not exist\n", label);
+        logError("label %s does not exist\n", label);
         return 1; /* argument out of range */;
     }
     existingEntry->wordsCounter += 1;
@@ -103,7 +103,7 @@ int updateDataLabels(unsigned int IC) {
     char* iter;
     MAP_FOREACH(char *, iter, labels_table) {
         if (iter == NULL) {
-            log_error("Out of memory\n");
+            logError("Out of memory\n");
             return OUT_OF_MEMORY;
         }
         currentEntry = mapGet(labels_table, iter);
@@ -131,7 +131,7 @@ void printLabelsTable() {
         }
         currentEntry = mapGet(labels_table, iter);
         if (currentEntry == NULL) {
-            log_error("unreachable code had been reached");
+            logError("unreachable code had been reached");
             free(iter);
             return;
         }
@@ -146,7 +146,7 @@ void printLabelsTable() {
 
 }
 
-enum MapResult_t setEntryLabel(char* label) {
+MapResult setEntryLabel(char* label) {
     entry *labelEntry = NULL;
 
     if (labels_table == NULL) {
@@ -169,7 +169,7 @@ enum MapResult_t setEntryLabel(char* label) {
     return MAP_SUCCESS;
 }
 
-entry *get_data(char *label) {
+entry *getEntry(char *label) {
     return mapGet(labels_table, label);
 }
 
