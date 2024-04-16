@@ -52,7 +52,7 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
         line += strlen(result->label) + 1;
 
         if (!isspace(*line)) {
-            log_error("after a label at least one space must appear\n");
+            log_error("a label must be followed by at least one space character\n");
         }
         skipWhitespaces(&line);
     }

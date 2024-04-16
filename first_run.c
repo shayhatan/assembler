@@ -154,34 +154,6 @@ enum analyze_status analyze_line(input_line line) {
     return NEXT;
 }
 
-
-
-static void removeExcessSpaces(char *input) {
-    int i = 0, j = 0;
-    bool space_flag = false;
-    /* avoid use cases where it starts with space */
-    while (isspace(input[i])) {
-        ++i;
-    }
-
-    for (; input[i] != '\0'; i++) {
-
-        if (isspace(input[i])) {
-            space_flag = true;
-        } else {
-            if (space_flag && input[i] != ' ') {
-                input[j++] = ' ';
-                space_flag = false;
-
-            }
-            input[j++] = input[i];
-        }
-    }
-
-    input[j] = '\n';
-    input[j++] = '\0';
-}
-
 enum ParseResult run(FILE *srcFile) {
     char buffer[81] = "";
     int index = 0;

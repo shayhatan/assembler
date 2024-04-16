@@ -5,12 +5,12 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <ctype.h>
 #include "labels_table.h"
 #include "parsers/parse_types.h"
 #include "parsers/line_utils.h"
 #include "logs/logging_utils.h"
 #include "words/decoders.h"
+#include "string_utils.h"
 
 static int address = 100;
 
@@ -49,31 +49,7 @@ enum ParseResult analyzeLine(input_line *line) {
 
     return PARSE_SUCCESS;
 }
-void removeExcessSpaces(char *input) {
-    int i = 0, j = 0;
-    bool space_flag = false;
-    /* avoid use cases where it starts with space*/
-    while (isspace(input[i])) {
-        ++i;
-    }
 
-    for (; input[i] != '\0'; i++) {
-
-        if (isspace(input[i])) {
-            space_flag = true;
-        } else {
-            if (space_flag && input[i] != ' ') {
-                input[j++] = ' ';
-                space_flag = false;
-
-            }
-            input[j++] = input[i];
-        }
-    }
-
-    input[j] = '\n';
-    input[j++] = '\0';
-}
 enum ParseResult secondRun(FILE *srcFile) {
     char buffer[81];
     int index = 0;

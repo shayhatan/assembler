@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "data_structures/map/map.h"
 #include "words/types.h"
+#include "preprocessor/helper/helper.h"
 
 Map words_map;
 
@@ -21,7 +22,7 @@ static MapDataElement copyElement(MapDataElement existing) {
         return NULL;
     }
 
-    clone = malloc(sizeof(word));
+    clone = allocateMemory(sizeof(word));
     if (clone == NULL) {
         return NULL;
     }
@@ -36,7 +37,7 @@ static MapKeyElement copyKeyElement(MapKeyElement existing) {
     int *existing_int = (int *) existing;
     if (existing == NULL) return NULL;
 
-    clone = malloc(sizeof(int));
+    clone = allocateMemory(sizeof(int));
     if (clone == NULL) {
         return NULL;
     }

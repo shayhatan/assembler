@@ -12,12 +12,13 @@
 #include "data_structures/map/map.h"
 #include "factory.h"
 #include "string_utils.h"
+#include "./preprocessor/helper/helper.h"
 
 static Map labels_table;
 
 
 MapDataElement copyElement(MapDataElement existing) {
-    entry *clone = malloc(sizeof(entry));
+    entry *clone = allocateMemory(sizeof(entry));
     entry *existingEntry = existing;
 
     if (clone == NULL || existing == NULL) {

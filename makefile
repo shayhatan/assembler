@@ -22,10 +22,10 @@ $(OBJ_DIR)/factory.o: factory.c factory.h parsers/parse_types.h
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/factory.o -c factory.c
 
 # Build rule for first_run.o
-$(OBJ_DIR)/first_run.o: first_run.c first_run.h labels_table.h labels_table.c parsers/parse_types.h parsers/line_utils.h parsers/line_utils.c logs/logging_utils.h logs/logging_utils.c decode_table.h decode_table.c words/decoders.h words/decoders.c
+$(OBJ_DIR)/first_run.o: first_run.c first_run.h labels_table.h labels_table.c parsers/parse_types.h parsers/line_utils.h parsers/line_utils.c logs/logging_utils.h logs/logging_utils.c decode_table.h decode_table.c words/decoders.h words/decoders.c string_utils.c string_utils.h
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/first_run.o -c first_run.c
 
-$(OBJ_DIR)/second_run.o: second_run.c second_run.h labels_table.h labels_table.c parsers/parse_types.h parsers/line_utils.h parsers/line_utils.c logs/logging_utils.h logs/logging_utils.c words/decoders.h words/decoders.c
+$(OBJ_DIR)/second_run.o: second_run.c second_run.h labels_table.h labels_table.c parsers/parse_types.h parsers/line_utils.h parsers/line_utils.c logs/logging_utils.h logs/logging_utils.c words/decoders.h words/decoders.c string_utils.c string_utils.h
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/second_run.o -c second_run.c
 
 # Build rule for map.o

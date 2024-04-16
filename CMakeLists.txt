@@ -40,6 +40,8 @@ add_executable(assembler
         parsers/line_utils.c
         parsers/line_utils.h
         second_run.h
+        preprocessor/file_manger/file_manger.c
+        preprocessor/helper/helper.c
 )
 
 # Link math library

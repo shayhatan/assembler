@@ -2,37 +2,6 @@
 #include "../helper/helper.h"
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
-
-/* Function to remove excess spaces from a string */
-void removeExcessSpaces(char *input) {
-    int i = 0, j = 0;
-    bool space_flag = false; /* Flag to track if previous character was a space */
-
-    /* Avoid leading spaces */
-    while (isspace(input[i])) {
-        ++i;
-    }
-
-    /* Loop through the input string */
-    for (; input[i] != '\0'; i++) {
-        /* If current character is a space */
-        if (isspace(input[i])) {
-            space_flag = true; /* Set space flag */
-        } else {
-            /* If space flag is set and current character is not a space */
-            if (space_flag && input[i] != ' ') {
-                input[j++] = ' '; /* Add a single space */
-                space_flag = false; /* Reset space flag */
-            }
-            input[j++] = input[i]; /* Copy non-space character to output */
-        }
-    }
-
-    input[j] = '\0'; /* Null-terminate the modified string */
-}
-
 
 /* Function to check if a character followed by a space is a comma-space pair */
 bool isCommaSpacePair(char current, char next) {

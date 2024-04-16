@@ -1,17 +1,32 @@
 
 #include "helper.h"
+#include "../../logs/logging_utils.h"
 #include <string.h>
 
 
 #define PRE_INSTRUCTION_SIZE 4
 #define PRE_CMD_SIZE 16
 #define PRE_REG_SIZE 8
+#define MAX_MEMORY_POOL 4000
+
+int current_allocated_memory = 0;
+
 
 Pointer allocateMemory(size_t size) {
-    Pointer ptr = malloc(size);
+    Pointer ptr;
+
+    if (current_allocated_memory + size >= MAX_MEMORY_POOL) {
+        log_error("max allowed memory encountered");
+        return NULL;
+    }
+    ptr = malloc(size);
     if (ptr == NULL) {
         printf("Error: Unable to allocate memory.\n");
+        return NULL;
     }
+
+    current_allocated_memory += (int)size;
+
     return ptr;
 }
 

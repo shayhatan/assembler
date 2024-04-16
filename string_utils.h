@@ -27,5 +27,6 @@ bool isNumber(char *word);
 bool tryGetNumber(char *word, int * number);
 
 bool isQuotedString(char *word);
+void removeExcessSpaces(char *input);
 
 #endif /* ASSEMBLER_STRING_UTILS_H */

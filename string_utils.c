@@ -9,6 +9,7 @@
 #include <string.h>
 #include <limits.h>
 #include "logs/logging_utils.h"
+#include "preprocessor/helper/helper.h"
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
@@ -23,7 +24,7 @@ void duplicateStr(const char *original, char *target, int length) {
 
 char *allocatedDuplicateString(char *str) {
     size_t len = strlen(str) + 1;
-    char *copy = (char *) malloc(len);
+    char *copy = (char *) allocateMemory(len);
     if (str == NULL)
         return NULL;
 
@@ -142,4 +143,30 @@ bool isQuotedString(char *word) {
     /* todo: validate no 3rd " in between the last and first */
 
     return true;
+}
+
+void removeExcessSpaces(char *input) {
+    int i = 0, j = 0;
+    bool space_flag = false;
+    /* avoid use cases where it starts with space */
+    while (isspace(input[i])) {
+        ++i;
+    }
+
+    for (; input[i] != '\0'; i++) {
+
+        if (isspace(input[i])) {
+            space_flag = true;
+        } else {
+            if (space_flag && input[i] != ' ') {
+                input[j++] = ' ';
+                space_flag = false;
+
+            }
+            input[j++] = input[i];
+        }
+    }
+
+    input[j] = '\n';
+    input[j++] = '\0';
 }

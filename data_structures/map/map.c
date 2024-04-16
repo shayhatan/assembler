@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "map.h"
+#include "../../preprocessor/helper/helper.h"
 
 #define NEG (-1)
 #define EQUAL 0
@@ -51,7 +52,7 @@ static void destroyNode(Map map, Node node) {
 static Node nodeCreate(Map map, MapKeyElement key, MapDataElement data) {
     Node new_node;
     assert(key && data && map);
-    new_node = malloc(sizeof(*new_node));
+    new_node = allocateMemory(sizeof(*new_node));
     if (new_node == NULL) {
         return NULL;
     }
@@ -108,7 +109,7 @@ Map mapCreate(copyMapDataElements copyData,
               freeMapKeyElements freeKey,
               compareMapKeyElements cmpKey
 ) {
-    Map map = malloc(sizeof(*map));
+    Map map = allocateMemory(sizeof(*map));
     if (copyData == NULL || copyKey == NULL || freeData == NULL
         || freeKey == NULL || cmpKey == NULL) {
         return NULL;
