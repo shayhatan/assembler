@@ -12,6 +12,7 @@
 #include "../labels_table.h"
 #include "../string_utils.h"
 #include "../decode_table.h"
+#include "../logs/logging_utils.h"
 #include "decoders.h"
 
 
@@ -181,6 +182,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
     MapResult status = decodeAndAddCommand(address, code, operands, length);
 
     if (status != MAP_SUCCESS) {
+        log_error("failed to decode or add an instruction opcode, status: %d\n", status);
         return status;
     }
 
@@ -192,6 +194,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
         new_word.reg.decode = ABSOLUTE_DECODING;
         status = addWord((*address)++,&new_word);
         if (status != MAP_SUCCESS) {
+            log_error("failed to decode or add a dual regex operands, status: %d\n", status);
             return status;
         }
         return MAP_SUCCESS;
@@ -203,6 +206,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
         if (addressing == constantIndex) {
             status = tryDecodeConstantIndexOperand(address, operands[i]);
             if (status != MAP_SUCCESS) {
+                log_error("failed to decode or add a constant index operand, status: %d\n", status);
                 return status;
             }
             type++;
@@ -223,10 +227,12 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
                 return MAP_ERROR;
         }
         if (status != MAP_SUCCESS) {
+            log_error("failed to decode a direct/instant/single register operand, status: %d\n", status);
             return status;
         }
         status = addWord((*address)++, &new_word);
         if (status != MAP_SUCCESS) {
+            log_error("failed to add a decoded direct/instant/single register operand, status: %d\n", status);
             return status;
         }
         type++;

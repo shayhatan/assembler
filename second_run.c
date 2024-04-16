@@ -4,6 +4,7 @@
 
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <ctype.h>
 #include "labels_table.h"
 #include "parsers/parse_types.h"
@@ -39,8 +40,10 @@ enum ParseResult analyzeLine(input_line *line) {
         case MAP_NULL_ARGUMENT:
         case MAP_ITEM_ALREADY_EXISTS:
         case MAP_ITEM_DOES_NOT_EXIST:
+            log_error("failed to analyze line\n");
             return PARSE_FAILURE;
         case MAP_OUT_OF_MEMORY:
+            log_error("out of memory\n");
             return OUT_OF_MEMORY;
     }
 
@@ -78,8 +81,9 @@ enum ParseResult secondRun(FILE *srcFile) {
     while (fgets(buffer, 81, srcFile) != 0) {
         input_line line;
         enum ParseResult parse_result;
-        removeExcessSpaces(buffer);
         bool shouldStop = false;
+
+        removeExcessSpaces(buffer);
 
         resetLine(&line);
 

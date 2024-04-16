@@ -9,10 +9,12 @@
 #include "second_run.h"
 
 
+void cleanup(FILE *source_file);
+
 int main() {
     int run_result = -3; /* undefined */
 
-    FILE *source_file = fopen("/mnt/c/Users/shayh/CLionProjects/untitled/assembler/inputs/h1.asm", "r");
+    FILE *source_file = fopen("C:\\Documents\\repos\\uni\\programming_lab\\assembler\\inputs\\i1.asm", "r");
 
     if (source_file == NULL) return -1;
 
@@ -22,20 +24,25 @@ int main() {
     run_result = run(source_file);
 
     /* first run has finished successfully */
-    if (run_result == PARSE_SUCCESS) {
-        printLabelsTable();
-        fseek(source_file, 0, SEEK_SET);
-        run_result = secondRun(source_file);
-        printWordsMap();
+    if (run_result == OUT_OF_MEMORY) {
+        cleanup(source_file);
+        return OUT_OF_MEMORY;
     }
 
+    printLabelsTable();
+    fseek(source_file, 0, SEEK_SET);
+    run_result = secondRun(source_file);
+    printWordsMap();
 
-    printf("run finished with status %d", run_result);
+    printf("run finished with status %d\n", run_result);
 
+    cleanup(source_file);
+
+    return 1;
+}
+
+void cleanup(FILE *source_file) {
     wordsMapDispose();
     labelsTableDispose();
-
     fclose(source_file);
-    
-    return 1;
 }
