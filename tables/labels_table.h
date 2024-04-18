@@ -1,8 +1,3 @@
-/*
- Created by User on 17/03/2024.
-*/
-
-
 #ifndef ASSEMBLER_LABELS_TABLE_H
 #define ASSEMBLER_LABELS_TABLE_H
 

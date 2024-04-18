@@ -1,7 +1,3 @@
-/*
- Created by User on 08/04/2024.
-*/
-
 #ifndef ASSEMBLER_DECODE_TABLE_H
 #define ASSEMBLER_DECODE_TABLE_H
 
