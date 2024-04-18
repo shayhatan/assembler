@@ -14,6 +14,7 @@
 #include "tables/decode_table.h"
 #include "../logs/logging_utils.h"
 #include "decoders.h"
+#include "tables/externals_table.h"
 
 
 #define mapResultToString(enum_value) \
@@ -244,6 +245,14 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
             logError("failed to add a decoded direct/instant/single register operand, status: %s\n",
                      mapResultToString(status));
             return status;
+        }
+        if (addressing == direct && new_word.direct.decode == EXTERNAL_DECODING) {
+            status = addExternal((*address)-1, operands[i]);
+            if (status != MAP_SUCCESS) {
+                logError("failed to add a decoded direct/instant/single register operand, status: %s\n",
+                         mapResultToString(status));
+                return status;
+            }
         }
         type++;
     }

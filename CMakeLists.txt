@@ -42,6 +42,8 @@ add_executable(assembler
         runs/second_run.h
         utils/file_manger.c
         utils/memory.c
+        tables/externals_table.c
+        tables/externals_table.h
 )
 
 # Link math library

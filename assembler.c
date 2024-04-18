@@ -7,6 +7,7 @@
 #include "tables/labels_table.h"
 #include "tables/decode_table.h"
 #include "runs/second_run.h"
+#include "tables/externals_table.h"
 
 
 void cleanup(FILE *source_file);
@@ -20,6 +21,7 @@ int main() {
 
     labelsTableInit();
     wordsMapInit();
+    externalsMapInit();
 
     run_result = run(source_file);
 
@@ -33,6 +35,7 @@ int main() {
     fseek(source_file, 0, SEEK_SET);
     run_result = secondRun(source_file);
     printWordsMap();
+    printExternals();
 
     printf("run finished with status %d\n", run_result);
 
@@ -42,6 +45,7 @@ int main() {
 }
 
 void cleanup(FILE *source_file) {
+    externalsMapDispose();
     wordsMapDispose();
     labelsTableDispose();
     fclose(source_file);

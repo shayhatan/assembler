@@ -2,9 +2,6 @@
  Created by User on 08/04/2024.
 */
 
-#ifndef ASSEMBLER_DECODE_TABLE_H
-#define ASSEMBLER_DECODE_TABLE_H
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -12,7 +9,7 @@
 #include "../words/types.h"
 #include "../utils/memory.h"
 #include "./decode_table.h"
-#include "utils/string_utils.h"
+#include "../utils/string_utils.h"
 
 Map words_map;
 
@@ -198,9 +195,6 @@ MapIterationResult getNextLine(char* result) {
     static int iter = -1;
     int* key_ptr = NULL;
     word* current_word;
-    char base2_buffer[15];
-    char base4_buffer[8];
-    char encrypted_buffer[8];
 
     if (words_map == NULL) {
         return UNDEFINED_MAP;
@@ -256,6 +250,4 @@ void printWordsMap() {
         status = getNextLine(buffer);
     }
 }
-
-#endif /*ASSEMBLER_DECODE_TABLE_H*/
 
