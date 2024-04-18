@@ -1,6 +1,5 @@
+#include "../../utils/string_utils.h"
 #include "macro_parser.h"
-
-
 
 
 /**************************** static functions ***************************************/

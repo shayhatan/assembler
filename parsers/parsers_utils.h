@@ -1,8 +1,3 @@
-/*
- Created by User on 20/03/2024.
-*/
-
-
 #ifndef ASSEMBLER_PARSERS_UTILS_H
 #define ASSEMBLER_PARSERS_UTILS_H
 

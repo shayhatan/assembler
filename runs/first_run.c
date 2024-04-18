@@ -1,7 +1,3 @@
-/*
- Created by User on 17/03/2024.
-*/
-
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -15,7 +11,7 @@
 #include "../parsers/line_utils.h"
 #include "../tables/decode_table.h"
 #include "../words/decoders.h"
-#include <ctype.h>
+
 
 
 bool errored;

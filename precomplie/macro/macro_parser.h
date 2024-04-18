@@ -2,7 +2,6 @@
 #ifndef MMN14_MACRO_PARSER_H
 #define MMN14_MACRO_PARSER_H
 
-#include "macro_parser.h"
 #include <string.h>
 #include <assert.h>
 #include "macros.h"

@@ -1,7 +1,3 @@
-/*
- parse_types.h
-*/
-
 
 #ifndef ASSEMBLER_PARSERS_TYPES_H
 #define ASSEMBLER_PARSERS_TYPES_H

@@ -1,6 +1,3 @@
-/*
- Created by User on 09/04/2024.
-*/
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -9,7 +6,6 @@
 #include "./parsers_utils.h"
 #include "./line_utils.h"
 #include "../logs/logging_utils.h"
-#include "utils/string_utils.h"
 
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     char temp_buffer[81];

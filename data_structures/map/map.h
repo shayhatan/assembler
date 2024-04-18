@@ -1,7 +1,3 @@
-/*
- Created by shayh on 18/03/2024.
-*/
-
 #ifndef MMN14_MAP_H
 #define MMN14_MAP_H
 

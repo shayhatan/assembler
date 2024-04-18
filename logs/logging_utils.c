@@ -1,17 +1,11 @@
-
-/*
- Created by User on 17/03/2024.
-*/
-
-
 #ifndef ASSEMBLER_UTILS_LOGS_H
 #define ASSEMBLER_UTILS_LOGS_H
 
 
+#include "../utils/string_utils.h"
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stdio.h>
-#include "utils/string_utils.h"
+
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 

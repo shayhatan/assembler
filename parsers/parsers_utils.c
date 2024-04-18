@@ -1,11 +1,4 @@
-/*
- Created by User on 20/03/2024.
-*/
-
-
-
 #include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
@@ -13,7 +6,7 @@
 #include "./parse_types.h"
 #include "../logs/logging_utils.h"
 #include "./parsers_utils.h"
-#include "utils/string_utils.h"
+#include "../utils/string_utils.h"
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
