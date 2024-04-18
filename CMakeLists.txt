@@ -44,6 +44,16 @@ add_executable(assembler
         utils/memory.c
         tables/externals_table.c
         tables/externals_table.h
+        precomplie/precompile.c
+        precomplie/precompile.h
+        precomplie/macro/macro_parser.c
+        precomplie/macro/macro_parser.h
+        precomplie/macro/macros.c
+        precomplie/macro/macros.c
+        precomplie/precompile_list/sorted_list.c
+        precomplie/precompile_list/sorted_list.h
+        runs/assembler_run.c
+        runs/assembler_run.h
 )
 
 # Link math library
