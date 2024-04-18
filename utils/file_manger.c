@@ -1,5 +1,5 @@
-#include "./file_manger.h"
-#include "./memory.h"
+#include "file_manger.h"
+#include "memory.h"
 #include <stdlib.h>
 #include <string.h>
 
