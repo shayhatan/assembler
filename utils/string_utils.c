@@ -1,8 +1,3 @@
-/*
- Created by User on 01/04/2024.
-*/
-
-
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -10,8 +5,11 @@
 #include <limits.h>
 #include "../logs/logging_utils.h"
 #include "./memory.h"
-
+#define INSTRUCTION_SIZE 4
+#define CMD_SIZE 15
+#define REG_SIZE 8
 #define min(a, b) (((a) < (b)) ? (a) : (b))
+
 
 /* duplicate str without allocation */
 void duplicateStr(const char *original, char *target, int length) {
@@ -193,4 +191,28 @@ void resetString(char* string) {
     for (; i < length; i++) {
         string[i] = '\0';
     }
+}
+
+bool isInstruction(char *str) {
+    char *inst[] = {".data", ".string", ".extern", ".entry"};
+    return isInArray(str, inst, INSTRUCTION_SIZE);
+}
+
+bool isCmd(char *str) {
+    char *cmd[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea",
+                   "inc", "dec", "jmp", "bne", "red", "prn", "jsr", "rts",
+                   "hlt"};
+
+    return isInArray(str, cmd, CMD_SIZE);
+
+}
+
+bool isRegister(char* str) {
+    char* regs[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
+    return isInArray(str, regs, REG_SIZE);
+}
+
+
+bool isValidMacroName(char* macro_name) {
+    return !(isRegister(macro_name) || isCmd(macro_name) || isInstruction(macro_name));
 }
