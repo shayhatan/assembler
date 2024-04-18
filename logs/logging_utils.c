@@ -11,7 +11,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "../string_utils.h"
+#include "utils/string_utils.h"
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 

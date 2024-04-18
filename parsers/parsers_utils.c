@@ -13,7 +13,7 @@
 #include "./parse_types.h"
 #include "../logs/logging_utils.h"
 #include "./parsers_utils.h"
-#include "../string_utils.h"
+#include "utils/string_utils.h"
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 

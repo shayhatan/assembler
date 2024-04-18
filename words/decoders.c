@@ -9,9 +9,9 @@
 #include "types.h"
 #include "../parsers/parse_types.h"
 #include "../parsers/parsers_utils.h"
-#include "../labels_table.h"
-#include "../string_utils.h"
-#include "../decode_table.h"
+#include "tables/labels_table.h"
+#include "utils/string_utils.h"
+#include "tables/decode_table.h"
 #include "../logs/logging_utils.h"
 #include "decoders.h"
 

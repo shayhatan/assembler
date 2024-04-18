@@ -20,28 +20,28 @@ add_executable(assembler
         words/parsers.h
         words/types.h
         consts.h
-        second_run.c
-        first_run.c
+        runs/second_run.c
+        runs/first_run.c
         data_structures/map/map.c
-        factory.h
-        labels_table.c
-        labels_table.h
+        utils/factory.h
+        tables/labels_table.c
+        tables/labels_table.h
         parsers/parsers_utils.h
         parsers/parsers_utils.c
         assembler.c
-        factory.c
+        utils/factory.c
         logs/logging_utils.c
-        string_utils.c
-        string_utils.h
+        utils/string_utils.c
+        utils/string_utils.h
         words/decoders.c
-        decode_table.h
-        decode_table.c
+        tables/decode_table.h
+        tables/decode_table.c
         words/decoders.h
         parsers/line_utils.c
         parsers/line_utils.h
-        second_run.h
-        preprocessor/file_manger/file_manger.c
-        preprocessor/helper/helper.c
+        runs/second_run.h
+        utils/file_manger.c
+        utils/memory.c
 )
 
 # Link math library

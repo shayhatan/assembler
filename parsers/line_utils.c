@@ -9,7 +9,7 @@
 #include "./parsers_utils.h"
 #include "./line_utils.h"
 #include "../logs/logging_utils.h"
-#include "../string_utils.h"
+#include "utils/string_utils.h"
 
 enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
     char temp_buffer[81];

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "map.h"
-#include "../../preprocessor/helper/helper.h"
+#include "../../utils/memory.h"
 
 #define NEG (-1)
 #define EQUAL 0

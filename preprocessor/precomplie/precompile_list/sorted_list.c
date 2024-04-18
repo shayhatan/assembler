@@ -1,5 +1,5 @@
 #include "sorted_list.h"
-#include "../../helper/helper.h"
+#include "../../utils/memory.h"
 
 Node* createNode(void *data) {
     Node* new_node = allocateMemory(sizeof(Node));

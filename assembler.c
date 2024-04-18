@@ -3,10 +3,10 @@
 */
 
 #include <stdio.h>
-#include "./first_run.h"
-#include "labels_table.h"
-#include "decode_table.h"
-#include "second_run.h"
+#include "runs/first_run.h"
+#include "tables/labels_table.h"
+#include "tables/decode_table.h"
+#include "runs/second_run.h"
 
 
 void cleanup(FILE *source_file);
