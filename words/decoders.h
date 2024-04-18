@@ -1,13 +1,8 @@
-/*
- Created by User on 09/04/2024.
-*/
-
-
 #ifndef ASSEMBLER_DECODERS_H
 #define ASSEMBLER_DECODERS_H
 
-#include "../data_structures/map/map.h"
 #include "../parsers/parse_types.h"
+#include "../data_structures/map/map.h"
 
 #define ABSOLUTE_DECODING 0
 #define EXTERNAL_DECODING 1
