@@ -16,4 +16,6 @@ void printWordsMap(void);
 
 MapResult wordUpdateDecode(int IC);
 
+MapIterationResult getNextLine(char* result);
+
 #endif /*ASSEMBLER_DECODE_TABLE_H*/

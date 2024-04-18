@@ -5,16 +5,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "./parsers/parse_types.h"
-#include "tables/labels_table.h"
-#include "./logs/logging_utils.h"
-#include "utils/factory.h"
-#include "./parsers/parsers_utils.h"
+#include "../parsers/parse_types.h"
+#include "../tables/labels_table.h"
+#include "../logs/logging_utils.h"
+#include "../utils/factory.h"
+#include "../parsers/parsers_utils.h"
 #include "./first_run.h"
-#include "utils/string_utils.h"
-#include "./parsers/line_utils.h"
-#include "tables/decode_table.h"
-#include "./words/decoders.h"
+#include "../utils/string_utils.h"
+#include "../parsers/line_utils.h"
+#include "../tables/decode_table.h"
+#include "../words/decoders.h"
 #include <ctype.h>
 
 

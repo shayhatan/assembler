@@ -186,3 +186,11 @@ bool isInArray(char* str,  char *array[], int size) {
     return false; /* Return false if the string is not found in the array */
 }
 
+void resetString(char* string) {
+    int i = 0;
+    int length = strlen(string);
+
+    for (; i < length; i++) {
+        string[i] = '\0';
+    }
+}

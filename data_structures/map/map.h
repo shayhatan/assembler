@@ -246,4 +246,13 @@ MapResult mapClear(Map map);
     for(iterator = (type) mapGetFirst(map) ; \
         iterator != NULL ;\
         iterator = mapGetNext(map))
+
+
+typedef enum {
+    UNDEFINED_MAP,
+    NULL_NODE,
+    SUCCESSFUL_ITERATION,
+    ITERATION_FINISHED
+} MapIterationResult;
+
 #endif /*MMN14_MAP_H*/

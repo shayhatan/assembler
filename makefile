@@ -54,7 +54,7 @@ $(OBJ_DIR)/parsers_utils.o: parsers/parsers_utils.c parsers/parsers_utils.h pars
 $(OBJ_DIR)/decoders.o: words/decoders.h words/decoders.c data_structures/map/map.h data_structures/map/map.c parsers/parse_types.h parsers/parsers_utils.h parsers/parsers_utils.c logs/logging_utils.h logs/logging_utils.c words/consts.h utils/string_utils.h utils/string_utils.c tables/labels_table.h tables/labels_table.c utils/memory.h utils/memory.c
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/decoders.o -c words/decoders.c
 
-$(OBJ_DIR)/decoders_table.o: tables/decode_table.h tables/decode_table.c data_structures/map/map.h data_structures/map/map.c words/types.h
+$(OBJ_DIR)/decoders_table.o: tables/decode_table.h tables/decode_table.c data_structures/map/map.h data_structures/map/map.c words/types.h utils/string_utils.c utils/string_utils.h
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/decoders_table.o -c decode_table.c
 
 $(OBJ_DIR)/line_utils.o: parsers/line_utils.h parsers/line_utils.c parsers/parse_types.h parsers/parsers_utils.h parsers/parsers_utils.c logs/logging_utils.h logs/logging_utils.c utils/string_utils.h utils/string_utils.c

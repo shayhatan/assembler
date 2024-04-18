@@ -11,8 +11,12 @@
 #include "../data_structures/map/map.h"
 #include "../words/types.h"
 #include "../utils/memory.h"
+#include "./decode_table.h"
+#include "utils/string_utils.h"
 
 Map words_map;
+
+void compileInstruction(char *result, const int *key_ptr, const word *current_word);
 
 static MapDataElement copyElement(MapDataElement existing) {
     word *clone;
@@ -190,26 +194,68 @@ MapResult wordUpdateDecode(int IC) {
     return MAP_SUCCESS;
 }
 
-void printWordsMap() {
-    int *iter;
-    word *current_word;
-    MAP_FOREACH(int *, iter, words_map) {
-        char base2_buffer[15];
-        char base4_buffer[8];
-        char encrypted_buffer[8];
+MapIterationResult getNextLine(char* result) {
+    static int iter = -1;
+    int* key_ptr = NULL;
+    word* current_word;
+    char base2_buffer[15];
+    char base4_buffer[8];
+    char encrypted_buffer[8];
 
-        current_word = mapGet(words_map, iter);
-
-        base10ToBase2(current_word->print, base2_buffer);
-        binaryToBase4(base2_buffer, base4_buffer);
-        base4ToEncrypted(base4_buffer, encrypted_buffer);
-
-        printf("%04i\t%s\n", *iter, encrypted_buffer);
-        free(iter);
+    if (words_map == NULL) {
+        return UNDEFINED_MAP;
     }
 
+    if (iter == -1) {
+        key_ptr = mapGetFirst(words_map);
+        if (key_ptr == NULL) {
+            return NULL_NODE;
+        }
+        current_word = mapGet(words_map, key_ptr);
+        iter++;
+        compileInstruction(result, key_ptr, current_word);
+        free(key_ptr);
+
+        return SUCCESSFUL_ITERATION;
+    }
+
+    key_ptr = mapGetNext(words_map);
+    if (key_ptr == NULL) { /* reached end of map */
+        iter = -1;
+        return ITERATION_FINISHED;
+    }
+    current_word = mapGet(words_map, key_ptr);
+    iter++;
+    compileInstruction(result, key_ptr, current_word);
+    free(key_ptr);
+
+    return SUCCESSFUL_ITERATION;
 }
 
+void compileInstruction(char *result, const int *key_ptr, const word *current_word) {
+    char base2_buffer[15];
+    char base4_buffer[8];
+    char encrypted_buffer[8];
+    base10ToBase2(current_word->print, base2_buffer);
+    binaryToBase4(base2_buffer, base4_buffer);
+    base4ToEncrypted(base4_buffer, encrypted_buffer);
+
+    sprintf(result, "%d", *key_ptr);
+    *(result + strlen(result)) = '\t';
+    *(result + strlen(result)+1) = '\0';
+    strcpy(result+ strlen(result), encrypted_buffer);
+}
+
+void printWordsMap() {
+    char buffer[81] = {'\0'};
+    MapIterationResult status = getNextLine(buffer);
+
+    while (status == SUCCESSFUL_ITERATION) {
+        printf("%s\n", buffer);
+        resetString(buffer);
+        status = getNextLine(buffer);
+    }
+}
 
 #endif /*ASSEMBLER_DECODE_TABLE_H*/
 

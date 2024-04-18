@@ -5,12 +5,11 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "tables/labels_table.h"
-#include "parsers/parse_types.h"
-#include "parsers/line_utils.h"
-#include "logs/logging_utils.h"
-#include "words/decoders.h"
-#include "utils/string_utils.h"
+#include "../tables/labels_table.h"
+#include "../parsers/line_utils.h"
+#include "../logs/logging_utils.h"
+#include "../words/decoders.h"
+#include "../utils/string_utils.h"
 
 static int address = 100;
 
