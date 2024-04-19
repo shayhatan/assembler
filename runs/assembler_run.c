@@ -32,12 +32,15 @@ void assemblerRun(char *files[], int index) {
     /* first run has finished successfully */
     if (run_result == OUT_OF_MEMORY) {
         cleanup(source_file);
+        remove(am_file);
         exit(1);
     }
 
     printLabelsTable();
     fseek(source_file, 0, SEEK_SET);
     run_result = secondRun(source_file);
+    /*Do we need any check for result here? @itay ?*/
+
     printWordsMap();
     printExternals();
 

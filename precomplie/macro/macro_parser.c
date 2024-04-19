@@ -160,7 +160,7 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file) {
     }
 
     strcpy(am_file, destination_base); /* Copy destination file name to am_file */
-
+    printf("=========  am file  ================\n");
     while (fgets(line, PRE_MAX_LINE, file) != NULL) {
         Node *current = macros->macros->head;
         while (current != NULL) {
@@ -258,7 +258,6 @@ bool removeMacros(const char *source_filename, char *destination_filename, Macro
     fclose(source_file);
     fclose(destination_file);
 
-    printf("File %s processed with macros and saved to %s successfully\n", source_filename, destination_base);
     return true;
 }
 
