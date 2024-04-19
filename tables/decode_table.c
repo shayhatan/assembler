@@ -236,12 +236,12 @@ void compileInstruction(char *result, const int *key_ptr, const word *current_wo
     strcpy(result+ strlen(result), encrypted_buffer);
 }
 
-void printWordsMap() {
+void printWordsMap(FILE* ob_file) {
     char buffer[81] = {'\0'};
     MapIterationResult status = getNextLine(buffer);
-
     while (status == SUCCESSFUL_ITERATION) {
         printf("%s\n", buffer);
+        fprintf(ob_file, "%s\n", buffer);
         resetString(buffer);
         status = getNextLine(buffer);
     }
