@@ -12,13 +12,13 @@ void cleanup(FILE *source_file);
 
 void assemblerRun(char *files[], int index) {
     char am_file[81] = "";
+    int run_result = -3; /* undefined */
+    FILE *source_file;
 
     if (!preCompile(files, am_file, index))
         return;
 
-    int run_result = -3; /* undefined */
-
-    FILE *source_file = fopen(am_file, "r");
+    source_file = fopen(am_file, "r");
 
     if (source_file == NULL)
         return;
