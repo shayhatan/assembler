@@ -247,3 +247,6 @@ void printWordsMap() {
     }
 }
 
+bool isEmptyWordsMap() {
+    return mapGetSize(words_map) == 0;
+}
