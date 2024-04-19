@@ -114,12 +114,17 @@ MapIterationResult getNextExternal(char* result) {
     return SUCCESSFUL_ITERATION;
 }
 
-void printExternals() {
+bool isEmptyExternals() {
+    return mapGetSize(externals_map) == 0;
+}
+
+void printExternals(FILE* ext_file) {
     char buffer[81] = {'\0'};
     MapIterationResult status = getNextExternal(buffer);
-
+    printf("===========Print Externals==============\n");
     while (status == SUCCESSFUL_ITERATION) {
         printf("%s\n", buffer);
+        fprintf(ext_file, "%s\n", buffer);
         resetString(buffer);
         status = getNextExternal(buffer);
     }
