@@ -2,6 +2,7 @@
 #define ASSEMBLER_EXTERNALS_TABLE_H
 
 #include "../data_structures/map/map.h"
+#include <stdio.h>
 
 void externalsMapInit();
 
