@@ -3,6 +3,7 @@
 
 #include "../data_structures/map/map.h"
 #include "../words/types.h"
+#include <stdio.h>
 
 void wordsMapInit ();
 void wordsMapDispose();
