@@ -8,7 +8,6 @@ void wordsMapInit ();
 void wordsMapDispose();
 
 MapResult addWord(int address, word *word);
-void printWordsMap(void);
 
 MapResult wordUpdateDecode(int IC);
 
