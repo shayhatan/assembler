@@ -14,4 +14,6 @@ MapResult wordUpdateDecode(int IC);
 
 MapIterationResult getNextLine(char* result);
 
+bool isEmptyWordsMap();
+
 #endif /*ASSEMBLER_DECODE_TABLE_H*/
