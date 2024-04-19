@@ -9,6 +9,8 @@ void externalsMapDispose();
 
 MapResult addExternal(int address, char *label);
 
-void printExternals();
+bool isEmptyExternals();
+
+void printExternals(FILE* ext_file);
 
 #endif /*ASSEMBLER_EXTERNALS_TABLE_H*/
