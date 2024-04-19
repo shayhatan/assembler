@@ -160,7 +160,7 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file) {
     }
 
     strcpy(am_file, destination_base); /* Copy destination file name to am_file */
-    printf("=========  am file  ================\n");
+    printf("===========Am File==================\n");
     while (fgets(line, PRE_MAX_LINE, file) != NULL) {
         Node *current = macros->macros->head;
         while (current != NULL) {
