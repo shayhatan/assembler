@@ -69,4 +69,12 @@ bool isLineTooLong(const char *line);
  */
 char *copyTextFile(FILE *fp, fpos_t *pos, int length);
 
+/**
+ * Check if a file name ends with ".am".
+ *
+ * @param file_name The name of the file to check.
+ * @return true if the file name ends with ".am", false otherwise.
+ */
+bool endsWithAM(const char *file_name);
+
 #endif /* MMN14_FORMAT_PARSER_H */
