@@ -6,22 +6,35 @@
 #include "../runs/second_run.h"
 #include "../tables/externals_table.h"
 #include "../precomplie/precompile.h"
+#include "../utils/file_manger.h"
 #include <stdlib.h>
 
-void cleanup(FILE *source_file);
+
+void cleanup(FILE *source_file, FILE *obj_file, FILE *ext_file, bool obj_removed, bool ext_removed);
 
 void assemblerRun(char *files[], int index) {
-    char am_file[81] = "";
-    int run_result = -3; /* undefined */
-    FILE *source_file;
+    char am_file[81] = "", ob_file[81] = "", ex_file[81] = ""; /*Need to add file of enrty and handle errors properly*/
+    int run_result = -3;
+    bool obj_removed = false, ext_removed = false;
 
-    if (!preCompile(files, am_file, index))
+    FILE *source_file = NULL, *obj_file = NULL, *ext_file = NULL;
+    
+    if (!preCompile(files, am_file, index)) {
         return;
+    }
+
+    generateOutputFileName(files[index], ob_file, ".ob");
+    generateOutputFileName(files[index], ex_file, ".ext");
 
     source_file = fopen(am_file, "r");
+    obj_file = fopen(ob_file, "w");
+    ext_file = fopen(ex_file, "w");
 
-    if (source_file == NULL)
+    if (!source_file || !obj_file || !ext_file) {
+        perror("Error opening files");
+        cleanup(source_file, obj_file, ext_file, obj_removed, ext_removed);
         return;
+    }
 
     labelsTableInit();
     wordsMapInit();
@@ -29,31 +42,42 @@ void assemblerRun(char *files[], int index) {
 
     run_result = run(source_file);
 
-    /* first run has finished successfully */
     if (run_result == OUT_OF_MEMORY) {
-        cleanup(source_file);
-        remove(am_file);
+        cleanup(source_file, obj_file, ext_file, obj_removed, ext_removed);
         exit(1);
     }
 
     printLabelsTable();
     fseek(source_file, 0, SEEK_SET);
     run_result = secondRun(source_file);
-    /*Do we need any check for result here? @itay ?*/
+    printWordsMap(obj_file);
+    printExternals(ext_file);
 
-    printWordsMap();
-    printExternals();
+    if (isEmptyWordsMap()) {
+        fclose(obj_file);
+        remove(ob_file);
+        obj_removed = true;
+    }
 
-    printf("run finished with status %d\n", run_result);
+    if (isEmptyExternals()) {
+        fclose(ext_file);
+        remove(ex_file);
+        ext_removed = true;
+    }
 
-    cleanup(source_file);
-
+    printf("Run finished with status %d\n", run_result);
+    cleanup(source_file, obj_file, ext_file, obj_removed, ext_removed);
 }
 
-
-void cleanup(FILE *source_file) {
+void cleanup(FILE *source_file, FILE *obj_file, FILE *ext_file, bool obj_removed, bool ext_removed) {
     externalsMapDispose();
     wordsMapDispose();
     labelsTableDispose();
-    fclose(source_file);
+
+    if (source_file)
+        fclose(source_file);
+    if (obj_file && !obj_removed)
+        fclose(obj_file);
+    if (ext_file && !ext_removed)
+        fclose(ext_file);
 }
