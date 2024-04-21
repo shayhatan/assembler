@@ -50,8 +50,8 @@ void assemblerRun(char *files[], int index) {
     printLabelsTable();
     fseek(source_file, 0, SEEK_SET);
     run_result = secondRun(source_file);
-    printWordsMap(obj_file);
-    printExternals(ext_file);
+    writeWordsMap(obj_file);
+    writeExternals(ext_file);
 
     if (isEmptyWordsMap()) {
         fclose(obj_file);

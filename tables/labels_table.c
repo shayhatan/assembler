@@ -8,7 +8,7 @@
 #include "../utils/memory.h"
 
 static Map labels_table;
-
+extern unsigned int IC = 0, DC = 0;
 
 MapDataElement copyElement(MapDataElement existing) {
     entry *clone = allocateMemory(sizeof(entry));
@@ -131,12 +131,31 @@ void printLabelsTable() {
         printf("%s\t%d\t%s\t%d\n", (char *) iter, currentEntry->value, currentEntry->classification,
                currentEntry->wordsCounter);
 
-
         free(iter);
     }
 
     printf("====================================\n");
+}
 
+void getDCAndIC(char buffer[81]) {
+    entry *currentEntry = NULL;
+    char* iter;
+    if (labels_table == NULL) return;
+    MAP_FOREACH(char*, iter, labels_table) {
+        if (iter == NULL) {
+            break;
+        }
+        currentEntry = mapGet(labels_table, iter);
+        if (currentEntry == NULL) {
+            logError("unreachable code had been reached");
+            free(iter);
+            return;
+        }
+
+        free(iter);
+    }
+
+    sprintf(buffer, "%d\t%d", IC, DC);
 }
 
 MapResult setEntryLabel(char* label) {

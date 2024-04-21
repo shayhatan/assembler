@@ -12,10 +12,8 @@
 #include "../tables/decode_table.h"
 #include "../words/decoders.h"
 
-
-
 bool errored;
-unsigned int IC = 0, DC = 0;
+extern unsigned int IC, DC;
 
 void countStringWords(char *label, char *strPtr) {
     while (*strPtr != '\0') {
@@ -43,7 +41,7 @@ int countDataWords(char *label, void *ptr) {
         logError(".data symbol %s must be a constant definition", strPtr);
         return false;
     }
-    incrementLabelWordsCounter(strPtr);
+    incrementLabelWordsCounter(label);
     return true;
 }
 
@@ -91,7 +89,6 @@ static AnalyzeStatus analyzeLine(input_line line) {
             int index;
             int temp;
 
-            incrementLabelWordsCounter(line.label);
             addedEntry = getEntry(line.label);
             temp = addedEntry->value;
 
@@ -208,5 +205,6 @@ ParseResult run(FILE *srcFile) {
     /*update all symbols with data classification to IC + 100 */
     updateDataLabels(IC);
     wordUpdateDecode((int)IC + 100);
+
     return PARSE_SUCCESS;
 }

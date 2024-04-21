@@ -7,7 +7,7 @@ bool preCompile(char *arr[], char* am_file, int dex) {
     char temp_file1[PRE_MAX_LINE] = "";
     char temp_file2[PRE_MAX_LINE] = "";
     /* Insure file ends with am extension */
-    if (!endsWithAM(arr[dex]))
+    if (!endsWithAS(arr[dex]))
         return false; /* @itay */ /* error msg to log*/
 
 

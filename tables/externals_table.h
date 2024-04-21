@@ -12,6 +12,6 @@ MapResult addExternal(int address, char *label);
 
 bool isEmptyExternals();
 
-void printExternals(FILE* ext_file);
+void writeExternals(FILE* ext_file);
 
 #endif /*ASSEMBLER_EXTERNALS_TABLE_H*/

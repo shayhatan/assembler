@@ -4,6 +4,8 @@
 #include "../parsers/parse_types.h"
 #include "../data_structures/map/map.h"
 
+extern unsigned int IC, DC;
+
 /**
  * allocates a map
  */
@@ -31,5 +33,7 @@ void printLabelsTable(void);
 MapResult setEntryLabel(char *label);
 
 MapResult getConstantByLabel(char* label, unsigned int* result);
+
+void getDCAndIC(char buffer[81]);
 
 #endif /*ASSEMBLER_LABELS_TABLE_H*/

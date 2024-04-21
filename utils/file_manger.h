@@ -75,6 +75,6 @@ char *copyTextFile(FILE *fp, fpos_t *pos, int length);
  * @param file_name The name of the file to check.
  * @return true if the file name ends with ".am", false otherwise.
  */
-bool endsWithAM(const char *file_name);
+bool endsWithAS(const char *file_name);
 
 #endif /* MMN14_FORMAT_PARSER_H */

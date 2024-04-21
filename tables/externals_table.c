@@ -118,7 +118,7 @@ bool isEmptyExternals() {
     return mapGetSize(externals_map) == 0;
 }
 
-void printExternals(FILE* ext_file) {
+void writeExternals(FILE* ext_file) {
     char buffer[81] = {'\0'};
     MapIterationResult status = getNextExternal(buffer);
     printf("===========Print Externals==============\n");

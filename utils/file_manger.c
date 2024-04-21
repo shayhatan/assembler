@@ -139,8 +139,8 @@ bool formatFile(const char *input_file_name, char *new_file1) {
         }
         formatString(line); /* Format the line */
         /* Skip blank lines */ /* Do we want to skip? @itay*/
-        length = strlen(line);
-        if (length > 0)
+        /*length = strlen(line);
+        if (length > 0)*/
             fprintf(output_file, "%s\n", line); /* Write formatted line to output file */
     }
 
@@ -152,13 +152,13 @@ bool formatFile(const char *input_file_name, char *new_file1) {
 
 
 /* Function to check if a file name ends with ".am" */
-bool endsWithAM(const char *file_name) {
+bool endsWithAS(const char *file_name) {
     size_t len = strlen(file_name); // Get the length of the file name
 
     // Check if the file name is at least 3 characters long
     if (len >= 3) {
         // Compare the last three characters of the file name with ".am"
-        return (strcmp(file_name + len - 3, ".am") == 0);
+        return (strcmp(file_name + len - 3, ".as") == 0);
     } else {
         // File name is too short to end with ".am"
         return false;

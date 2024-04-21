@@ -6,8 +6,10 @@
 #include "../utils/memory.h"
 #include "./decode_table.h"
 #include "../utils/string_utils.h"
+#include "labels_table.h"
 
 Map words_map;
+extern unsigned int IC, DC;
 
 void compileInstruction(char *result, const int *key_ptr, const word *current_word);
 
@@ -236,9 +238,13 @@ void compileInstruction(char *result, const int *key_ptr, const word *current_wo
     strcpy(result+ strlen(result), encrypted_buffer);
 }
 
-void printWordsMap(FILE* ob_file) {
+void writeWordsMap(FILE* ob_file) {
     char buffer[81] = {'\0'};
-    MapIterationResult status = getNextLine(buffer);
+    MapIterationResult status;
+
+    getDCAndIC(buffer);
+    fprintf(ob_file, "%s\n", buffer);
+    status = getNextLine(buffer);
     while (status == SUCCESSFUL_ITERATION) {
         printf("%s\n", buffer);
         fprintf(ob_file, "%s\n", buffer);
