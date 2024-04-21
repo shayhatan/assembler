@@ -118,14 +118,17 @@ bool isEmptyExternals() {
     return mapGetSize(externals_map) == 0;
 }
 
-void writeExternals(FILE* ext_file) {
+int writeExternals(FILE* ext_file) {
+    int size = 0; /* if size is 0  by the end of the func we wont create ext_file*/
     char buffer[81] = {'\0'};
     MapIterationResult status = getNextExternal(buffer);
     printf("===========Print Externals==============\n");
     while (status == SUCCESSFUL_ITERATION) {
+        ++size;
         printf("%s\n", buffer);
         fprintf(ext_file, "%s\n", buffer);
         resetString(buffer);
         status = getNextExternal(buffer);
-    }
+    }    
+    return size;
 }
