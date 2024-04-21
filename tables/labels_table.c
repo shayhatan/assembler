@@ -197,3 +197,19 @@ MapResult getConstantByLabel(char* label, unsigned int* result) {
     *result = (unsigned) constant_entry->value;
     return MAP_SUCCESS;
 }
+
+int writeEntriesFile(FILE* ent_file) {
+    char* iter; 
+    entry* data;
+    int size = 0;
+    printf("=======ENTRY======");
+    for (iter = mapGetFirst(labels_table); iter != NULL; iter = mapGetNext(labels_table)) {
+        data = mapGet(labels_table, iter);
+        if(data->isEntry) {
+          printf("\n%s, %d\n",iter, data->value);
+          fprintf(ent_file, "%s\t%d", iter, data->value);
+        }
+        free(iter);
+    }
+    return size;
+}
