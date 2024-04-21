@@ -36,4 +36,6 @@ MapResult getConstantByLabel(char* label, unsigned int* result);
 
 void getDCAndIC(char buffer[81]);
 
+int writeEntriesFile(FILE* ent_file);
+
 #endif /*ASSEMBLER_LABELS_TABLE_H*/
