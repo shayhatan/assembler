@@ -16,6 +16,5 @@ MapIterationResult getNextLine(char* result);
 
 bool isEmptyWordsMap();
 
-void writeWordsMap(FILE* ob_file);
-
+int writeWordsMap(FILE* ob_file);
 #endif /*ASSEMBLER_DECODE_TABLE_H*/
