@@ -238,19 +238,22 @@ void compileInstruction(char *result, const int *key_ptr, const word *current_wo
     strcpy(result+ strlen(result), encrypted_buffer);
 }
 
-void writeWordsMap(FILE* ob_file) {
+int writeWordsMap(FILE* ob_file) {
     char buffer[81] = {'\0'};
     MapIterationResult status;
+    int size = 0 /* If empty we won't create a file*/
 
     getDCAndIC(buffer);
     fprintf(ob_file, "%s\n", buffer);
     status = getNextLine(buffer);
     while (status == SUCCESSFUL_ITERATION) {
+        ++size;
         printf("%s\n", buffer);
         fprintf(ob_file, "%s\n", buffer);
         resetString(buffer);
         status = getNextLine(buffer);
     }
+    return size;
 }
 
 bool isEmptyWordsMap() {
