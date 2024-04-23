@@ -48,6 +48,7 @@ static enum ParseResult analyzeLine(input_line *line) {
 enum ParseResult secondRun(FILE *srcFile) {
     char buffer[81];
     int index = 0;
+    bool errored;
 
     while (fgets(buffer, 81, srcFile) != 0) {
         input_line line;
@@ -58,9 +59,13 @@ enum ParseResult secondRun(FILE *srcFile) {
 
         resetLine(&line);
 
-        setLogLineContext(index, buffer);
+        setLogLineContext(index, buffer, "second-run");
 
         parse_result = parseLine(buffer, index++, &line);
+
+        if (!errored) {
+            errored = parse_result != PARSE_SUCCESS;
+        }
 
         switch (parse_result) {
             case PARSE_FAILURE:
@@ -76,7 +81,6 @@ enum ParseResult secondRun(FILE *srcFile) {
                 break;
         }
 
-
         if (line.isComment || line.isEmpty) {
             disposeLine(&line);
             continue;
@@ -91,7 +95,7 @@ enum ParseResult secondRun(FILE *srcFile) {
             case OUT_OF_MEMORY:
                 shouldStop = true;
                 logError("Out of memory!\n");
-                break;
+                return OUT_OF_MEMORY;
         }
         disposeLine(&line);
         if (shouldStop) {

@@ -232,16 +232,13 @@ void compileInstruction(char *result, const int *key_ptr, const word *current_wo
     binaryToBase4(base2_buffer, base4_buffer);
     base4ToEncrypted(base4_buffer, encrypted_buffer);
 
-    sprintf(result, "%d", *key_ptr);
-    *(result + strlen(result)) = '\t';
-    *(result + strlen(result)+1) = '\0';
-    strcpy(result+ strlen(result), encrypted_buffer);
+    sprintf(result, "%d\t%s", *key_ptr, encrypted_buffer);
 }
 
 int writeWordsMap(FILE* ob_file) {
     char buffer[81] = {'\0'};
     MapIterationResult status;
-    int size = 0 /* If empty we won't create a file*/
+    int size = 0; /* If empty we won't create a file*/
 
     getDCAndIC(buffer);
     fprintf(ob_file, "%s\n", buffer);

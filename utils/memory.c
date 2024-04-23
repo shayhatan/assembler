@@ -1,7 +1,7 @@
 #include "./memory.h"
 #include "../logs/logging_utils.h"
 
-#define MAX_MEMORY_POOL 4000
+#define MAX_MEMORY_POOL 4096
 
 int current_allocated_memory = 0;
 
@@ -9,7 +9,7 @@ Pointer allocateMemory(size_t size) {
     Pointer ptr;
 
     if (current_allocated_memory + size >= MAX_MEMORY_POOL) {
-        logError("max allowed memory encountered");
+        logError("max allowed memory encountered\n");
         return NULL;
     }
     ptr = malloc(size);

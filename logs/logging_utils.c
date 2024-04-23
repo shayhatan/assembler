@@ -5,26 +5,27 @@
 #include "../utils/string_utils.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
-extern bool errored;
-
 char prefix[81];
+char context[81];
 int line;
 
-void setLogLineContext(int line_number, char *line_text) {
+void setLogLineContext(int line_number, char *line_text, char* ctx) {
     int index = min(indexOfChar(line_text, '\n'), indexOfChar(line_text, '\0'));
     line = line_number;
     duplicateStr(line_text, prefix, index);
+    strcpy(context, ctx);
 }
 
 void logError(char *error_msg, ...) {
     va_list lst;
     va_start(lst, error_msg);
 
-    printf("[ERROR][line-%d] \"%s\" - failed by: ", line, prefix);
+    printf("[ERROR][context=%s][#line=%d]: \"%s\" - failed by - ", context, line, prefix);
 
     while (*error_msg != '\0') {
         if (*error_msg != '%') {

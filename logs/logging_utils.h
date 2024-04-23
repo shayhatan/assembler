@@ -4,9 +4,7 @@
 
 #include <stdbool.h>
 
-extern bool errored;
-
-void setLogLineContext(int line_number, char *line_text);
+void setLogLineContext(int line_number, char *line_text, char* ctx);
 
 void logError(char *error_msg, ...);
 

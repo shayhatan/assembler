@@ -9,6 +9,7 @@
 
 static Map labels_table;
 extern unsigned int IC = 0, DC = 0;
+static hasDotEntry = false;
 
 MapDataElement copyElement(MapDataElement existing) {
     entry *clone = allocateMemory(sizeof(entry));
@@ -20,6 +21,7 @@ MapDataElement copyElement(MapDataElement existing) {
     clone->classification = allocatedDuplicateString(existingEntry->classification);
     clone->wordsCounter = existingEntry->wordsCounter;
     clone->value = existingEntry->value;
+    clone->isEntry = existingEntry->isEntry;
     return clone;
 }
 
@@ -44,7 +46,9 @@ void cleanMapKeyElements(MapKeyElement key) {
 int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     char *s1 = key1;
     char *s2 = key2;
-    return strcmp(s1, s2);
+    int result = strcmp(s1, s2);
+    if (result != 0) return -result;
+    return result;
 }
 
 void labelsTableInit() {
@@ -116,7 +120,7 @@ void printLabelsTable() {
     char* iter;
     if (labels_table == NULL) return;
     printf("============Labels table============\n");
-    printf("Label\tValue\tClassification\tExtra Words\n");
+    printf("Label\tValue\tClassification\tExtra Words\tisEntry\n");
     MAP_FOREACH(char*, iter, labels_table) {
         if (iter == NULL) {
             printf("====================================\n");
@@ -128,8 +132,8 @@ void printLabelsTable() {
             free(iter);
             return;
         }
-        printf("%s\t%d\t%s\t%d\n", (char *) iter, currentEntry->value, currentEntry->classification,
-               currentEntry->wordsCounter);
+        printf("%s\t%d\t%s\t%d\t%d\n", (char *) iter, currentEntry->value, currentEntry->classification,
+               currentEntry->wordsCounter, currentEntry->isEntry);
 
         free(iter);
     }
@@ -177,6 +181,7 @@ MapResult setEntryLabel(char* label) {
     }
 
     labelEntry->isEntry = true;
+    hasDotEntry = true;
 
     return MAP_SUCCESS;
 }
@@ -198,16 +203,20 @@ MapResult getConstantByLabel(char* label, unsigned int* result) {
     return MAP_SUCCESS;
 }
 
+bool hasAnyDotEntryLabel(void) {
+    return hasDotEntry;
+}
+
 int writeEntriesFile(FILE* ent_file) {
     char* iter; 
-    entry* data;
+    entry* data = NULL;
     int size = 0;
     printf("=======ENTRY======");
     for (iter = mapGetFirst(labels_table); iter != NULL; iter = mapGetNext(labels_table)) {
         data = mapGet(labels_table, iter);
-        if(data->isEntry) {
+        if (data->isEntry) {
           printf("\n%s, %d\n",iter, data->value);
-          fprintf(ent_file, "%s\t%d", iter, data->value);
+          fprintf(ent_file, "%s\t%d\n", iter, data->value);
         }
         free(iter);
     }

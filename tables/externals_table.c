@@ -8,10 +8,7 @@
 Map externals_map;
 
 void compileExternal(char *result, int *line_number, char* current_external) {
-    sprintf(result, "%d", *line_number);
-    *(result + strlen(result)) = '\t';
-    *(result + strlen(result)+1) = '\0';
-    strcpy(result+ strlen(result), current_external);
+    sprintf(result, "%s\t%d", current_external, *line_number);
 }
 
 static MapDataElement copyElement(MapDataElement existing) {

@@ -12,7 +12,6 @@
 #include "../tables/decode_table.h"
 #include "../words/decoders.h"
 
-bool errored;
 extern unsigned int IC, DC;
 
 void countStringWords(char *label, char *strPtr) {
@@ -148,6 +147,7 @@ static AnalyzeStatus analyzeLine(input_line line) {
 ParseResult run(FILE *srcFile) {
     char buffer[81] = "";
     int index = 0;
+    bool errored = false;
 
     while (fgets(buffer, 81, srcFile) != 0) {
         input_line line;
@@ -156,9 +156,13 @@ ParseResult run(FILE *srcFile) {
         removeExcessSpaces(buffer);
         resetLine(&line);
 
-        setLogLineContext(index, buffer);
+        setLogLineContext(index, buffer, "first-run");
 
         parse_result = parseLine(buffer, index++, &line);
+
+        if (!errored) {
+            errored = parse_result != PARSE_SUCCESS;
+        }
 
         switch (parse_result) {
             case PARSE_FAILURE:
@@ -189,7 +193,7 @@ ParseResult run(FILE *srcFile) {
             case ANALYZE_OUT_OF_MEMORY:
                 shouldStop = true;
                 logError("Out of memory!\n");
-                break;
+                return OUT_OF_MEMORY;
         }
         disposeLine(&line);
         memset(buffer, 0, sizeof(buffer)); /* clear buffer */

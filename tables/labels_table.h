@@ -1,6 +1,8 @@
 #ifndef ASSEMBLER_LABELS_TABLE_H
 #define ASSEMBLER_LABELS_TABLE_H
 
+#include <stdio.h>
+#include <stdbool.h>
 #include "../parsers/parse_types.h"
 #include "../data_structures/map/map.h"
 
@@ -36,6 +38,7 @@ MapResult getConstantByLabel(char* label, unsigned int* result);
 
 void getDCAndIC(char buffer[81]);
 
+bool hasAnyDotEntryLabel(void);
 int writeEntriesFile(FILE* ent_file);
 
 #endif /*ASSEMBLER_LABELS_TABLE_H*/
