@@ -7,7 +7,13 @@
 #include <stdlib.h>
 #include "assembler.h"
 
-void cleanup(void);
+
+/*What's left?
+ * errors final touch
+ * in assemblerRun (here) refine the way we handle files
+ * in macro module we might want to allocate its name
+ * eliminate magic numbers such as 81
+ * */
 
 void assemblerRun(char *files[], int index) {
     char am_file[81] = "", ob_file[81] = "", ex_file[81] = "", ent_file[81] = ""; /*Need to  handle errors properly*/
