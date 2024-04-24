@@ -20,7 +20,7 @@ void duplicateStr(const char *original, char *target, int length) {
     target[i] = '\0';
 }
 
-char *allocatedDuplicateString(char *str) {
+char *allocatedDuplicateString(const char *str) {
     size_t len = strlen(str) + 1;
     char *copy = (char *) allocateMemory(len);
     if (str == NULL)

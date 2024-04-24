@@ -8,7 +8,7 @@
 void duplicateStr(const char *original, char *target, int length);
 
 /* duplicate str with allocation */
-char *allocatedDuplicateString(char *s1);
+char *allocatedDuplicateString(const char *s1);
 
 int indexOfChar(const char *str, char ch);
 

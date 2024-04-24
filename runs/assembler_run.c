@@ -11,7 +11,6 @@
 /*What's left?
  * errors final touch
  * in assemblerRun (here) refine the way we handle files
- * in macro module we might want to allocate its name
  * eliminate magic numbers such as 81
  * */
 

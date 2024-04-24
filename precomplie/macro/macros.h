@@ -10,7 +10,7 @@
 
 /* Struct for storing macro information */
 typedef struct {
-    char macro_name[PRE_MAX_LINE];
+    char* macro_name;
     char *allocated_data;
 } Macro;
 
@@ -61,7 +61,7 @@ bool isContainMacro(Macros *macros, const char *macro_name);
  * @param data The data associated with the macro.
  * @return A pointer to the newly created Macro structure.
  */
-Macro *createMacro(const char *macro_name, char *data);
+Macro *createMacro(char *macro_name, char *data);
 
 /**
  * Function to replace macro occurrences in a file and write the result to a new file.

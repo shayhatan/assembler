@@ -1,4 +1,5 @@
 #include "macros.h"
+#include "../../utils/string_utils.h"
 
 int compareMacroNames(const void *a, const void *b) {
     const Macro *macro_a = (const Macro *) a;
@@ -8,6 +9,7 @@ int compareMacroNames(const void *a, const void *b) {
 
 void freeMacroData(void *data) {
     Macro *macro = (Macro *) data;
+    free(macro->macro_name);
     free(macro->allocated_data);
     free(macro);
 }
@@ -29,8 +31,11 @@ void freeMacros(Macros *macros) {
 
 
 void insertMacro(Macros *macros, const char *macro_name, char *data) {
+    char *mcr_name;
+    Macro *macro;
     if (macros != NULL && macro_name != NULL && data != NULL) {
-        Macro *macro = createMacro(macro_name, data);
+        mcr_name = allocatedDuplicateString(macro_name);
+        macro = createMacro(mcr_name, data);
         if (macro != NULL) {
             insert(macros->macros, macro);
         } else {
@@ -69,10 +74,10 @@ bool isContainMacro(Macros *macros, const char *macro_name) {
     return false;
 }
 
-Macro *createMacro(const char *macro_name, char *data) {
+Macro *createMacro(char *macro_name, char *data) {
     Macro *macro = (Macro *) allocateMemory(sizeof(Macro)); /* malloc(sizeof(Macro)); */
     if (macro != NULL) {
-        strcpy(macro->macro_name, macro_name);
+        macro->macro_name = macro_name;
         macro->allocated_data = data; /* Assuming data is already allocated */
     }
     return macro;
