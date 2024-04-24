@@ -43,12 +43,3 @@ bool preCompile(char *arr[], char* am_file, int dex) {
     freeMacros(macros);
     return true;
 }
-/*
-
-
- Step 4: Replacing all macro calls with their definitions
-replaceMacrosInFile("temp2.txt", macros);
-
-Step 5: Freeing allocated memory and cleaning up
-freeMacros(macros);
-remove("temp2.txt");*/
