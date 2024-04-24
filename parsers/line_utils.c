@@ -146,5 +146,6 @@ void disposeLine(input_line *line) {
 
     line->const_definition_arg.constant_value = 0;
     line->isComment = false;
+    line->isEmpty = false;
     line->isEOF = false;
 }

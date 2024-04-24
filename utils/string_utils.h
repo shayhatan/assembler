@@ -26,5 +26,6 @@ bool tryGetNumber(char *word, int * number);
 bool isQuotedString(char *word);
 void removeExcessSpaces(char *input);
 void resetString(char* string);
+bool isValidMacroName(char* macro_name);
 
 #endif /* ASSEMBLER_STRING_UTILS_H */

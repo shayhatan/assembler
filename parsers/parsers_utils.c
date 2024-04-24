@@ -437,7 +437,12 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
         return PARSE_FAILURE;
     }
     if (!tryGetVariableString(temp_string.content, ptr)) {
-        logError("invalid constant id syntax %s\n", line);
+        if (line == NULL) {
+            logError("invalid constant id syntax NULL\n");
+        }
+        else {
+            logError("invalid constant id syntax %s\n", line);
+        }
         return PARSE_FAILURE;
     }
     argument->constant_id = allocatedDuplicateString(ptr);
@@ -455,7 +460,12 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     
     if (!tryGetNumber(temp_buffer, &argument->constant_value)) {
         /*...input is not a decimal number */
-        logError("invalid numeric constant value %s\n", line);
+        if (line == NULL) {
+            logError("invalid numeric constant value NULL\n");
+        }
+        else {
+            logError("invalid numeric constant value %s\n", line);
+        }
         return PARSE_FAILURE;
     }
 

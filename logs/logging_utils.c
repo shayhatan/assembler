@@ -25,26 +25,24 @@ void logError(char *error_msg, ...) {
     va_list lst;
     va_start(lst, error_msg);
 
-    printf("[ERROR][context=%s][#line=%d]: \"%s\" - failed by - ", context, line, prefix);
+    fprintf(stderr, "[ERROR][context=%s][#line=%d]: \"%s\" - failed by - ", context, line, prefix);
 
     while (*error_msg != '\0') {
         if (*error_msg != '%') {
-            putchar(*error_msg);
+            fprintf(stderr, "%c", *error_msg);
             error_msg++;
             continue;
         }
         error_msg++;
         switch (*error_msg) {
             case 'd':
-                /*putchar(va_arg(lst, int));*/
-                printf("%d", va_arg(lst, int));
+                fprintf(stderr, "%d", va_arg(lst, int));
                 break;
             case 's':
-                printf("%s", va_arg(lst, char*));
-                /*fputs(va_arg(lst, char *), stdout);*/
+                fprintf(stderr, "%s", va_arg(lst, char*));
                 break;
             case 'c':
-                putchar(va_arg(lst, int));
+                fprintf(stderr, "%c", va_arg(lst, int));
                 break;
         }
         error_msg++;

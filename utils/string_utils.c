@@ -212,7 +212,6 @@ bool isRegister(char* str) {
     return isInArray(str, regs, REG_SIZE);
 }
 
-
 bool isValidMacroName(char* macro_name) {
     return !(isRegister(macro_name) || isCmd(macro_name) || isInstruction(macro_name));
 }

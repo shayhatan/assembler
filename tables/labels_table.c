@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "./labels_table.h"
 #include "../logs/logging_utils.h"
 #include "../utils/factory.h"
@@ -8,8 +9,8 @@
 #include "../utils/memory.h"
 
 static Map labels_table;
-extern unsigned int IC = 0, DC = 0;
-static hasDotEntry = false;
+unsigned int IC = 0, DC = 0;
+static bool hasDotEntry = false;
 
 MapDataElement copyElement(MapDataElement existing) {
     entry *clone = allocateMemory(sizeof(entry));

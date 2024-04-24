@@ -130,7 +130,6 @@ bool formatFile(const char *input_file_name, char *new_file1) {
 
     /* Read each line from input file, format it, and write to output file */
     while (fgets(line, sizeof(line), input_file)) {
-        size_t length;
         if (isLineTooLong(line)) {
             fprintf(stderr, "Error: Line too long in input file\n");
             fclose(input_file);
@@ -150,17 +149,16 @@ bool formatFile(const char *input_file_name, char *new_file1) {
     return true;
 }
 
-
 /* Function to check if a file name ends with ".am" */
 bool endsWithAS(const char *file_name) {
-    size_t len = strlen(file_name); // Get the length of the file name
+    size_t len = strlen(file_name); /* Get the length of the file name */
 
-    // Check if the file name is at least 3 characters long
+    /*Check if the file name is at least 3 characters long*/
     if (len >= 3) {
-        // Compare the last three characters of the file name with ".am"
+        /*Compare the last three characters of the file name with ".am"*/
         return (strcmp(file_name + len - 3, ".as") == 0);
     } else {
-        // File name is too short to end with ".am"
+        /*File name is too short to end with ".am"*/
         return false;
     }
 }
