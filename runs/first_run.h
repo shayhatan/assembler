@@ -1,6 +1,7 @@
 #ifndef FIRST_RUN_H
 #define FIRST_RUN_H
 
+#include "assembler.h"
 #include "../parsers/parse_types.h"
 #include <stdio.h>
 
@@ -8,6 +9,6 @@ typedef enum {
     STOP, NEXT, ANALYZE_OUT_OF_MEMORY
 } AnalyzeStatus;
 
-ParseResult run(FILE *srcFile);
+ParseResult run(FILE *srcFile, Assembler* assembler);
 
 #endif /* FIRST_RUN_H */

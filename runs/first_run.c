@@ -9,29 +9,27 @@
 #include "./first_run.h"
 #include "../utils/string_utils.h"
 #include "../parsers/line_utils.h"
-#include "../tables/decode_table.h"
 #include "../words/decoders.h"
 
-extern unsigned int IC, DC;
 
-void countStringWords(char *label, char *strPtr) {
+void countStringWords(char *label, char *strPtr, Assembler *assembler) {
     while (*strPtr != '\0') {
         /* each character is one word */
-        incrementLabelWordsCounter(label);
+        incrementLabelWordsCounter(label, assembler->tables->labels_table);
         strPtr++;
     }
     /* also increment for '\0' */
-    incrementLabelWordsCounter(label);
+    incrementLabelWordsCounter(label, assembler->tables->labels_table);
 }
 
-int countDataWords(char *label, void *ptr) {
+int countDataWords(char *label, void *ptr, Assembler *assembler) {
     entry *temp;
     char *strPtr = ptr;
     if (isNumber(strPtr)) {
-        incrementLabelWordsCounter(label);
+        incrementLabelWordsCounter(label, assembler->tables->labels_table);
         return true;
     }
-    temp = getEntry(strPtr); /* in case we passed a symbol */
+    temp = getEntry(strPtr, assembler->tables->labels_table); /* in case we passed a symbol */
     if (temp == NULL) {
         logError("non-existent symbol %s cannot be a .data argument", strPtr);
         return false;
@@ -40,11 +38,11 @@ int countDataWords(char *label, void *ptr) {
         logError(".data symbol %s must be a constant definition", strPtr);
         return false;
     }
-    incrementLabelWordsCounter(label);
+    incrementLabelWordsCounter(label, assembler->tables->labels_table);
     return true;
 }
 
-static AnalyzeStatus analyzeLine(input_line line) {
+static AnalyzeStatus analyzeLine(input_line line, Assembler *assembler) {
     int L;
     MapResult status = MAP_SUCCESS;
 
@@ -55,7 +53,8 @@ static AnalyzeStatus analyzeLine(input_line line) {
     /* step 4 */
     if (line.directive_props & dot_define) {
         if (setLabel(line.const_definition_arg.constant_id,
-                     createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true) == MAP_OUT_OF_MEMORY) {
+                     createEntry(DOT_DEFINE, line.const_definition_arg.constant_value), true,
+                     assembler->tables->labels_table) == MAP_OUT_OF_MEMORY) {
             return ANALYZE_OUT_OF_MEMORY;
         }
         return NEXT;
@@ -65,7 +64,7 @@ static AnalyzeStatus analyzeLine(input_line line) {
     if (line.directive_props & (dot_data | dot_string) && line.hasLabel) {
         entry *addedEntry;
         /* step 8 */
-        status = setLabel(line.label, createEntry(DOT_DATA, (int) DC), true);
+        status = setLabel(line.label, createEntry(DOT_DATA, (int) assembler->DC), true, assembler->tables->labels_table);
         if (status != MAP_SUCCESS) {
             return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
         }
@@ -73,12 +72,12 @@ static AnalyzeStatus analyzeLine(input_line line) {
         /* increase DC according to arguments */
         if (line.directive_props & dot_string) {
             int temp;
-            addedEntry = getEntry(line.label);
+            addedEntry = getEntry(line.label, assembler->tables->labels_table);
             temp = addedEntry->value;
 
             /* in-case of a .string the list has 1 node which contains a pointer to the entire string */
-            countStringWords(line.label, line.arguments.args[0]);
-            status = decodeString(&temp, &line.arguments);
+            countStringWords(line.label, line.arguments.args[0], assembler);
+            status = decodeString(&temp, &line.arguments, assembler->tables->words_map);
             if (status != MAP_SUCCESS) {
                 return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
             }
@@ -88,31 +87,31 @@ static AnalyzeStatus analyzeLine(input_line line) {
             int index;
             int temp;
 
-            addedEntry = getEntry(line.label);
+            addedEntry = getEntry(line.label, assembler->tables->labels_table);
             temp = addedEntry->value;
 
             for (index = 0; index < line.arguments.args_count; index++) {
 
-                if (!countDataWords(line.label, line.arguments.args[index])) {
-                    DC += addedEntry->wordsCounter;
+                if (!countDataWords(line.label, line.arguments.args[index], assembler)) {
+                    assembler->DC += addedEntry->wordsCounter;
                     return NEXT;
                 }
             }
-            status = decodeData(&temp, &line.arguments);
+            status = decodeData(&temp, &line.arguments, assembler->tables->labels_table, assembler->tables->words_map);
             if (status != MAP_SUCCESS) {
                 return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
             }
         }
 
         /* it's impossible for addedEntry to be null in this case */
-        addedEntry = getEntry(line.label);
-        DC += addedEntry->wordsCounter;
+        addedEntry = getEntry(line.label, assembler->tables->labels_table);
+        assembler->DC += addedEntry->wordsCounter;
         return NEXT;
     }
 
     /* step 10, 11 */
     if (line.directive_props & dot_external) {
-        status = bulkAddExternalOperands(&line.arguments, true);
+        status = bulkAddExternalOperands(&line.arguments, true, assembler->tables->labels_table);
         return status != MAP_OUT_OF_MEMORY ? NEXT : ANALYZE_OUT_OF_MEMORY;
     }
 
@@ -123,7 +122,8 @@ static AnalyzeStatus analyzeLine(input_line line) {
 
     /* step 12 */
     if (line.hasLabel) {
-        status = setLabel(line.label, createEntry(DOT_CODE, ((int) IC) + 100), true);
+        status = setLabel(line.label, createEntry(DOT_CODE, ((int) assembler->IC) + 100), true,
+                          assembler->tables->labels_table);
         if (status != MAP_SUCCESS) {
             return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
         }
@@ -139,12 +139,12 @@ static AnalyzeStatus analyzeLine(input_line line) {
     if (tryGetOperationWordsCounter(&line, &L) != PARSE_SUCCESS) {
         logError("failed to get operand words_map\n");
     }
-    IC += L;
+    assembler->IC += L;
 
     return NEXT;
 }
 
-ParseResult run(FILE *srcFile) {
+ParseResult run(FILE *srcFile, Assembler *assembler) {
     char buffer[81] = "";
     int index = 0;
     bool errored = false;
@@ -153,7 +153,6 @@ ParseResult run(FILE *srcFile) {
         input_line line;
         ParseResult parse_result;
         bool shouldStop = false;
-        removeExcessSpaces(buffer);
         resetLine(&line);
 
         setLogLineContext(index, buffer, "first-run");
@@ -172,7 +171,7 @@ ParseResult run(FILE *srcFile) {
             case OUT_OF_MEMORY:
                 logError("gracefully clearing all allocations and shutting down\n");
                 disposeLine(&line);
-                labelsTableDispose();
+                /* labelsTableDispose();*/
                 return OUT_OF_MEMORY; /* complete bail out */
             case PARSE_SUCCESS: /* do nothing */
                 break;
@@ -184,7 +183,7 @@ ParseResult run(FILE *srcFile) {
             continue;
         }
 
-        switch (analyzeLine(line)) {
+        switch (analyzeLine(line, assembler)) {
             case NEXT:
                 break;
             case STOP:
@@ -207,8 +206,8 @@ ParseResult run(FILE *srcFile) {
     }
 
     /*update all symbols with data classification to IC + 100 */
-    updateDataLabels(IC);
-    wordUpdateDecode((int)IC + 100);
+    updateDataLabels(assembler->IC, assembler->tables->labels_table);
+    wordUpdateDecode((int) assembler->IC + 100, assembler->tables->words_map);
 
     return PARSE_SUCCESS;
 }

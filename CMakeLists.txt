@@ -54,6 +54,10 @@ add_executable(assembler
         precomplie/precompile_list/sorted_list.h
         runs/assembler_run.c
         runs/assembler_run.h
+        tables/tables.c
+        tables/tables.h
+        runs/assembler.c
+        runs/assembler.h
 )
 
 # Link math library

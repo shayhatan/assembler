@@ -8,8 +8,7 @@
 #include "../utils/string_utils.h"
 #include "../utils/memory.h"
 
-static Map labels_table;
-unsigned int IC = 0, DC = 0;
+
 static bool hasDotEntry = false;
 
 MapDataElement copyElement(MapDataElement existing) {
@@ -52,17 +51,23 @@ int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     return result;
 }
 
-void labelsTableInit() {
+/*void labelsTableInit() {
     if (labels_table != NULL) return;
     labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                              compareKeyElements);
+}*/
+
+Map labelsTableCreate() {
+    return mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
+                     compareKeyElements);
 }
 
-void labelsTableDispose() {
+
+void labelsTableDispose(Map labels_table) {
     mapDestroy(labels_table);
 }
 
-MapResult setLabel(char *label, entry newEntry, bool create_only) {
+MapResult setLabel(char *label, entry newEntry, bool create_only, Map labels_table) {
     newEntry.wordsCounter = 0;
 
     if (create_only && mapContains(labels_table, label)) {
@@ -72,7 +77,7 @@ MapResult setLabel(char *label, entry newEntry, bool create_only) {
     return mapPut(labels_table, label, &newEntry);
 }
 
-int incrementLabelWordsCounter(char *label) {
+int incrementLabelWordsCounter(char *label, Map labels_table) {
     entry *existingEntry = mapGet(labels_table, label);
     if (existingEntry == NULL) {
         logError("label %s does not exist\n", label);
@@ -83,11 +88,11 @@ int incrementLabelWordsCounter(char *label) {
 }
 
 
-MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only) {
+MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only, Map labels_table) {
     int index = 0;
     MapResult status = MAP_SUCCESS;
     for (; index < args_container->args_count; index++) {
-        status = setLabel(args_container->args[index], createEntry(DOT_EXTERNAL, -1), create_only);
+        status = setLabel(args_container->args[index], createEntry(DOT_EXTERNAL, -1), create_only, labels_table);
         if (status != MAP_SUCCESS) {
             return status;
         }
@@ -96,9 +101,9 @@ MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only) {
 }
 
 
-int updateDataLabels(unsigned int IC) {
+int updateDataLabels(unsigned int IC, Map labels_table) {
     entry *currentEntry;
-    char* iter;
+    char *iter;
     MAP_FOREACH(char *, iter, labels_table) {
         if (iter == NULL) {
             logError("Out of memory\n");
@@ -116,9 +121,9 @@ int updateDataLabels(unsigned int IC) {
 }
 
 
-void printLabelsTable() {
+void printLabelsTable(Map labels_table) {
     entry *currentEntry = NULL;
-    char* iter;
+    char *iter;
     if (labels_table == NULL) return;
     printf("============Labels table============\n");
     printf("Label\tValue\tClassification\tExtra Words\tisEntry\n");
@@ -142,9 +147,9 @@ void printLabelsTable() {
     printf("====================================\n");
 }
 
-void getDCAndIC(char buffer[81]) {
+void getDCAndIC(char buffer[81], Map labels_table, int IC, int DC) {
     entry *currentEntry = NULL;
-    char* iter;
+    char *iter;
     if (labels_table == NULL) return;
     MAP_FOREACH(char*, iter, labels_table) {
         if (iter == NULL) {
@@ -163,7 +168,7 @@ void getDCAndIC(char buffer[81]) {
     sprintf(buffer, "%d\t%d", IC, DC);
 }
 
-MapResult setEntryLabel(char* label) {
+MapResult setEntryLabel(char *label, Map labels_table) {
     entry *labelEntry = NULL;
 
     if (labels_table == NULL) {
@@ -172,7 +177,7 @@ MapResult setEntryLabel(char* label) {
     if (label == NULL) {
         return MAP_NULL_ARGUMENT;
     }
-    if (!mapContains(labels_table,label)) {
+    if (!mapContains(labels_table, label)) {
         return MAP_ITEM_DOES_NOT_EXIST;
     }
 
@@ -187,13 +192,13 @@ MapResult setEntryLabel(char* label) {
     return MAP_SUCCESS;
 }
 
-entry *getEntry(char *label) {
+entry *getEntry(char *label, Map labels_table) {
     return mapGet(labels_table, label);
 }
 
-MapResult getConstantByLabel(char* label, unsigned int* result) {
+MapResult getConstantByLabel(char *label, unsigned int *result, Map labels_table) {
     entry *constant_entry = NULL;
-    constant_entry =  mapGet(labels_table, label);
+    constant_entry = mapGet(labels_table, label);
     if (constant_entry == NULL) {
         return MAP_ITEM_DOES_NOT_EXIST;
     }
@@ -208,16 +213,16 @@ bool hasAnyDotEntryLabel(void) {
     return hasDotEntry;
 }
 
-int writeEntriesFile(FILE* ent_file) {
-    char* iter; 
-    entry* data = NULL;
+int writeEntriesFile(FILE *ent_file, Map labels_table) {
+    char *iter;
+    entry *data = NULL;
     int size = 0;
     printf("=======ENTRY======");
     for (iter = mapGetFirst(labels_table); iter != NULL; iter = mapGetNext(labels_table)) {
         data = mapGet(labels_table, iter);
         if (data->isEntry) {
-          printf("\n%s, %d\n",iter, data->value);
-          fprintf(ent_file, "%s\t%d\n", iter, data->value);
+            printf("\n%s, %d\n", iter, data->value);
+            fprintf(ent_file, "%s\t%d\n", iter, data->value);
         }
         free(iter);
     }

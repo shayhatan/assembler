@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "../tables/labels_table.h"
+#include "assembler.h"
 #include "../parsers/line_utils.h"
 #include "../logs/logging_utils.h"
 #include "../words/decoders.h"
@@ -9,7 +9,7 @@
 
 static int address = 100;
 
-static enum ParseResult analyzeLine(input_line *line) {
+static enum ParseResult analyzeLine(input_line *line, Assembler* assembler) {
     MapResult status;
     if (line->directive_props & (dot_data | dot_string | dot_external | dot_define))
     {
@@ -17,7 +17,7 @@ static enum ParseResult analyzeLine(input_line *line) {
     }
 
     if (line->directive_props & dot_entry) {
-        status = setEntryLabel(line->arguments.args[0]);
+        status = setEntryLabel(line->arguments.args[0], assembler->tables->labels_table);
         if (status != MAP_SUCCESS) {
             logError("Failed to set %s as entry label", line->label);
             return status == MAP_OUT_OF_MEMORY ? OUT_OF_MEMORY : PARSE_FAILURE;
@@ -25,7 +25,7 @@ static enum ParseResult analyzeLine(input_line *line) {
         return PARSE_SUCCESS;
     }
 
-    status = decodeInstruction(&address, line->opcode, line->arguments.args, line->arguments.args_count);
+    status = decodeInstruction(&address, line->opcode, line->arguments.args, line->arguments.args_count, assembler->tables->labels_table, assembler->tables->words_map, assembler->tables->externals_map);
 
     switch (status) {
 
@@ -45,7 +45,7 @@ static enum ParseResult analyzeLine(input_line *line) {
     return PARSE_SUCCESS;
 }
 
-enum ParseResult secondRun(FILE *srcFile) {
+enum ParseResult secondRun(FILE *srcFile, Assembler* assembler) {
     char buffer[81];
     int index = 0;
     bool errored;
@@ -54,8 +54,6 @@ enum ParseResult secondRun(FILE *srcFile) {
         input_line line;
         enum ParseResult parse_result;
         bool shouldStop = false;
-
-        removeExcessSpaces(buffer);
 
         resetLine(&line);
 
@@ -75,7 +73,7 @@ enum ParseResult secondRun(FILE *srcFile) {
             case OUT_OF_MEMORY:
                 logError("gracefully clearing all allocations and shutting down\n");
                 disposeLine(&line);
-                labelsTableDispose();
+                labelsTableDispose(assembler->tables->labels_table);
                 return OUT_OF_MEMORY; /* complete bail out */
             case PARSE_SUCCESS: /* do nothing */
                 break;
@@ -86,7 +84,7 @@ enum ParseResult secondRun(FILE *srcFile) {
             continue;
         }
 
-        switch (analyzeLine(&line)) {
+        switch (analyzeLine(&line, assembler)) {
             case PARSE_SUCCESS:
                 break;
             case PARSE_FAILURE:

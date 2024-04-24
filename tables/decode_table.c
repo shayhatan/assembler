@@ -8,8 +8,7 @@
 #include "../utils/string_utils.h"
 #include "labels_table.h"
 
-Map words_map;
-extern unsigned int IC, DC;
+
 
 void compileInstruction(char *result, const int *key_ptr, const word *current_word);
 
@@ -61,18 +60,23 @@ static int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     return *(int *) key1 - *(int *) key2;
 }
 
-void wordsMapInit() {
+/*void wordsMapInit() {
     if (words_map != NULL) return;
     words_map = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                           compareKeyElements);
+}*/
+
+Map wordsMapCreate() {
+    return mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
+                     compareKeyElements);
 }
 
-void wordsMapDispose() {
+void wordsMapDispose(Map words_map) {
     if (words_map == NULL) return;
     mapDestroy(words_map);
 }
 
-MapResult addWord(int address, word *word) {
+MapResult addWord(int address, word *word, Map words_map) {
     if (words_map == NULL) {
         return MAP_NULL_ARGUMENT;
     }
@@ -158,14 +162,15 @@ void binaryToBase4(const char *binary, char *base4) {
     /* Iterate over the binary string */
     for (i = remainder; i < binaryLength; i += 2) {
         /* Convert each pair of bits to base-4 digit */
-        base4Digit = (binary[i] - '0') * 2 + (i + 1 < binaryLength ? binary[i + 1] - '0' : 0); /* Handle the case where binaryLength is odd*/
+        base4Digit = (binary[i] - '0') * 2 +
+                     (i + 1 < binaryLength ? binary[i + 1] - '0' : 0); /* Handle the case where binaryLength is odd*/
         base4[base4Index++] = base4Digit + '0'; /* Convert to character and store */
     }
     base4[base4Index] = '\0'; /* Null-terminate the base4 string */
 }
 
 
-MapResult wordUpdateDecode(int IC) {
+MapResult wordUpdateDecode(int IC, Map words_map) {
     int *iter;
     int key;
     word *current_word;
@@ -189,10 +194,10 @@ MapResult wordUpdateDecode(int IC) {
     return MAP_SUCCESS;
 }
 
-MapIterationResult getNextLine(char* result) {
+MapIterationResult getNextLine(char *result, Map words_map) {
     static int iter = -1;
-    int* key_ptr = NULL;
-    word* current_word;
+    int *key_ptr = NULL;
+    word *current_word;
 
     if (words_map == NULL) {
         return UNDEFINED_MAP;
@@ -235,24 +240,24 @@ void compileInstruction(char *result, const int *key_ptr, const word *current_wo
     sprintf(result, "%d\t%s", *key_ptr, encrypted_buffer);
 }
 
-int writeWordsMap(FILE* ob_file) {
+int writeWordsMap(FILE *ob_file, Map words_map, Map labels_table, int IC, int DC) {
     char buffer[81] = {'\0'};
     MapIterationResult status;
     int size = 0; /* If empty we won't create a file*/
 
-    getDCAndIC(buffer);
+    getDCAndIC(buffer,labels_table, IC, DC);
     fprintf(ob_file, "%s\n", buffer);
-    status = getNextLine(buffer);
+    status = getNextLine(buffer, words_map);
     while (status == SUCCESSFUL_ITERATION) {
         ++size;
         printf("%s\n", buffer);
         fprintf(ob_file, "%s\n", buffer);
         resetString(buffer);
-        status = getNextLine(buffer);
+        status = getNextLine(buffer, words_map);
     }
     return size;
 }
 
-bool isEmptyWordsMap() {
+/*bool isEmptyWordsMap() {
     return mapGetSize(words_map) == 0;
-}
+}*/

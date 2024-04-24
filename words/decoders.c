@@ -25,10 +25,10 @@ typedef enum OperandType {
     TARGET
 } OperandType;
 
-bool tryGetNumberFromConstantSymbolOrSting(Operand operand, int* result) {
+bool tryGetNumberFromConstantSymbolOrSting(Operand operand, int* result, Map labels_table) {
     unsigned  int temp;
     if (isValidVariableString(operand)){ /* in this case the argument should be a .define symbol */
-        if (getConstantByLabel(operand, &temp) != MAP_SUCCESS) {
+        if (getConstantByLabel(operand, &temp, labels_table) != MAP_SUCCESS) {
             return false;
         }
         *result = (signed) temp;
@@ -53,7 +53,7 @@ bool tryExtractListAccess(Operand operand, char *list_ptr, char* index_ptr) {
 }
 
 
-MapResult decodeAndAddCommand(int *address, Opcode code, char operands[2][MAX_ARG_CHARS], int length) {
+MapResult decodeAndAddCommand(int *address, Opcode code, char operands[2][MAX_ARG_CHARS], int length, Map words_map) {
     word cmd_word;
 
     cmd_word.cmd.opcode = (int) code;
@@ -76,23 +76,23 @@ MapResult decodeAndAddCommand(int *address, Opcode code, char operands[2][MAX_AR
     }
     cmd_word.cmd.unused=0;
 
-    return addWord((*address)++, &cmd_word);
+    return addWord((*address)++, &cmd_word, words_map);
 }
 
 
-MapResult tryDecodeInstantOperand(Operand operand, word* word) {
+MapResult tryDecodeInstantOperand(Operand operand, word* word, Map labels_table) {
     int s_temp;
     word->instant.decode = ABSOLUTE_DECODING;
-    if (!tryGetNumberFromConstantSymbolOrSting(operand+1, &s_temp)) {
+    if (!tryGetNumberFromConstantSymbolOrSting(operand+1, &s_temp, labels_table)) {
         return MAP_ERROR;
     }
     word->instant.value = s_temp;
     return MAP_SUCCESS;
 }
 
-MapResult tryDecodeDirectOperand(Operand operand, word* word) {
+MapResult tryDecodeDirectOperand(Operand operand, word* word, Map labels_table) {
     entry *label_entry = NULL;
-    label_entry = getEntry(operand);
+    label_entry = getEntry(operand, labels_table);
 
     if (label_entry == NULL) {
         return MAP_ERROR;
@@ -115,7 +115,7 @@ MapResult tryDecodeDirectOperand(Operand operand, word* word) {
     return MAP_SUCCESS;
 }
 
-MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
+MapResult tryDecodeConstantIndexOperand(int *address, Operand operand, Map labels_table, Map words_map) {
     int s_temp;
     entry *label_entry = NULL;
     char list_name[MAX_ARG_CHARS];
@@ -128,7 +128,7 @@ MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
         return MAP_ERROR;
     }
 
-    label_entry = getEntry(list_name);
+    label_entry = getEntry(list_name, labels_table);
     if (label_entry == NULL) {
         return MAP_ERROR;
     }
@@ -136,21 +136,21 @@ MapResult tryDecodeConstantIndexOperand(int *address, Operand operand) {
     array_word.direct.value = label_entry->value;
     array_word.direct.decode = strcmp(label_entry->classification, RAW_DOT_EXTERN) == 0 ? EXTERNAL_DECODING : RELATIVE_DECODING;
 
-    status = addWord(*address,&array_word);
+    status = addWord(*address,&array_word, words_map);
     if (status != MAP_SUCCESS) {
         return  status;
     }
     *address += 1;
 
 
-    if (!tryGetNumberFromConstantSymbolOrSting(index_name, &s_temp)) {
+    if (!tryGetNumberFromConstantSymbolOrSting(index_name, &s_temp, labels_table)) {
         return MAP_ERROR;
     }
 
     index_word.instant.value = s_temp;
     index_word.instant.decode = ABSOLUTE_DECODING;
 
-    status = addWord(*address,&index_word);
+    status = addWord(*address,&index_word, words_map);
     if (status != MAP_SUCCESS) {
         return  status;
     }
@@ -178,12 +178,12 @@ MapResult tryDecodeDirectRegisterOperand(Operand operand, word* word, OperandTyp
 }
 
 /* we assume that this is called in the 2nd run where we already know that the lines are valid input */
-MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_CHARS], int length) {
+MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_CHARS], int length, Map labels_table, Map words_map, Map externals_table) {
     int i;
     word new_word;
     /* try to unify words_map if possible */
     OperandType type = length == 2 ? SOURCE : TARGET;
-    MapResult status = decodeAndAddCommand(address, code, operands, length);
+    MapResult status = decodeAndAddCommand(address, code, operands, length, words_map);
 
     
     if (status != MAP_SUCCESS) {
@@ -197,7 +197,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
         new_word.reg.targetOperand = (unsigned int)*(operands[1]+1);
         new_word.reg.unused = 0;
         new_word.reg.decode = ABSOLUTE_DECODING;
-        status = addWord((*address)++,&new_word);
+        status = addWord((*address)++,&new_word, words_map);
         if (status != MAP_SUCCESS) {
             logError("failed to decode or add a dual regex operands, status: %s\n", mapResultToString(status));
             return status;
@@ -209,7 +209,7 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
         enum Addressing addressing = getAddressingFlagForOperand(operands[i]);
 
         if (addressing == constantIndex) {
-            status = tryDecodeConstantIndexOperand(address, operands[i]);
+            status = tryDecodeConstantIndexOperand(address, operands[i],labels_table, words_map);
             if (status != MAP_SUCCESS) {
                 logError("failed to decode or add a constant index operand, status: %s\n", mapResultToString(status));
                 return status;
@@ -220,10 +220,10 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
 
         switch (addressing) {
             case instant:
-                status = tryDecodeInstantOperand(operands[i], &new_word);
+                status = tryDecodeInstantOperand(operands[i], &new_word, labels_table);
                 break;
             case direct:
-                status = tryDecodeDirectOperand(operands[i], &new_word);
+                status = tryDecodeDirectOperand(operands[i], &new_word, labels_table);
                 break;
             case directRegister:
                 status = tryDecodeDirectRegisterOperand(operands[i], &new_word, type);
@@ -236,14 +236,14 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
                      mapResultToString(status));
             return status;
         }
-        status = addWord((*address)++, &new_word);
+        status = addWord((*address)++, &new_word, words_map);
         if (status != MAP_SUCCESS) {
             logError("failed to add a decoded direct/instant/single register operand, status: %s\n",
                      mapResultToString(status));
             return status;
         }
         if (addressing == direct && new_word.direct.decode == EXTERNAL_DECODING) {
-            status = addExternal((*address)-1, operands[i]);
+            status = addExternal((*address)-1, operands[i], externals_table);
             if (status != MAP_SUCCESS) {
                 logError("failed to add a decoded direct/instant/single register operand, status: %s\n",
                          mapResultToString(status));
@@ -255,18 +255,18 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][MAX_ARG_
     return MAP_SUCCESS;
 }
 
-MapResult decodeData(int *address, Arguments *args) {
+MapResult decodeData(int *address, Arguments *args, Map labels_table, Map words_map) {
     int i;
     int temp;
     word new_word;
     MapResult status = MAP_SUCCESS;
 
     for (i = 0; i < args->args_count; ++i) {
-        if (!tryGetNumberFromConstantSymbolOrSting(args->args[i], &temp)) {
+        if (!tryGetNumberFromConstantSymbolOrSting(args->args[i], &temp,labels_table)) {
             return MAP_ERROR;
         }
         new_word.data.value = temp;
-        status = addWord(*address, &new_word);
+        status = addWord(*address, &new_word, words_map);
         if (status != MAP_SUCCESS) {
             return status;
         }
@@ -275,14 +275,14 @@ MapResult decodeData(int *address, Arguments *args) {
     return MAP_SUCCESS;
 }
 
-MapResult decodeString(int * address, Arguments *args) {
+MapResult decodeString(int * address, Arguments *args, Map words_map) {
     word new_word;
     char* ptr = args->args[0];
     MapResult status = MAP_SUCCESS;
 
     while(*ptr != '\0') {
         new_word.data.value = (int)*ptr;
-        status = addWord(*address, &new_word);
+        status = addWord(*address, &new_word, words_map);
         if (status != MAP_SUCCESS) {
             return status;
         }
@@ -290,7 +290,7 @@ MapResult decodeString(int * address, Arguments *args) {
         ptr++;
     }
     new_word.data.value = (int)*ptr;
-    status = addWord(*address, &new_word);
+    status = addWord(*address, &new_word, words_map);
     if (status != MAP_SUCCESS) {
         return status;
     }

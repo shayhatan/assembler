@@ -1,13 +1,11 @@
 
 #include <stdio.h>
-#include <string.h>
 #include "../utils/memory.h"
 #include "../utils/string_utils.h"
 #include "../data_structures/map/map.h"
 
-Map externals_map;
 
-void compileExternal(char *result, int *line_number, char* current_external) {
+void compileExternal(char *result, int *line_number, char *current_external) {
     sprintf(result, "%s\t%d", current_external, *line_number);
 }
 
@@ -18,7 +16,7 @@ static MapDataElement copyElement(MapDataElement existing) {
     if (existing == NULL) {
         return NULL;
     }
-    
+
     clone = allocatedDuplicateString(existing_word);
 
     return clone;
@@ -40,7 +38,7 @@ static MapKeyElement copyKeyElement(MapKeyElement existing) {
 
 /** Type of function for deallocating a data element of the map */
 static void cleanMapDataElements(MapDataElement disposable) {
-    char* *disposed_word = disposable;
+    char **disposed_word = disposable;
     free(disposed_word);
 }
 
@@ -54,32 +52,39 @@ static int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     return *(int *) key1 - *(int *) key2;
 }
 
+/*
 void externalsMapInit() {
     if (externals_map != NULL) return;
     externals_map = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
-                          compareKeyElements);
+                              compareKeyElements);
+}
+*/
+
+Map externalsMapCreate() {
+    return mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
+                     compareKeyElements);
 }
 
-void externalsMapDispose() {
+void externalsMapDispose(Map externals_map) {
     if (externals_map == NULL) return;
     mapDestroy(externals_map);
 }
 
-MapResult addExternal(int address, char *label) {
+MapResult addExternal(int address, char *label, Map externals_map) {
     if (externals_map == NULL) {
         return MAP_NULL_ARGUMENT;
     }
     if (mapContains(externals_map, &address)) {
         return MAP_ITEM_ALREADY_EXISTS;
     }
-    return mapPut(externals_map, &address,label);
+    return mapPut(externals_map, &address, label);
 }
 
 
-MapIterationResult getNextExternal(char* result) {
+MapIterationResult getNextExternal(char *result, Map externals_map) {
     static int iter = -1;
-    int* key_ptr = NULL;
-    char* external_label;
+    int *key_ptr = NULL;
+    char *external_label;
 
     if (externals_map == NULL) {
         return UNDEFINED_MAP;
@@ -111,21 +116,21 @@ MapIterationResult getNextExternal(char* result) {
     return SUCCESSFUL_ITERATION;
 }
 
-bool isEmptyExternals() {
+bool isEmptyExternals(Map externals_map) {
     return mapGetSize(externals_map) == 0;
 }
 
-int writeExternals(FILE* ext_file) {
+int writeExternals(FILE *ext_file, Map externals_map) {
     int size = 0; /* if size is 0  by the end of the func we wont create ext_file*/
     char buffer[81] = {'\0'};
-    MapIterationResult status = getNextExternal(buffer);
+    MapIterationResult status = getNextExternal(buffer, externals_map);
     printf("===========Print Externals==============\n");
     while (status == SUCCESSFUL_ITERATION) {
         ++size;
         printf("%s\n", buffer);
         fprintf(ext_file, "%s\n", buffer);
         resetString(buffer);
-        status = getNextExternal(buffer);
-    }    
+        status = getNextExternal(buffer, externals_map);
+    }
     return size;
 }

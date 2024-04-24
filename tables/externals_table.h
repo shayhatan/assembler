@@ -6,12 +6,14 @@
 
 void externalsMapInit();
 
-void externalsMapDispose();
+void externalsMapDispose(Map externals_map);
 
-MapResult addExternal(int address, char *label);
+MapResult addExternal(int address, char *label, Map externals_map);
 
-bool isEmptyExternals();
+bool isEmptyExternals(Map externals_map);
 
-int writeExternals(FILE* ext_file);
+int writeExternals(FILE *ext_file, Map externals_map);
+
+Map externalsMapCreate();
 
 #endif /*ASSEMBLER_EXTERNALS_TABLE_H*/
