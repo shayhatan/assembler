@@ -257,7 +257,3 @@ int writeWordsMap(FILE *ob_file, Map words_map, Map labels_table, int IC, int DC
     }
     return size;
 }
-
-/*bool isEmptyWordsMap() {
-    return mapGetSize(words_map) == 0;
-}*/

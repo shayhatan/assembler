@@ -64,7 +64,7 @@ void assemblerRun(char *files[], int index) {
         writeExternals(ext_file, assembler.tables->externals_map);
         fclose(ext_file);
     }
-    if (hasAnyDotEntryLabel()) {
+    if (assembler.has_dot_ent) {
         generateOutputFileName(files[index], ent_file, ".ent");
         entries_file = fopen(ent_file, "w");
         if (entries_file == NULL) {

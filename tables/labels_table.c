@@ -9,8 +9,6 @@
 #include "../utils/memory.h"
 
 
-static bool hasDotEntry = false;
-
 MapDataElement copyElement(MapDataElement existing) {
     entry *clone = allocateMemory(sizeof(entry));
     entry *existingEntry = existing;
@@ -101,7 +99,7 @@ MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only, M
 }
 
 
-int updateDataLabels(unsigned int IC, Map labels_table) {
+int updateDataLabels(int IC, Map labels_table) {
     entry *currentEntry;
     char *iter;
     MAP_FOREACH(char *, iter, labels_table) {
@@ -168,7 +166,7 @@ void getDCAndIC(char buffer[81], Map labels_table, int IC, int DC) {
     sprintf(buffer, "%d\t%d", IC, DC);
 }
 
-MapResult setEntryLabel(char *label, Map labels_table) {
+MapResult setEntryLabel(char *label, Map labels_table, bool *has_dot_ent) {
     entry *labelEntry = NULL;
 
     if (labels_table == NULL) {
@@ -187,7 +185,7 @@ MapResult setEntryLabel(char *label, Map labels_table) {
     }
 
     labelEntry->isEntry = true;
-    hasDotEntry = true;
+    *has_dot_ent = true;
 
     return MAP_SUCCESS;
 }
@@ -209,9 +207,6 @@ MapResult getConstantByLabel(char *label, unsigned int *result, Map labels_table
     return MAP_SUCCESS;
 }
 
-bool hasAnyDotEntryLabel(void) {
-    return hasDotEntry;
-}
 
 int writeEntriesFile(FILE *ent_file, Map labels_table) {
     char *iter;
@@ -219,6 +214,7 @@ int writeEntriesFile(FILE *ent_file, Map labels_table) {
     int size = 0;
     printf("=======ENTRY======");
     for (iter = mapGetFirst(labels_table); iter != NULL; iter = mapGetNext(labels_table)) {
+        ++size;
         data = mapGet(labels_table, iter);
         if (data->isEntry) {
             printf("\n%s, %d\n", iter, data->value);

@@ -17,7 +17,7 @@ static enum ParseResult analyzeLine(input_line *line, Assembler* assembler) {
     }
 
     if (line->directive_props & dot_entry) {
-        status = setEntryLabel(line->arguments.args[0], assembler->tables->labels_table);
+        status = setEntryLabel(line->arguments.args[0], assembler->tables->labels_table, &(assembler->has_dot_ent));
         if (status != MAP_SUCCESS) {
             logError("Failed to set %s as entry label", line->label);
             return status == MAP_OUT_OF_MEMORY ? OUT_OF_MEMORY : PARSE_FAILURE;

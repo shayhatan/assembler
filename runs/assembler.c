@@ -15,4 +15,5 @@ void assemblerInit(Assembler *assembler) {
     /* Initialize IC and DC */
     assembler->IC = 0;
     assembler->DC = 0;
+    assembler->has_dot_ent = false;
 }

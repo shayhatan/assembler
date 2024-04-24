@@ -4,7 +4,6 @@
 #include "../data_structures/map/map.h"
 #include <stdio.h>
 
-void externalsMapInit();
 
 void externalsMapDispose(Map externals_map);
 
