@@ -12,4 +12,6 @@ typedef struct {
 
 void assemblerInit(Assembler *assembler);
 
+void assemblerDispose(Assembler *assembler);
+
 #endif /*ASSEMBLER_ASSEMBLER_H*/

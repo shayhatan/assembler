@@ -78,13 +78,6 @@ void assemblerRun(char *files[], int index) {
 
 
     printf("Run finished with status %d\n", run_result);
-/*    cleanup();*/
-}
 
-/*
-void cleanup() {
-    externalsMapDispose();
-    wordsMapDispose();
-    labelsTableDispose();
+    assemblerDispose(&assembler);
 }
-*/

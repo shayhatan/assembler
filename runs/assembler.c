@@ -17,3 +17,12 @@ void assemblerInit(Assembler *assembler) {
     assembler->DC = 0;
     assembler->has_dot_ent = false;
 }
+
+void assemblerDispose(Assembler *assembler) {
+    if (assembler->tables != NULL) {
+        // Dispose Tables
+        tablesDispose(assembler->tables);
+        free(assembler->tables); // Free memory allocated for Tables
+        assembler->tables = NULL; // Reset pointer to NULL
+    }
+}
