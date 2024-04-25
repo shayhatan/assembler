@@ -44,9 +44,9 @@ static enum ParseResult analyzeLine(InputLine *line, Assembler* assembler) {
 }
 
 enum ParseResult secondRun(FILE *srcFile, Assembler* assembler) {
-    char buffer[81];
+    char buffer[81] = "";
     int index = 1;
-    bool errored;
+    bool errored = false;
 
     while (fgets(buffer, 81, srcFile) != 0) {
         InputLine line;

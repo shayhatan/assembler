@@ -3,10 +3,16 @@
 #include "../utils/memory.h"
 
 MapResult assemblerInit(Assembler *assembler) {
+    assembler->tables = NULL;
+    assembler->IC = 0;
+    assembler->DC = 0;
+    assembler->has_dot_ent = false;
     assembler->tables = allocateMemory(sizeof(Tables));
+
     if (assembler->tables == NULL) {
         return MAP_OUT_OF_MEMORY;
     }
+
 
     /* Initialize Tables */
     if (tablesInit(assembler->tables) == MAP_OUT_OF_MEMORY) {
@@ -14,10 +20,7 @@ MapResult assemblerInit(Assembler *assembler) {
         return MAP_OUT_OF_MEMORY;
     }
 
-    /* Initialize IC and DC */
-    assembler->IC = 0;
-    assembler->DC = 0;
-    assembler->has_dot_ent = false;
+
     return MAP_SUCCESS;
 }
 

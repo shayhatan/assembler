@@ -16,6 +16,7 @@ MapResult tablesInit(Tables *tables) {
         wordsMapDispose(tables->externals_map);
         return MAP_OUT_OF_MEMORY;
     }
+
     return MAP_SUCCESS;
 }
 
@@ -23,4 +24,8 @@ void tablesDispose(Tables *tables) {
     externalsMapDispose(tables->externals_map);
     wordsMapDispose(tables->words_map);
     labelsTableDispose(tables->labels_table);
+}
+
+int getNodesNumber(Tables *tables) {
+    return mapGetSize(tables->externals_map) + mapGetSize(tables->words_map) + mapGetSize(tables->labels_table);
 }

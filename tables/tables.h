@@ -16,4 +16,6 @@ MapResult tablesInit(Tables *tables);
 
 void tablesDispose(Tables *tables);
 
+int getNodesNumber(Tables *tables);
+
 #endif /*ASSEMBLER_TABLES_H*/

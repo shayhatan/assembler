@@ -115,7 +115,7 @@ int updateDataLabels(int IC, Map labels_table) {
 
 void printLabelsTable(Map labels_table) {
     Entry *current_entry = NULL;
-    char *iter;
+    char *iter = NULL;
     if (labels_table == NULL) return;
     printf("============Labels table============\n");
     printf("Label\tValue\tClassification\tExtra Words\tisEntry\n");

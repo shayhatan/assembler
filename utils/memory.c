@@ -8,10 +8,10 @@ int current_allocated_memory = 0;
 Pointer allocateMemory(size_t size) {
     Pointer ptr;
 
-    if (current_allocated_memory + size >= MAX_MEMORY_POOL) {
+/*    if (current_allocated_memory + size >= MAX_MEMORY_POOL) {
         logError("max allowed memory encountered\n");
         return NULL;
-    }
+    }*/
     ptr = malloc(size);
     if (ptr == NULL) {
         printf("Error: Unable to allocate memory.\n");

@@ -304,7 +304,7 @@ int tryGetDirectiveProps(char *word, enum DirectiveProps *result) {
 
 enum ParseResult tryGetLabelValue(char *line, char **result) {
     String temp;
-    char buffer[81];
+    char buffer[81] = "";
     temp.content = buffer;
 
     if (!doesContainLabel(line, &temp)) {
@@ -319,7 +319,7 @@ enum ParseResult tryGetLabelValue(char *line, char **result) {
     }
 
     *result = allocatedDuplicateString(buffer);
-    if (result == NULL) {
+    if (*result == NULL) {
         return OUT_OF_MEMORY;
     }
     return PARSE_SUCCESS;
