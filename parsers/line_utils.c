@@ -44,7 +44,6 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 
         result->hasLabel = true;
         /* skip to the instruction following the label*/
-        /* todo: after label empty line */
         line += strlen(result->label) + 1;
 
         if (!isspace(*line)) {

@@ -438,7 +438,6 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
         return OUT_OF_MEMORY;
     }
 
-    /* todo: remove possible lines in the suffix and prefix of constant_id, raise error if there is a space between two words_map of it for exammple "SSS fff=" (invalid) "    SSSfff   " (valid) */
     readTillNewLine(&line, temp_buffer);
 
     if (temp_buffer[0] == '\0') {
