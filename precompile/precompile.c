@@ -3,10 +3,11 @@
 #include "./macro/macro_parser.h"
 #include "../logs/logging_utils.h"
 
-bool preCompile(char *arr[], char* am_file, int dex, bool *parse_failure) {
+bool preCompile(char *arr[], char *am_file, int dex, bool *parse_failure) {
     Macros *macros;
     char temp_file1[PRE_MAX_LINE] = "";
     char temp_file2[PRE_MAX_LINE] = "";
+
     /* Insure file ends with am extension */
     if (!endsWithAS(arr[dex])) {
         logError("source file doesn't have a valid file extension\n");
@@ -41,12 +42,11 @@ bool preCompile(char *arr[], char* am_file, int dex, bool *parse_failure) {
         return false;
     }
 
-    if (*parse_failure) {
+    if (*parse_failure)
         strcpy(am_file, temp_file2);
-    }
-    else {
+    else
         remove(temp_file2);
-        freeMacros(macros);
-    }
+
+    freeMacros(macros);
     return true;
 }

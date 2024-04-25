@@ -18,7 +18,7 @@ static int hasUnexpectedText(const char *str) {
  * Function to read macro content from file.
  * Returns a pointer to the macro content if successful, NULL otherwise.
  */
-char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *parse_failure) {
+char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, bool *parse_failure) {
     int mcr_len = 0; /* Variable to store the length of macro content */
     char str[PRE_MAX_LINE] = ""; /* Buffer to store each line of the file */
     char *data; /* Pointer to store the macro content */
@@ -58,12 +58,12 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *parse_failure
  * @param formatted_file_name The name of the formatted file containing macro definitions.
  * @return bool Returns true if the parsing and insertion process is successful, false otherwise.
  */
-_Bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *parse_failure) {
+bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *parse_failure) {
     FILE *fp = fopen(formatted_file_name, "r");
     char line[PRE_MAX_LINE] = "";
     char mcr_name[PRE_MAX_LINE] = "";
     int cnt = 0;
-    char* data;
+    char *data;
     fpos_t pos;
 
     if (fp == NULL) {
@@ -73,9 +73,9 @@ _Bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *p
 
     /* file is already formatted hence lines size are valid*/
     while (fgets(line, sizeof(line), fp)) {
-        cnt++;
+        setLogLineContext(++cnt, line, "precompile");
         /* if there is error here it's not fatal meaning that file we will continue to check more erros*/
-        if (processAddMcrLine(line, cnt, mcr_name, parse_failure)) {
+        if (processAddMcrLine(line, mcr_name, parse_failure)) {
             /* Get current file position. */
             fgetpos(fp, &pos);
             data = readMacroData(fp, &pos, &cnt, parse_failure);
@@ -89,7 +89,7 @@ _Bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *p
         memset(line, '\0', PRE_MAX_LINE);
     }
     fclose(fp);
-    return !parse_failure;
+    return true;
 }
 
 
@@ -102,7 +102,7 @@ bool isLastLineWord(const char *token) {
  * Function to process a line of code when adding a macro definition.
  * Returns true if processing is successful, false otherwise.
  */
-bool processAddMcrLine(char *line, int line_number, char *name, bool *parse_failure) {
+bool processAddMcrLine(char *line, char *name, bool *parse_failure) {
     char *token;
     token = strtok(line, " \n"); /* Tokenize the line using space and newline as delimiters */
 
@@ -123,16 +123,17 @@ bool processAddMcrLine(char *line, int line_number, char *name, bool *parse_fail
             }
             logError("Invalid macro name! (reg/inst etc)"); /* Print error message if macro name is invalid */
         }
-        /* If token is NULL, it means there was no name provided */
+            /* If token is NULL, it means there was no name provided */
         else if (token == NULL) {
-            logError("Error in line %d: missing macro name\n", line_number); /* Print error message */
+            logError("missing macro name\n"); /* Print error message */
+            *parse_failure = true;
         } else {
-            logError("Error in line %d: Extra text after macro name definition\n",
-                     line_number); /* Print error message */
+            logError("Extra text after macro name definition\n"); /* Print error message */
+            *parse_failure = true;
         }
     }
-    *parse_failure = true;
-    return true; /* Return false by default */
+
+    return false;
 }
 
 

@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "macros.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 /**
  * Function to read macro content from file.
@@ -14,7 +15,7 @@
  * @param line_count Pointer to store the number of lines read.
  * @return A pointer to the macro content if successful, NULL otherwise.
  */
-char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *aBool);
+char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, bool *parse_failure);
 
 /**
  * Function to process a line of code when adding a macro definition.
@@ -24,7 +25,7 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *aBool);
  * @param error Pointer to store error flag.
  * @return true if processing is successful, false otherwise.
  */
-bool processAddMcrLine(char *line, int line_number, char* name, bool* error);
+bool processAddMcrLine(char *line, char *name, bool *error);
 
 /**
  * Function to check if a token is the last Word in a line.
@@ -39,7 +40,7 @@ bool isLastLineWord(const char *token);
  * @param formatted_file_name The name of the formatted file to process.
  * @return true if processing is successful, false otherwise.
  */
-_Bool processMacroLines(Macros *macros, const char *formatted_file_name, _Bool *aBool);
+bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *parse_failure);
 
 /**
  * Function to replace occurrences of macro names with allocated data in a file.
@@ -48,7 +49,7 @@ _Bool processMacroLines(Macros *macros, const char *formatted_file_name, _Bool *
  * @param am_file Pointer to store the name of the output file with replaced macros.
  * @return true if replacement is successful, false otherwise.
  */
-bool replaceMacrosInFile(const char *filename, Macros *macros, char* am_file, bool parse_failure);
+bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool parse_failure);
 
 /**
  * Function to remove macro blocks from a source file and save the result to a destination file.
@@ -58,4 +59,5 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char* am_file, bo
  * @return true if removal is successful, false otherwise.
  */
 bool removeMacros(const char *source_filename, char *destination_filename, Macros *macros);
+
 #endif /* MMN14_MACRO_PARSER_H */

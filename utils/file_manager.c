@@ -108,6 +108,7 @@ bool formatFile(const char *input_file_name, char *new_file1) {
     FILE *output_file;
     char line[MAX_FIlE_LINE];
     line[MAX_FIlE_LINE - 1] = '\0'; /* Null-terminate the line buffer */
+    int index = 0;
 
     /* Generate output file name */
     generateOutputFileName(input_file_name, new_file1, ".out");
@@ -131,6 +132,7 @@ bool formatFile(const char *input_file_name, char *new_file1) {
 
     /* Read each line from input file, format it, and write to output file */
     while (fgets(line, sizeof(line), input_file)) {
+        setLogLineContext(++index, line, "format file");
         if (isLineTooLong(line)) {
             logError("Error: Line too long in input file\n");
             fclose(input_file);
@@ -139,8 +141,8 @@ bool formatFile(const char *input_file_name, char *new_file1) {
         }
         formatString(line); /* Format the line */
         /* Skip blank lines */
-        if (strlen(line) > 0)
-            fprintf(output_file, "%s\n", line); /* Write formatted line to output file */
+        /*if (strlen(line) > 0)*/
+        fprintf(output_file, "%s\n", line); /* Write formatted line to output file */
     }
 
     /* Close the files */

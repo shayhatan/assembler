@@ -7,10 +7,11 @@
 #include "../utils/file_manager.h"
 #include "../logs/logging_utils.h"
 
-typedef int (*WriteFunction)(FILE*, Map);
+typedef int (*WriteFunction)(FILE *, Map);
 
-bool tryCreateOutputFile(char *source_file_path, char* output_file_path, char* extension, Map map, WriteFunction writeFn) {
-    FILE* file = NULL;
+bool
+tryCreateOutputFile(char *source_file_path, char *output_file_path, char *extension, Map map, WriteFunction writeFn) {
+    FILE *file = NULL;
     generateOutputFileName(source_file_path, output_file_path, extension);
     setLogLineContext(-1, output_file_path, "OUTPUTS");
     file = fopen(output_file_path, "w");
@@ -36,7 +37,8 @@ void writeOutputs(char *file, Assembler *assembler) {
         assemblerDispose(assembler);
         exit(-1);
     }
-    writeWordsMap(obj_file, (*assembler).tables->words_map, (*assembler).tables->labels_table, (int) (*assembler).IC, (int) (*assembler).DC);
+    writeWordsMap(obj_file, (*assembler).tables->words_map, (*assembler).tables->labels_table, (int) (*assembler).IC,
+                  (int) (*assembler).DC);
     fclose(obj_file);
 
     /* try writing externals */
@@ -90,20 +92,22 @@ void assemblerRun(char *files[], int index) {
         exit(current_run_result);
     }
 
-   /* printLabelsTable(assembler.tables->labels_table);*/
+    /* printLabelsTable(assembler.tables->labels_table);*/
     fseek(source_file, 0, SEEK_SET);
     current_run_result = secondRun(source_file, &assembler);
 
     fclose(source_file); /* close am file */
 
-    if (current_run_result != PARSE_SUCCESS || overall_run_result != PARSE_SUCCESS) {
+    if (current_run_result != PARSE_SUCCESS || overall_run_result != PARSE_SUCCESS || precompile_parse_failure) {
+        if (precompile_parse_failure)
+            remove(am_file);
         assemblerDispose(&assembler);
         exit(current_run_result);
     }
 
     /* runs finished successfully, create output files */
 
-    writeOutputs(files[index],  &assembler);
+    writeOutputs(files[index], &assembler);
 
     printf("Compilation finished with status %d\n", overall_run_result);
 
