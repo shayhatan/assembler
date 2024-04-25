@@ -4,10 +4,10 @@
 #include "parse_types.h"
 
 
-enum ParseResult parseLine(char *line, int line_number, input_line *result);
+enum ParseResult parseLine(char *line, int line_number, InputLine *result);
 
-void resetLine(input_line *line);
+void resetLine(InputLine *line);
 
-void disposeLine(input_line *line);
+void disposeLine(InputLine *line);
 
 #endif /* ASSEMBLER_LINE_UTILS_H */

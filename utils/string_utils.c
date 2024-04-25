@@ -95,7 +95,7 @@ void getStringBetweenSpaces(char *word, char *buffer) {
     buffer[i] = '\0';
 }
 
-void strcpy_n(const char *src, char *target, int len) {
+void strcpyn(const char *src, char *target, int len) {
     int i;
     for (i = 0; i < len; ++i) {
         target[i] = src[i];
@@ -191,7 +191,7 @@ bool isInArray(char* str,  char *array[], int size) {
 
 void resetString(char* string) {
     int i = 0;
-    int length = strlen(string);
+    int length = (int)strlen(string);
 
     for (; i < length; i++) {
         string[i] = '\0';

@@ -11,15 +11,15 @@
 
 MapDataElement copyElement(MapDataElement existing) {
     Entry *clone = allocateMemory(sizeof(Entry));
-    Entry *existingEntry = existing;
+    Entry *existing_entry = existing;
 
     if (clone == NULL || existing == NULL) {
         return NULL;
     }
-    clone->classification = allocatedDuplicateString(existingEntry->classification);
-    clone->words_counter = existingEntry->words_counter;
-    clone->value = existingEntry->value;
-    clone->is_entry = existingEntry->is_entry;
+    clone->classification = allocatedDuplicateString(existing_entry->classification);
+    clone->words_counter = existing_entry->words_counter;
+    clone->value = existing_entry->value;
+    clone->is_entry = existing_entry->is_entry;
     return clone;
 }
 
@@ -31,8 +31,8 @@ MapKeyElement copyKeyElement(MapKeyElement existing) {
 
 /** Type of function for deallocating a data element of the map */
 void cleanMapDataElements(MapDataElement disposable) {
-    Entry *disposedEntry = disposable;
-    free(disposedEntry->classification);
+    Entry *disposed_entry = disposable;
+    free(disposed_entry->classification);
     free(disposable);
 }
 
@@ -70,12 +70,12 @@ MapResult setLabel(char *label, Entry newEntry, bool create_only, Map labels_tab
 }
 
 int incrementLabelWordsCounter(char *label, Map labels_table) {
-    Entry *existingEntry = mapGet(labels_table, label);
-    if (existingEntry == NULL) {
+    Entry *existing_entry = mapGet(labels_table, label);
+    if (existing_entry == NULL) {
         logError("label %s does not exist\n", label);
         return 1; /* argument out of range */;
     }
-    existingEntry->words_counter += 1;
+    existing_entry->words_counter += 1;
     return 0; /* success */
 }
 
@@ -94,16 +94,16 @@ MapResult bulkAddExternalOperands(Arguments *args_container, bool create_only, M
 
 
 int updateDataLabels(int IC, Map labels_table) {
-    Entry *currentEntry;
+    Entry *current_entry;
     char *iter;
     MAP_FOREACH(char *, iter, labels_table) {
         if (iter == NULL) {
             logError("Out of memory\n");
             return OUT_OF_MEMORY;
         }
-        currentEntry = mapGet(labels_table, iter);
-        if (strcmp(currentEntry->classification, DEF_DOT_DATA) == 0) {
-            currentEntry->value += ((int) IC) + 100;
+        current_entry = mapGet(labels_table, iter);
+        if (strcmp(current_entry->classification, DEF_DOT_DATA) == 0) {
+            current_entry->value += ((int) IC) + 100;
         }
 
         free(iter);
@@ -114,7 +114,7 @@ int updateDataLabels(int IC, Map labels_table) {
 
 
 void printLabelsTable(Map labels_table) {
-    Entry *currentEntry = NULL;
+    Entry *current_entry = NULL;
     char *iter;
     if (labels_table == NULL) return;
     printf("============Labels table============\n");
@@ -124,14 +124,14 @@ void printLabelsTable(Map labels_table) {
             printf("====================================\n");
             break;
         }
-        currentEntry = mapGet(labels_table, iter);
-        if (currentEntry == NULL) {
+        current_entry = mapGet(labels_table, iter);
+        if (current_entry == NULL) {
             logError("unreachable code had been reached");
             free(iter);
             return;
         }
-        printf("%s\t%d\t%s\t%d\t%d\n", (char *) iter, currentEntry->value, currentEntry->classification,
-               currentEntry->words_counter, currentEntry->is_entry);
+        printf("%s\t%d\t%s\t%d\t%d\n", (char *) iter, current_entry->value, current_entry->classification,
+               current_entry->words_counter, current_entry->is_entry);
 
         free(iter);
     }
@@ -140,15 +140,15 @@ void printLabelsTable(Map labels_table) {
 }
 
 void getDCAndIC(char buffer[81], Map labels_table, int IC, int DC) {
-    Entry *currentEntry = NULL;
+    Entry *current_entry = NULL;
     char *iter;
     if (labels_table == NULL) return;
     MAP_FOREACH(char*, iter, labels_table) {
         if (iter == NULL) {
             break;
         }
-        currentEntry = mapGet(labels_table, iter);
-        if (currentEntry == NULL) {
+        current_entry = mapGet(labels_table, iter);
+        if (current_entry == NULL) {
             logError("unreachable code had been reached");
             free(iter);
             return;
@@ -161,7 +161,7 @@ void getDCAndIC(char buffer[81], Map labels_table, int IC, int DC) {
 }
 
 MapResult setEntryLabel(char *label, Map labels_table, bool *has_dot_ent) {
-    Entry *labelEntry = NULL;
+    Entry *label_entry = NULL;
 
     if (labels_table == NULL) {
         return MAP_ERROR;
@@ -173,12 +173,12 @@ MapResult setEntryLabel(char *label, Map labels_table, bool *has_dot_ent) {
         return MAP_ITEM_DOES_NOT_EXIST;
     }
 
-    labelEntry = mapGet(labels_table, label);
-    if (labelEntry == NULL) {
+    label_entry = mapGet(labels_table, label);
+    if (label_entry == NULL) {
         return MAP_ERROR; /* shouldn't be possible as we have just verified that the label does exist */
     }
 
-    labelEntry->is_entry = true;
+    label_entry->is_entry = true;
     *has_dot_ent = true;
 
     return MAP_SUCCESS;

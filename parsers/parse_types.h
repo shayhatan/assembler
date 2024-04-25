@@ -72,7 +72,7 @@ typedef struct {
     int line_number;
     bool is_comment;
     bool is_empty;
-} input_line;
+} InputLine;
 
 typedef enum ArgumentType {
     NUMERIC_TYPE, STRING_TYPE, DOUBLE_QUOTE_STRING, LABEL_TYPE

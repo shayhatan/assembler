@@ -7,7 +7,7 @@
 #include "./line_utils.h"
 #include "../logs/logging_utils.h"
 
-enum ParseResult parseLine(char *line, int line_number, input_line *result) {
+enum ParseResult parseLine(char *line, int line_number, InputLine *result) {
     char temp_buffer[81];
 
     String temp_string;
@@ -115,7 +115,7 @@ enum ParseResult parseLine(char *line, int line_number, input_line *result) {
     return PARSE_FAILURE;
 }
 
-void resetLine(input_line *line) {
+void resetLine(InputLine *line) {
     line->label = NULL;
     line->has_label = false;
     line->directive_props = 0;
@@ -128,7 +128,7 @@ void resetLine(input_line *line) {
     line->isEOF = false;
 }
 
-void disposeLine(input_line *line) {
+void disposeLine(InputLine *line) {
     if (line->has_label) {
         free(line->label);
         line->label = NULL;

@@ -42,7 +42,7 @@ int countDataWords(char *label, void *ptr, Assembler *assembler) {
     return true;
 }
 
-static AnalyzeStatus analyzeLine(input_line line, Assembler *assembler) {
+static AnalyzeStatus analyzeLine(InputLine line, Assembler *assembler) {
     int L;
     MapResult status = MAP_SUCCESS;
 
@@ -150,7 +150,7 @@ ParseResult run(FILE *src_file, Assembler *assembler) {
     bool errored = false;
 
     while (fgets(buffer, 81, src_file) != 0) {
-        input_line line;
+        InputLine line;
         ParseResult parse_result;
         bool shouldStop = false;
         resetLine(&line);

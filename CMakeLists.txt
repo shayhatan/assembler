@@ -54,8 +54,8 @@ add_executable(assembler
         runs/assembler_run.h
         tables/tables.c
         tables/tables.h
-        runs/assembler_types.c
-        runs/assembler_types.h
+        runs/assembler_utils.c
+        runs/assembler_utils.h
 )
 
 # Link math library

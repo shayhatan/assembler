@@ -6,7 +6,7 @@
 #include "../precomplie/precompile.h"
 #include "../utils/file_manger.h"
 #include "../logs/logging_utils.h"
-#include "assembler_types.h"
+#include "assembler_utils.h"
 
 typedef int (*WriteFunction)(FILE*, Map);
 

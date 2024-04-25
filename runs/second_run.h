@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include "../parsers/parse_types.h"
-#include "assembler_types.h"
+#include "assembler_utils.h"
 
 enum ParseResult secondRun(FILE *srcFile, Assembler* assembler);
 

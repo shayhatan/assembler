@@ -1,8 +1,9 @@
-#include "file_manger.h"
-#include "memory.h"
-#include "logs/logging_utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include "file_manger.h"
+#include "../utils/memory.h"
+#include "../logs/logging_utils.h"
+#include "../utils/string_utils.h"
 
 /* Function to check if a character followed by a space is a comma-space pair */
 bool isCommaSpacePair(char current, char next) {
@@ -13,7 +14,6 @@ bool isCommaSpacePair(char current, char next) {
 bool isSpaceCommaPair(char current, char next) {
     return (current == ' ' && next == ','); /* Check if current character is a space and next character is a comma */
 }
-
 
 /* Function to compact comma-space pairs into single commas */
 void compactCommas(char *input) {

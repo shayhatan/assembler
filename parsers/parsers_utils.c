@@ -222,7 +222,7 @@ char *getNthArgument(Arguments *args_container, int index) {
     return args_container->args[index];
 }
 
-enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter) {
+enum ParseResult tryGetOperationWordsCounter(InputLine *line, int *words_counter) {
     enum Addressing operandsAddressing[2] = {-1};
 
     int amountOfOperands = getAmountOfOperandsByOperation(line->opcode);

@@ -8,8 +8,6 @@
 #include "../utils/string_utils.h"
 #include "labels_table.h"
 
-
-
 void compileInstruction(char *result, const int *key_ptr, const Word *current_word);
 
 static MapDataElement copyElement(MapDataElement existing) {
@@ -150,23 +148,23 @@ void base4ToEncrypted(char *base4, char *encrypted) {
 
 void binaryToBase4(const char *binary, char *base4) {
     int i;
-    int binaryLength = strlen(binary);
-    int base4Index = 0;
-    int remainder = binaryLength % 2; /*To handle cases with odd number of digits*/
-    int base4Digit = 0;
+    int binary_length = strlen(binary);
+    int base_4_index = 0;
+    int remainder = binary_length % 2; /*To handle cases with odd number of digits*/
+    int base_4_digit = 0;
 
     /*Check if the binary length is odd and prepend a zero if necessary*/
     if (remainder != 0) {
-        base4[base4Index++] = '0';
+        base4[base_4_index++] = '0';
     }
     /* Iterate over the binary string */
-    for (i = remainder; i < binaryLength; i += 2) {
+    for (i = remainder; i < binary_length; i += 2) {
         /* Convert each pair of bits to base-4 digit */
-        base4Digit = (binary[i] - '0') * 2 +
-                     (i + 1 < binaryLength ? binary[i + 1] - '0' : 0); /* Handle the case where binaryLength is odd*/
-        base4[base4Index++] = base4Digit + '0'; /* Convert to character and store */
+        base_4_digit = (binary[i] - '0') * 2 +
+                       (i + 1 < binary_length ? binary[i + 1] - '0' : 0); /* Handle the case where binary_length is odd*/
+        base4[base_4_index++] = base_4_digit + '0'; /* Convert to character and store */
     }
-    base4[base4Index] = '\0'; /* Null-terminate the base4 string */
+    base4[base_4_index] = '\0'; /* Null-terminate the base4 string */
 }
 
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "assembler_types.h"
+#include "assembler_utils.h"
 #include "../parsers/line_utils.h"
 #include "../logs/logging_utils.h"
 #include "../words/decoders.h"
@@ -9,10 +9,9 @@
 
 static int address = 100;
 
-static enum ParseResult analyzeLine(input_line *line, Assembler* assembler) {
+static enum ParseResult analyzeLine(InputLine *line, Assembler* assembler) {
     MapResult status;
-    if (line->directive_props & (DOT_DATA | DOT_STRING | DOT_EXTERNAL | DOT_DEFINE))
-    {
+    if (line->directive_props & (DOT_DATA | DOT_STRING | DOT_EXTERNAL | DOT_DEFINE)) {
         return PARSE_SUCCESS;
     }
 
@@ -51,7 +50,7 @@ enum ParseResult secondRun(FILE *srcFile, Assembler* assembler) {
     bool errored;
 
     while (fgets(buffer, 81, srcFile) != 0) {
-        input_line line;
+        InputLine line;
         enum ParseResult parse_result;
         bool shouldStop = false;
 

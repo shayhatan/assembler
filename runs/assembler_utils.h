@@ -1,5 +1,5 @@
-#ifndef ASSEMBLER_ASSEMBLER_TYPES_H
-#define ASSEMBLER_ASSEMBLER_TYPES_H
+#ifndef ASSEMBLER_ASSEMBLER_UTILS_H
+#define ASSEMBLER_ASSEMBLER_UTILS_H
 
 #include "tables/tables.h"
 
@@ -14,4 +14,4 @@ MapResult assemblerInit(Assembler *assembler);
 
 void assemblerDispose(Assembler *assembler);
 
-#endif /*ASSEMBLER_ASSEMBLER_TYPES_H*/
+#endif /*ASSEMBLER_ASSEMBLER_UTILS_H*/

@@ -16,7 +16,7 @@ void getStringBetweenSpaces(char *word, char *buffer);
 
 bool isAlphaNumeric(char *word);
 
-void strcpy_n(const char *src, char *target, int len);
+void strcpyn(const char *src, char *target, int len);
 
 int indexOfChar(const char *str, char ch);
 

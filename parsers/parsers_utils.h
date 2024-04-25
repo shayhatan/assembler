@@ -13,7 +13,7 @@ Addressing getAddressingFlagForOperand(Operand operand);
 
 int getAddressingForOperand(Operand operand);
 
-ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter);
+ParseResult tryGetOperationWordsCounter(InputLine *line, int *words_counter);
 
 bool doesContainLabel(char *line, String *result);
 
