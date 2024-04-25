@@ -5,10 +5,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
-
 typedef void* Pointer;
 
 Pointer allocateMemory(size_t size);
+Pointer allocateAndCountMemory(size_t size);
 
 #endif /* MMN14_HELPER_H */

@@ -3,22 +3,33 @@
 
 #define MAX_MEMORY_POOL 4096
 
-int current_allocated_memory = 0;
+int allocations_counter = 0;
 
 Pointer allocateMemory(size_t size) {
     Pointer ptr;
 
-/*    if (current_allocated_memory + size >= MAX_MEMORY_POOL) {
-        logError("max allowed memory encountered\n");
-        return NULL;
-    }*/
     ptr = malloc(size);
     if (ptr == NULL) {
         printf("Error: Unable to allocate memory.\n");
         return NULL;
     }
 
-    current_allocated_memory += (int)size;
+    return ptr;
+}
+
+Pointer allocateAndCountMemory(size_t size) {
+    Pointer ptr;
+
+    if (allocations_counter + size >= MAX_MEMORY_POOL) {
+        logError("max allowed memory encountered\n");
+        return NULL;
+    }
+
+    ptr = allocateMemory(size);
+
+    if (ptr != NULL) {
+        allocations_counter++;
+    }
 
     return ptr;
 }

@@ -52,7 +52,7 @@ static void destroyNode(Map map, Node node) {
 static Node nodeCreate(Map map, MapKeyElement key, MapDataElement data) {
     Node new_node;
     assert(key && data && map);
-    new_node = allocateMemory(sizeof(*new_node));
+    new_node = allocateAndCountMemory(sizeof(*new_node));
     if (new_node == NULL) {
         return NULL;
     }
