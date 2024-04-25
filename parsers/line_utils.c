@@ -70,7 +70,6 @@ enum ParseResult parseLine(char *line, int lineNumber, input_line *result) {
 
     /* directive or constant line */
     if (tryGetDirectiveProps(temp_buffer, &result->directive_props)) {
-        /* todo handle failure status regarding out of memory */
         switch (result->directive_props) {
             case dot_data:
                 if (tryGetArguments(line, NUMERIC_TYPE, PLURAL, &result->arguments) != 0) {

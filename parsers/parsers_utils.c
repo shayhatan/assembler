@@ -10,10 +10,6 @@
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
-const int TWO_OPERANDS_OPERATIONS[] = {mov, cmp, add, sub, lea};
-const int ONE_OPERAND_OPERATIONS[] = {not, clr, inc, dec, jmp, bne, red, prn, jsr};
-const int ZERO_OPERANDS_OPERATIONS[] = {rts, hlt};
-
 /* todo move to consts*/
 char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
                       "rts", "hlt"};
@@ -278,16 +274,8 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
     }
 }
 
-/* todo fix this function */
 bool isEOF(char *ptr) {
     return *ptr == EOF;
-/*    while (ptr != NULL) {
-        if (*ptr == EOF) {
-            return true;
-        }
-        ptr++;
-    }
-    return false;*/
 }
 
 int tryGetOpcode(char *word, enum Opcode *result) {

@@ -10,7 +10,7 @@ typedef struct {
     bool has_dot_ent;
 } Assembler;
 
-void assemblerInit(Assembler *assembler);
+MapResult assemblerInit(Assembler *assembler);
 
 void assemblerDispose(Assembler *assembler);
 
