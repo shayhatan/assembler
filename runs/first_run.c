@@ -188,6 +188,7 @@ ParseResult run(FILE *src_file, Assembler *assembler) {
                 shouldStop = true;
                 break;
             case ANALYZE_OUT_OF_MEMORY:
+                disposeLine(&line);
                 shouldStop = true;
                 logError("Out of memory!\n");
                 return OUT_OF_MEMORY;

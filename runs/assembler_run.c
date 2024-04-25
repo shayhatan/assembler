@@ -62,15 +62,16 @@ void assemblerRun(char *files[], int index) {
     FILE *source_file = NULL;
     Assembler assembler;
 
+    if (!preCompile(files, am_file, index)) {
+        logError("Error pre-compiling\n");
+        return;
+    }
+
     if (assemblerInit(&assembler) == MAP_OUT_OF_MEMORY) {
         logError("Out of memory during initialization\n");
         exit(-1);
     }
 
-    if (!preCompile(files, am_file, index)) {
-        logError("Error pre-compiling\n");
-        exit(-2);
-    }
 
     source_file = fopen(am_file, "r");
     if (!source_file) {
@@ -89,7 +90,7 @@ void assemblerRun(char *files[], int index) {
         exit(current_run_result);
     }
 
-    printLabelsTable(assembler.tables->labels_table);
+   /* printLabelsTable(assembler.tables->labels_table);*/
     fseek(source_file, 0, SEEK_SET);
     current_run_result = secondRun(source_file, &assembler);
 

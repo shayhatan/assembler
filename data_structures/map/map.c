@@ -260,7 +260,7 @@ MapResult mapPut(Map map, MapKeyElement key_element, MapDataElement data_element
 
     new_node = nodeCreate(map, key_element, data_element);
     if (new_node == NULL) {
-        free(new_node);
+       /* free(new_node);*/
         return MAP_OUT_OF_MEMORY;
     }
     insert(map, &new_node);
