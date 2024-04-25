@@ -2,7 +2,7 @@
 #define MACROS_H
 
 #include <stdbool.h>
-#include "../../utils/file_manger.h"
+#include "../../utils/file_manager.h"
 #include "../../utils/memory.h"
 #include "../precompile_list/sorted_list.h"
 #include <string.h>

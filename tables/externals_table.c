@@ -5,7 +5,7 @@
 #include "../data_structures/map/map.h"
 
 
-void compileExternal(char *result, int *line_number, char *current_external) {
+void compileExternal(char *result, const int *line_number, char *current_external) {
     sprintf(result, "%s\t%d", current_external, *line_number);
 }
 

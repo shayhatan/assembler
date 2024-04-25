@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "file_manger.h"
+#include "file_manager.h"
 #include "../utils/memory.h"
 #include "../logs/logging_utils.h"
 #include "../utils/string_utils.h"

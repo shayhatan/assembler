@@ -1,7 +1,7 @@
 #ifndef ASSEMBLER_ASSEMBLER_UTILS_H
 #define ASSEMBLER_ASSEMBLER_UTILS_H
 
-#include "tables/tables.h"
+#include "../tables/tables.h"
 
 typedef struct {
     Tables *tables;

@@ -38,18 +38,18 @@ add_executable(assembler
         parsers/line_utils.c
         parsers/line_utils.h
         runs/second_run.h
-        utils/file_manger.c
+        utils/file_manager.c
         utils/memory.c
         tables/externals_table.c
         tables/externals_table.h
-        precomplie/precompile.c
-        precomplie/precompile.h
-        precomplie/macro/macro_parser.c
-        precomplie/macro/macro_parser.h
-        precomplie/macro/macros.c
-        precomplie/macro/macros.c
-        precomplie/precompile_list/sorted_list.c
-        precomplie/precompile_list/sorted_list.h
+        precompile/precompile.c
+        precompile/precompile.h
+        precompile/macro/macro_parser.c
+        precompile/macro/macro_parser.h
+        precompile/macro/macros.c
+        precompile/macro/macros.c
+        precompile/precompile_list/sorted_list.c
+        precompile/precompile_list/sorted_list.h
         runs/assembler_run.c
         runs/assembler_run.h
         tables/tables.c

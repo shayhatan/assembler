@@ -1,7 +1,7 @@
-#include "precompile.h"
-#include "macro/macros.h"
-#include "macro/macro_parser.h"
-#include "logs/logging_utils.h"
+#include "./precompile.h"
+#include "./macro/macros.h"
+#include "./macro/macro_parser.h"
+#include "../logs/logging_utils.h"
 
 bool preCompile(char *arr[], char* am_file, int dex) {
     Macros *macros;

@@ -1,7 +1,6 @@
-
-#include "assembler_utils.h"
-#include "../utils/memory.h"
 #include <stdlib.h>
+#include "./assembler_utils.h"
+#include "../utils/memory.h"
 
 MapResult assemblerInit(Assembler *assembler) {
     assembler->tables = allocateMemory(sizeof(Tables));

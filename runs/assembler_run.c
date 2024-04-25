@@ -3,10 +3,9 @@
 #include "assembler_run.h"
 #include "../runs/first_run.h"
 #include "../runs/second_run.h"
-#include "../precomplie/precompile.h"
-#include "../utils/file_manger.h"
+#include "../precompile/precompile.h"
+#include "../utils/file_manager.h"
 #include "../logs/logging_utils.h"
-#include "assembler_utils.h"
 
 typedef int (*WriteFunction)(FILE*, Map);
 

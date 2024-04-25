@@ -1,6 +1,6 @@
 #include "macros.h"
 #include "../../utils/string_utils.h"
-#include "logs/logging_utils.h"
+#include "../../logs/logging_utils.h"
 
 int compareMacroNames(const void *a, const void *b) {
     const Macro *macro_a = (const Macro *) a;

@@ -1,0 +1,77 @@
+CC = gcc
+CFLAGS = -g -ansi -Wall -pedantic
+LDFLAGS = -lm
+SRCDIR = src
+INCDIR = include
+OBJDIR = obj
+BINDIR = bin
+
+# List of source files
+SRCS = \
+    assembler.c \
+    data_structures/map/map.c \
+    data_structures/map/map.h \
+    logs/logging_utils.c \
+    logs/logging_utils.h \
+    parsers/line_utils.c \
+    parsers/line_utils.h \
+    parsers/parsers_utils.h \
+    parsers/parsers_utils.c \
+    words/consts.h \
+    words/parsers.h \
+    words/types.h \
+    words/decoders.c \
+    words/decoders.h \
+    precomplie/precompile.c \
+    precomplie/precompile.h \
+    precomplie/macro/macro_parser.c \
+    precomplie/macro/macro_parser.h \
+    precomplie/macro/macros.c \
+    precomplie/macro/macros.h \
+    precomplie/precompile_list/sorted_list.c \
+    precomplie/precompile_list/sorted_list.h \
+    runs/second_run.c \
+    runs/second_run.h \
+    runs/first_run.c \
+    runs/first_run.h \
+    runs/assembler_run.c \
+    runs/assembler_run.h \
+    tables/labels_table.c \
+    tables/labels_table.h \
+    tables/decode_table.c \
+    tables/decode_table.h \
+    tables/externals_table.c \
+    tables/externals_table.h \
+    utils/factory.c \
+    utils/factory.h \
+    utils/string_utils.c \
+    utils/string_utils.h \
+    utils/file_manger.c \
+    utils/file_manger.h \
+    utils/memory.c \
+    utils/memory.h
+
+# List of object files
+OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
+
+# Target executable
+TARGET = $(BINDIR)/executable
+
+# Main target
+all: $(TARGET)
+
+# Rule to build the executable
+$(TARGET): $(OBJS) | $(BINDIR)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+# Rule to compile source files
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -I$(INCDIR) -c -o $@ $<
+
+# Create directories
+$(OBJDIR) $(BINDIR):
+	mkdir -p $@
+
+# Clean rule
+clean:
+	rm -rf $(OBJDIR) $(BINDIR)
