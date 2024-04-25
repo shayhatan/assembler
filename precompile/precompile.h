@@ -6,6 +6,6 @@
 
 #include <stdbool.h>
 
-bool preCompile(char *arr[], char *am_file, int dex);
+bool preCompile(char *arr[], char *am_file, int dex, bool *parse_failure);
 
 #endif /* MACROS_EXECTION_H */

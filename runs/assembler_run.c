@@ -61,8 +61,9 @@ void assemblerRun(char *files[], int index) {
     ParseResult current_run_result = PARSE_SUCCESS, overall_run_result = PARSE_SUCCESS;
     FILE *source_file = NULL;
     Assembler assembler;
+    bool precompile_parse_failure = false;
 
-    if (!preCompile(files, am_file, index)) {
+    if (!preCompile(files, am_file, index, &precompile_parse_failure)) {
         logError("Error pre-compiling\n");
         return;
     }
@@ -71,7 +72,6 @@ void assemblerRun(char *files[], int index) {
         logError("Out of memory during initialization\n");
         exit(-1);
     }
-
 
     source_file = fopen(am_file, "r");
     if (!source_file) {

@@ -35,7 +35,7 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *parse_failure
         mcr_len += strlen(str); /* Accumulate length of macro content */
         /* Check for unexpected text after 'endmcro' */
         if (hasUnexpectedText(str)) {
-            printf("Error: Unexpected text after 'endmcro'\n");
+            logError("Error: Unexpected text after 'endmcr'\n");
             *parse_failure = true;
             return NULL;
         }
@@ -102,7 +102,7 @@ bool isLastLineWord(const char *token) {
  * Function to process a line of code when adding a macro definition.
  * Returns true if processing is successful, false otherwise.
  */
-bool processAddMcrLine(char *line, int line_number, char *name, bool *error) {
+bool processAddMcrLine(char *line, int line_number, char *name, bool *parse_failure) {
     char *token;
     token = strtok(line, " \n"); /* Tokenize the line using space and newline as delimiters */
 
@@ -123,16 +123,16 @@ bool processAddMcrLine(char *line, int line_number, char *name, bool *error) {
             }
             logError("Invalid macro name! (reg/inst etc)"); /* Print error message if macro name is invalid */
         }
-            /* If token is NULL, it means there was no name provided */
+        /* If token is NULL, it means there was no name provided */
         else if (token == NULL) {
-            logError("Error in line %d: Invalid format\n", line_number); /* Print error message */
+            logError("Error in line %d: missing macro name\n", line_number); /* Print error message */
         } else {
             logError("Error in line %d: Extra text after macro name definition\n",
                      line_number); /* Print error message */
         }
-        /**error = true;*/ /* Set error flag to true */
     }
-    return false; /* Return false by default */
+    *parse_failure = true;
+    return true; /* Return false by default */
 }
 
 
@@ -144,11 +144,12 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
 
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Error opening file %s\n", filename);
+        logError("Error opening file %s\n", filename);
         return false;
     }
 
     if (parse_failure) {
+        fclose(file);
         return true;
     }
 
@@ -157,7 +158,7 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
     /* Open destination file */
     destination_file = fopen(destination_base, "w");
     if (destination_file == NULL) {
-        printf("Error opening destination file %s\n", destination_base);
+        logError("Error opening destination file %s\n", destination_base);
         fclose(file);
         return false;
     }
@@ -228,7 +229,7 @@ bool removeMacros(const char *source_filename, char *destination_filename, Macro
     /* Open source file */
     FILE *source_file = fopen(source_filename, "r");
     if (source_file == NULL) {
-        printf("Error opening source file %s\n", source_filename);
+        logError("Error opening source file %s\n", source_filename);
         return false;
     }
 
@@ -238,7 +239,7 @@ bool removeMacros(const char *source_filename, char *destination_filename, Macro
     /* Open destination file */
     destination_file = fopen(destination_base, "w");
     if (destination_file == NULL) {
-        printf("Error opening destination file %s\n", destination_base);
+        logError("Error opening destination file %s\n", destination_base);
         fclose(source_file);
         return false;
     }

@@ -3,11 +3,10 @@
 #include "./macro/macro_parser.h"
 #include "../logs/logging_utils.h"
 
-bool preCompile(char *arr[], char* am_file, int dex) {
+bool preCompile(char *arr[], char* am_file, int dex, bool *parse_failure) {
     Macros *macros;
     char temp_file1[PRE_MAX_LINE] = "";
     char temp_file2[PRE_MAX_LINE] = "";
-    bool parse_failure = false;
     /* Insure file ends with am extension */
     if (!endsWithAS(arr[dex])) {
         logError("source file doesn't have a valid file extension\n");
@@ -26,14 +25,14 @@ bool preCompile(char *arr[], char* am_file, int dex) {
     }
 
     /* processing Macros into macros and remove macros blocks where declared */
-    if (!processMacroLines(macros, temp_file1, &parse_failure) || !removeMacros(temp_file1, temp_file2, macros)) {
+    if (!processMacroLines(macros, temp_file1, parse_failure) || !removeMacros(temp_file1, temp_file2, macros)) {
         freeMacros(macros);
         remove(temp_file1);
         return false;
     }
     /* no need for temp_file1 */
     remove(temp_file1);
-    if (!replaceMacrosInFile(temp_file2, macros, am_file, parse_failure)) {
+    if (!replaceMacrosInFile(temp_file2, macros, am_file, *parse_failure)) {
         freeMacros(macros);
         remove(temp_file2);
         /* if file created */
@@ -42,7 +41,12 @@ bool preCompile(char *arr[], char* am_file, int dex) {
         return false;
     }
 
-    remove(temp_file2);
-    freeMacros(macros);
+    if (*parse_failure) {
+        strcpy(am_file, temp_file2);
+    }
+    else {
+        remove(temp_file2);
+        freeMacros(macros);
+    }
     return true;
 }
