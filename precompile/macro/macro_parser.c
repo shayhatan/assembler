@@ -33,13 +33,12 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count) {
     while (fgets(str, PRE_MAX_LINE, fp) != NULL && isNotEndMcro(str)) {
         (*line_count)++; /* Increment line count */
         mcr_len += strlen(str); /* Accumulate length of macro content */
+        /* Check for unexpected text after 'endmcro' */
+        if (hasUnexpectedText(str)) {
+            printf("Error: Unexpected text after 'endmcro'\n");
+            return NULL;
+        }
         memset(str, '\0', PRE_MAX_LINE); /* Clear the buffer */
-    }
-
-    /* Check for unexpected text after 'endmcro' */
-    if (hasUnexpectedText(str)) {
-        printf("Error: Unexpected text after 'endmcro'\n");
-        return NULL;
     }
 
     /* Copy macro content from file */
@@ -63,7 +62,7 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name) {
     char line[PRE_MAX_LINE] = "";
     char mcr_name[PRE_MAX_LINE] = "";
     int cnt = 0;
-    char* data;
+    char *data;
     bool error = false;
     fpos_t pos;
 
@@ -88,12 +87,11 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name) {
             }
 
         }
-        memset(line, '\0',PRE_MAX_LINE);
+        memset(line, '\0', PRE_MAX_LINE);
     }
     fclose(fp);
     return !error;
 }
-
 
 
 bool isLastLineWord(const char *token) {
@@ -124,15 +122,16 @@ bool processAddMcrLine(char *line, int line_number, char *name, bool *error) {
             if (isValidMacroName(name)) {
                 return true; /* Return true if macro name is valid */
             }
-            printf("Invalid macro name! (reg/inst etc)"); /* Print error message if macro name is invalid */
+            logError("Invalid macro name! (reg/inst etc)"); /* Print error message if macro name is invalid */
         }
             /* If token is NULL, it means there was no name provided */
         else if (token == NULL) {
-            printf("Error in line %d: Invalid format\n", line_number); /* Print error message */
+            logError("Error in line %d: Invalid format\n", line_number); /* Print error message */
         } else {
-            printf("Error in line %d: Extra text after macro name definition\n", line_number); /* Print error message */
+            logError("Error in line %d: Extra text after macro name definition\n",
+                     line_number); /* Print error message */
         }
-        *error = true; /* Set error flag to true */
+        /**error = true;*/ /* Set error flag to true */
     }
     return false; /* Return false by default */
 }
@@ -165,7 +164,7 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file) {
     while (fgets(line, PRE_MAX_LINE, file) != NULL) {
         Node *current = macros->macros->head;
         while (current != NULL) {
-            Macro *macro = (Macro *)current->data;
+            Macro *macro = (Macro *) current->data;
             char *pos = strstr(line, macro->macro_name); /* Find occurrence of macro_name in line */
             while (pos != NULL) {
                 int index = pos - line; /* Position of macro_name in line*/
@@ -193,14 +192,15 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file) {
 bool isMacroBlockStart(const char *buffer, Node *macros_head, bool *in_macro_block) {
     Node *current = macros_head; /* Pointer to traverse the list of macros */
     while (current != NULL) {
-        Macro *macro = (Macro *)current->data; /* Get the current macro */
+        Macro *macro = (Macro *) current->data; /* Get the current macro */
         char *start_macro_pos = strstr(buffer, "mcr "); /* Find occurrence of "mcr " in buffer */
         if (start_macro_pos != NULL) { /* If "mcr " is found */
             char *macro_name_start = start_macro_pos + strlen("mcr "); /* Get start position of macro name */
             char *macro_name_end = strchr(macro_name_start, '\n'); /* Find end position of macro name */
             if (macro_name_end != NULL) { /* If end of macro name is found */
                 *macro_name_end = '\0'; /* Null terminate the macro name */
-                if (strcmp(macro_name_start, macro->macro_name) == 0) { /* Compare macro name with current macro's name */
+                if (strcmp(macro_name_start, macro->macro_name) ==
+                    0) { /* Compare macro name with current macro's name */
                     *in_macro_block = true; /* Set in_macro_block flag to true */
                     return true; /* Return true indicating the start of a macro block */
                 }
