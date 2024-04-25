@@ -129,15 +129,15 @@ Map mapCreate(copyMapDataElements copyData,
     return map;
 }
 
-MapResult mapRemove(Map map, MapKeyElement keyElement) {
+MapResult mapRemove(Map map, MapKeyElement key_element) {
     Node iter;
     Node prev = EMPTY;
-    if (map == NULL || keyElement == NULL) {
+    if (map == NULL || key_element == NULL) {
         return MAP_NULL_ARGUMENT;
     }
     iter = map->head;
     while (iter != END_OF_LIST) {
-        if (map->cmpKey(iter->key, keyElement) == EQUAL) {
+        if (map->cmpKey(iter->key, key_element) == EQUAL) {
             if (prev == EMPTY_THEN_NODE_IS_HEAD) {
                 map->head = map->head->next;
                 destroyNode(map, iter);
@@ -247,18 +247,18 @@ Map mapCopy(Map map) {
 
 }
 
-MapResult mapPut(Map map, MapKeyElement keyElement, MapDataElement dataElement) {
+MapResult mapPut(Map map, MapKeyElement key_element, MapDataElement data_element) {
     Node new_node;
-    if (map == NULL || dataElement == NULL || keyElement == NULL) {
+    if (map == NULL || data_element == NULL || key_element == NULL) {
         return MAP_NULL_ARGUMENT;
     }
     map->iterator = NULL;
 
-    if (mapContains(map, keyElement)) {
-        mapRemove(map, keyElement);
+    if (mapContains(map, key_element)) {
+        mapRemove(map, key_element);
     }
 
-    new_node = nodeCreate(map, keyElement, dataElement);
+    new_node = nodeCreate(map, key_element, data_element);
     if (new_node == NULL) {
         free(new_node);
         return MAP_OUT_OF_MEMORY;
@@ -289,14 +289,14 @@ MapKeyElement mapGetNext(Map map) {
     return map->copyKey(map->iterator->key);
 }
 
-MapDataElement mapGet(Map map, MapKeyElement keyElement) {
+MapDataElement mapGet(Map map, MapKeyElement key_element) {
     Node iter;
-    if (map == NULL || keyElement == NULL || map->head == NULL) {
+    if (map == NULL || key_element == NULL || map->head == NULL) {
         return NULL;
     }
     iter = map->head;
     while (iter != NULL) {
-        if (map->cmpKey(keyElement, iter->key) == EQUAL) {
+        if (map->cmpKey(key_element, iter->key) == EQUAL) {
             return iter->data;
         }
         iter = iter->next;

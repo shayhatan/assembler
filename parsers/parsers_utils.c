@@ -15,7 +15,7 @@ char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "d
                       "rts", "hlt"};
 
 /* todo move to consts*/
-char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".Entry", ".define"};
+char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".entry", ".define"};
 
 
 bool isOpcode(char *word) {

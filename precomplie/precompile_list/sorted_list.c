@@ -22,13 +22,13 @@ SortedList *initializeList(int (*compare)(const void *, const void *), void (*fr
 
     list->head = NULL;
     list->compare = compare;
-    list->freeData = freeData;
+    list->free_data = freeData;
     return list;
 }
 
 /* Function to insert data into the sorted list */
 void insert(SortedList *list, void *data) {
-    Node* newNode = createNode(data);
+    Node* new_node = createNode(data);
     Node* current = list->head;
     Node* prev = NULL;
 
@@ -38,11 +38,11 @@ void insert(SortedList *list, void *data) {
     }
 
     if (prev == NULL) {
-        newNode->next = list->head;
-        list->head = newNode;
+        new_node->next = list->head;
+        list->head = new_node;
     } else {
-        prev->next = newNode;
-        newNode->next = current;
+        prev->next = new_node;
+        new_node->next = current;
     }
 }
 
@@ -62,8 +62,8 @@ void freeList(SortedList *list) {
     Node* current = list->head;
     while (current != NULL) {
         Node* next = current->next;
-        if (list->freeData != NULL)
-            list->freeData(current->data);
+        if (list->free_data != NULL)
+            list->free_data(current->data);
         free(current);
         current = next;
     }

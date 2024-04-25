@@ -16,7 +16,7 @@ typedef struct {
 
     int (*compare)(const void *, const void *);
 
-    void (*freeData)(void *);
+    void (*free_data)(void *);
 } SortedList;
 
 SortedList *initializeList(int (*compare)(const void *, const void *), void (*freeData)(void *));

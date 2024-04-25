@@ -232,20 +232,20 @@ MapResult decodeInstruction(int *address, Opcode code, char operands[2][DEF_MAX_
                 return MAP_ERROR;
         }
         if (status != MAP_SUCCESS) {
-            logError("failed to decode a DIRECT/INSTANT/single register operand, status: %s\n",
+            logError("failed to decode a DIRECT/INSTANT/SINGLE register operand, status: %s\n",
                      mapResultToString(status));
             return status;
         }
         status = addWord((*address)++, &new_word, words_map);
         if (status != MAP_SUCCESS) {
-            logError("failed to add a decoded DIRECT/INSTANT/single register operand, status: %s\n",
+            logError("failed to add a decoded DIRECT/INSTANT/SINGLE register operand, status: %s\n",
                      mapResultToString(status));
             return status;
         }
         if (addressing == DIRECT && new_word.direct.decode == EXTERNAL_DECODING) {
             status = addExternal((*address)-1, operands[i], externals_table);
             if (status != MAP_SUCCESS) {
-                logError("failed to add a decoded DIRECT/INSTANT/single register operand, status: %s\n",
+                logError("failed to add a decoded DIRECT/INSTANT/SINGLE register operand, status: %s\n",
                          mapResultToString(status));
                 return status;
             }

@@ -148,31 +148,31 @@ bool mapContains(Map map, MapKeyElement element);
 *  Iterator's value is undefined after this operation.
 *
 * @param map - The map for which to reassign the data element
-* @param keyElement - The key element which need to be reassigned
-* @param dataElement - The new data element to associate with the given key.
+* @param key_element - The key element which need to be reassigned
+* @param data_element - The new data element to associate with the given key.
 *      A copy of the element will be inserted as supplied by the copying function
 *      which is given at initialization and old data memory would be
 *      deleted using the free function given at initialization.
 * @return
-* 	MAP_NULL_ARGUMENT if a NULL was sent as map or keyElement or dataElement
+* 	MAP_NULL_ARGUMENT if a NULL was sent as map or key_element or data_element
 * 	MAP_OUT_OF_MEMORY if an allocation failed (Meaning the function for copying
 * 	an element or a key failed)
 * 	MAP_SUCCESS the paired elements had been inserted successfully
 */
-MapResult mapPut(Map map, MapKeyElement keyElement, MapDataElement dataElement);
+MapResult mapPut(Map map, MapKeyElement key_element, MapDataElement data_element);
 
 /**
 *	mapGet: Returns the data associated with a specific key in the map.
 *			Iterator status unchanged
 *
 * @param map - The map for which to get the data element from.
-* @param keyElement - The key element which need to be found and whos data
+* @param key_element - The key element which need to be found and whos data
 we want to get.
 * @return
 *  NULL if a NULL pointer was sent or if the map does not contain the requested key.
 * 	The data element associated with the key otherwise.
 */
-MapDataElement mapGet(Map map, MapKeyElement keyElement);
+MapDataElement mapGet(Map map, MapKeyElement key_element);
 
 /**
 * 	mapRemove: Removes a pair of key and data elements from the map. The elements
@@ -183,7 +183,7 @@ MapDataElement mapGet(Map map, MapKeyElement keyElement);
 *
 * @param map -
 * 	The map to remove the elements from.
-* @param keyElement
+* @param key_element
 * 	The key element to find and remove from the map. The element will be freed using the
 * 	free function given at initialization. The data element associated with this key
 *  will also be freed using the free function given at initialization.
@@ -192,7 +192,7 @@ MapDataElement mapGet(Map map, MapKeyElement keyElement);
 *  MAP_ITEM_DOES_NOT_EXIST if an equal key item does not already exists in the map
 * 	MAP_SUCCESS the paired elements had been removed successfully
 */
-MapResult mapRemove(Map map, MapKeyElement keyElement);
+MapResult mapRemove(Map map, MapKeyElement key_element);
 
 /**
 *	mapGetFirst: Sets the internal iterator (also called current key element) to

@@ -23,6 +23,7 @@ void setLogLineContext(int line_number, char *line_text, char* ctx) {
 
 void logError(char *error_msg, ...) {
     va_list lst;
+    char* c_ptr;
     va_start(lst, error_msg);
 
     fprintf(stderr, "[ERROR][context=%s][#line=%d]: \"%s\" - failed by - ", context, line, prefix);
@@ -39,7 +40,13 @@ void logError(char *error_msg, ...) {
                 fprintf(stderr, "%d", va_arg(lst, int));
                 break;
             case 's':
-                fprintf(stderr, "%s", va_arg(lst, char*));
+                c_ptr = va_arg(lst, char*);
+                if (c_ptr == NULL) {
+                    fprintf(stderr, "NULL");
+                }
+                else {
+                    fprintf(stderr, "%s", c_ptr);
+                }
                 break;
             case 'c':
                 fprintf(stderr, "%c", va_arg(lst, int));

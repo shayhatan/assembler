@@ -146,7 +146,7 @@ static AnalyzeStatus analyzeLine(input_line line, Assembler *assembler) {
 
 ParseResult run(FILE *src_file, Assembler *assembler) {
     char buffer[81] = "";
-    int index = 0;
+    int index = 1;
     bool errored = false;
 
     while (fgets(buffer, 81, src_file) != 0) {
