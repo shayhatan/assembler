@@ -18,7 +18,7 @@ static int hasUnexpectedText(const char *str) {
  * Function to read macro content from file.
  * Returns a pointer to the macro content if successful, NULL otherwise.
  */
-char *readMacroData(FILE *fp, fpos_t *pos, int *line_count) {
+char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *parse_failure) {
     int mcr_len = 0; /* Variable to store the length of macro content */
     char str[PRE_MAX_LINE] = ""; /* Buffer to store each line of the file */
     char *data; /* Pointer to store the macro content */
@@ -36,6 +36,7 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count) {
         /* Check for unexpected text after 'endmcro' */
         if (hasUnexpectedText(str)) {
             printf("Error: Unexpected text after 'endmcro'\n");
+            *parse_failure = true;
             return NULL;
         }
         memset(str, '\0', PRE_MAX_LINE); /* Clear the buffer */
@@ -57,15 +58,13 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count) {
  * @param formatted_file_name The name of the formatted file containing macro definitions.
  * @return bool Returns true if the parsing and insertion process is successful, false otherwise.
  */
-bool processMacroLines(Macros *macros, const char *formatted_file_name) {
+_Bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *parse_failure) {
     FILE *fp = fopen(formatted_file_name, "r");
     char line[PRE_MAX_LINE] = "";
     char mcr_name[PRE_MAX_LINE] = "";
     int cnt = 0;
-    char *data;
-    bool error = false;
+    char* data;
     fpos_t pos;
-
 
     if (fp == NULL) {
         logError("Error opening formatted file\n");
@@ -76,10 +75,10 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name) {
     while (fgets(line, sizeof(line), fp)) {
         cnt++;
         /* if there is error here it's not fatal meaning that file we will continue to check more erros*/
-        if (processAddMcrLine(line, cnt, mcr_name, &error)) {
+        if (processAddMcrLine(line, cnt, mcr_name, parse_failure)) {
             /* Get current file position. */
             fgetpos(fp, &pos);
-            data = readMacroData(fp, &pos, &cnt);
+            data = readMacroData(fp, &pos, &cnt, parse_failure);
 
             if (data) {
                 fsetpos(fp, &pos);
@@ -90,7 +89,7 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name) {
         memset(line, '\0', PRE_MAX_LINE);
     }
     fclose(fp);
-    return !error;
+    return !parse_failure;
 }
 
 
@@ -138,7 +137,7 @@ bool processAddMcrLine(char *line, int line_number, char *name, bool *error) {
 
 
 /* Function to replace occurrences of macro_name with allocated_data in a file */
-bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file) {
+bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool parse_failure) {
     FILE *destination_file;
     char destination_base[PRE_MAX_LINE] = "";
     char line[PRE_MAX_LINE] = "";
@@ -147,6 +146,10 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file) {
     if (file == NULL) {
         printf("Error opening file %s\n", filename);
         return false;
+    }
+
+    if (parse_failure) {
+        return true;
     }
 
     generateOutputFileName(filename, destination_base, ".am");

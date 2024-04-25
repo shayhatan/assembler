@@ -14,7 +14,7 @@
  * @param line_count Pointer to store the number of lines read.
  * @return A pointer to the macro content if successful, NULL otherwise.
  */
-char *readMacroData(FILE *fp, fpos_t *pos, int *line_count);
+char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, _Bool *aBool);
 
 /**
  * Function to process a line of code when adding a macro definition.
@@ -39,7 +39,7 @@ bool isLastLineWord(const char *token);
  * @param formatted_file_name The name of the formatted file to process.
  * @return true if processing is successful, false otherwise.
  */
-bool processMacroLines(Macros *macros, const char *formatted_file_name);
+_Bool processMacroLines(Macros *macros, const char *formatted_file_name, _Bool *aBool);
 
 /**
  * Function to replace occurrences of macro names with allocated data in a file.
@@ -48,7 +48,7 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name);
  * @param am_file Pointer to store the name of the output file with replaced macros.
  * @return true if replacement is successful, false otherwise.
  */
-bool replaceMacrosInFile(const char *filename, Macros *macros, char* am_file);
+bool replaceMacrosInFile(const char *filename, Macros *macros, char* am_file, bool parse_failure);
 
 /**
  * Function to remove macro blocks from a source file and save the result to a destination file.
