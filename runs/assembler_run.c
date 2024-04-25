@@ -9,16 +9,59 @@
 #include "logs/logging_utils.h"
 
 
-/*What's left?
- * errors final touch
- * in assemblerRun (here) refine the way we handle files
- * eliminate magic numbers such as 81
- * */
+typedef int (*WriteFunction)(FILE*, Map);
+
+bool tryCreateOutputFile(char *source_file_path, char* output_file_path, char* extension, Map map, WriteFunction writeFn) {
+    FILE* file = NULL;
+    generateOutputFileName(source_file_path, output_file_path, extension);
+    setLogLineContext(-1, output_file_path, "OUTPUTS");
+    file = fopen(output_file_path, "w");
+    if (file == NULL) {
+        logError("Error creating output file %s files\n", output_file_path);
+        return false;
+    }
+    writeFn(file, map);
+    fclose(file);
+    return true;
+}
+
+void writeOutputs(char *file, Assembler *assembler) {
+    char ob_file[81] = "", ex_file[81] = "", ent_file[81] = "";
+    FILE *obj_file = NULL;
+
+
+    generateOutputFileName(file, ob_file, ".ob");
+    setLogLineContext(-1, ob_file, "OUTPUTS");
+    obj_file = fopen(ob_file, "w");
+    if (!obj_file) {
+        logError("Error creating object file\n");
+        assemblerDispose(assembler);
+        exit(-1);
+    }
+    writeWordsMap(obj_file, (*assembler).tables->words_map, (*assembler).tables->labels_table, (int) (*assembler).IC, (int) (*assembler).DC);
+    fclose(obj_file);
+
+    /* try writing externals */
+    if (!isEmptyExternals((*assembler).tables->externals_map)) {
+        if (!tryCreateOutputFile(file, ex_file, ".ext", (*assembler).tables->externals_map, writeExternals)) {
+            assemblerDispose(assembler);
+            exit(-1);
+        }
+    }
+
+    /* try writing entries */
+    if ((*assembler).has_dot_ent) {
+        if (!tryCreateOutputFile(file, ent_file, ".ent", (*assembler).tables->labels_table, writeEntriesFile)) {
+            assemblerDispose(assembler);
+            exit(-1);
+        }
+    }
+}
 
 void assemblerRun(char *files[], int index) {
-    char am_file[81] = "", ob_file[81] = "", ex_file[81] = "", ent_file[81] = ""; /*Need to  handle errors properly*/
+    char am_file[81] = ""; /*Need to  handle errors properly*/
     ParseResult current_run_result = PARSE_SUCCESS, overall_run_result = PARSE_SUCCESS;
-    FILE *source_file = NULL, *obj_file = NULL, *ext_file = NULL, *entries_file = NULL;
+    FILE *source_file = NULL;
     Assembler assembler;
 
     if (assemblerInit(&assembler) == MAP_OUT_OF_MEMORY) {
@@ -59,41 +102,11 @@ void assemblerRun(char *files[], int index) {
         exit(current_run_result);
     }
 
-    generateOutputFileName(files[index], ob_file, ".ob");
-    obj_file = fopen(ob_file, "w");
-    if (!obj_file) {
-        logError("Error opening files\n");
-        assemblerDispose(&assembler);
-        exit(-1);
-    }
-    writeWordsMap(obj_file, assembler.tables->words_map, assembler.tables->labels_table, assembler.IC, assembler.DC);
-    fclose(obj_file);
+    /* runs finished successfully, create output files */
 
+    writeOutputs(files[index],  &assembler);
 
-    if (!isEmptyExternals(assembler.tables->externals_map)) {
-        generateOutputFileName(files[index], ex_file, ".ext");
-        ext_file = fopen(ex_file, "w");
-        if (ext_file == NULL) {
-            logError("Error opening files\n");
-            assemblerDispose(&assembler);
-            exit(-1);
-        }
-        writeExternals(ext_file, assembler.tables->externals_map);
-        fclose(ext_file);
-    }
-    if (assembler.has_dot_ent) {
-        generateOutputFileName(files[index], ent_file, ".ent");
-        entries_file = fopen(ent_file, "w");
-        if (entries_file == NULL) {
-            logError("Error opening files\n");
-            assemblerDispose(&assembler);
-            exit(-1);
-        }
-        writeEntriesFile(entries_file, assembler.tables->labels_table);
-        fclose(entries_file);
-    }
-
-    printf("Run finished with status %d\n", current_run_result);
+    printf("Compilation finished with status %d\n", overall_run_result);
 
     assemblerDispose(&assembler);
 }

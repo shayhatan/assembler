@@ -5,5 +5,5 @@
 int main(int argc, char *argv[]) {
     while (--argc > 0)
         assemblerRun(argv, argc);
-    return 1;
+    return 0;
 }
