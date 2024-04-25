@@ -12,7 +12,7 @@ typedef struct {
     Map labels_table;
 } Tables;
 
-void tablesInit(Tables *tables);
+MapResult tablesInit(Tables *tables);
 
 void tablesDispose(Tables *tables);
 
