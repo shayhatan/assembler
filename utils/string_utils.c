@@ -6,7 +6,7 @@
 #include "../logs/logging_utils.h"
 #include "./memory.h"
 #define INSTRUCTION_SIZE 4
-#define CMD_SIZE 15
+#define CMD_SIZE 16
 #define REG_SIZE 8
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 

@@ -121,7 +121,8 @@ bool processAddMcrLine(char *line, char *name, bool *parse_failure) {
             if (isValidMacroName(name)) {
                 return true; /* Return true if macro name is valid */
             }
-            logError("Invalid macro name! (reg/inst etc)"); /* Print error message if macro name is invalid */
+            *parse_failure = true;
+            logError("Invalid macro name! (reg/opcode/directive)\n"); /* Print error message if macro name is invalid */
         }
             /* If token is NULL, it means there was no name provided */
         else if (token == NULL) {

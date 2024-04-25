@@ -20,7 +20,7 @@ Pointer allocateMemory(size_t size) {
 Pointer allocateAndCountMemory(size_t size) {
     Pointer ptr;
 
-    if (allocations_counter + 1 >= MAX_MEMORY_POOL) {
+    if (allocations_counter + 1 > MAX_MEMORY_POOL) {
         logError("max allowed memory encountered\n");
         return NULL;
     }
