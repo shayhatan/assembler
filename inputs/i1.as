@@ -2,6 +2,7 @@
 
 MAIN:
     mov r3, LIST[sz]
+    mov 3, LIST[sz]
 
 LOOP:
     jmp L1
@@ -34,7 +35,23 @@ mov 4, r1
 
 mov #4, r1
 
+STR1:..string. "abcdef"
+DAT:..data 14
+DAT1:..data #14
+DAT1:..data "aaa"
+
+  bad comments
+ unknown #13, r3
+.define stttr = "-2"
+.define stttr1 "-2"
+
 .define len = 4
 STR: .string "abcdef"
 LIST: .data 6, -9, len
 K: .data 22
+
+
+    .entry .entry
+    .entry .extern
+LLL: .extern aaas
+    .extern "BLA"

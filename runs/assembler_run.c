@@ -69,7 +69,7 @@ void assemblerRun(char *files[], int index) {
 
     if (!preCompile(files, am_file, index)) {
         logError("Error pre-compiling\n");
-        return;
+        exit(-2);
     }
 
     source_file = fopen(am_file, "r");

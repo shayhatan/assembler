@@ -10,21 +10,31 @@
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
-char prefix[81];
-char context[81];
-int line;
+static char prefix[81];
+static char context[81];
+static int line;
+static bool had_error_for_line = false;
 
 void setLogLineContext(int line_number, char *line_text, char* ctx) {
     int index = min(indexOfChar(line_text, '\n'), indexOfChar(line_text, '\0'));
     line = line_number;
     duplicateStr(line_text, prefix, index);
     strcpy(context, ctx);
+    had_error_for_line = false;
 }
 
 void logError(char *error_msg, ...) {
     va_list lst;
     char* c_ptr;
+
+    /* distincts higher level error logs of a specific line, such that only the first error log of a line number will appear */
+    /* reason: lower level logs are more detailed, while higher level logs are last resort */
+    if (had_error_for_line) {
+        return;
+    }
     va_start(lst, error_msg);
+
+    had_error_for_line = true;
 
     fprintf(stderr, "[ERROR][context=%s][#line=%d]: \"%s\" - failed by - ", context, line, prefix);
 

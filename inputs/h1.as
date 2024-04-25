@@ -1,6 +1,7 @@
 .entry LIST
 .extern W
 .define sz = 2
+;some random comment
 MAIN: mov r3, LIST[sz]
 LOOP: jmp W
 prn #-5
