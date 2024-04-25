@@ -49,12 +49,6 @@ int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     return result;
 }
 
-/*void labelsTableInit() {
-    if (labels_table != NULL) return;
-    labels_table = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
-                             compareKeyElements);
-}*/
-
 Map labelsTableCreate() {
     return mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                      compareKeyElements);

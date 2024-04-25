@@ -1,5 +1,6 @@
 #include "macros.h"
 #include "../../utils/string_utils.h"
+#include "logs/logging_utils.h"
 
 int compareMacroNames(const void *a, const void *b) {
     const Macro *macro_a = (const Macro *) a;
@@ -15,7 +16,7 @@ void freeMacroData(void *data) {
 }
 
 Macros *createMacros() {
-    Macros *macros = (Macros *) allocateMemory(sizeof(Macros)); /* malloc(sizeof(Macros)); */
+    Macros *macros = (Macros *) allocateMemory(sizeof(Macros));
     if (macros != NULL) {
         macros->macros = initializeList(compareMacroNames, freeMacroData);
     }
@@ -39,7 +40,7 @@ void insertMacro(Macros *macros, const char *macro_name, char *data) {
         if (macro != NULL) {
             insert(macros->macros, macro);
         } else {
-            fprintf(stderr, "Memory allocation failed.\n");
+            logError("Memory allocation failed.\n");
         }
     }
 }
@@ -130,13 +131,13 @@ void replaceMacros(const char *file_name, char *out_put, Macros *macros) {
     char line[PRE_MAX_LINE] = "";
     char *new_line = NULL; /* To store modified line*/
     if (input_file == NULL) {
-        fprintf(stderr, "Error opening file %s\n", file_name);
+        logError( "Error opening file %s\n", file_name);
         return;
     }
 
     output_file = fopen(out_put, "w");
     if (output_file == NULL) {
-        fprintf(stderr, "Error creating temporary output file\n");
+        logError("Error creating temporary output file\n");
         fclose(input_file);
         return;
     }

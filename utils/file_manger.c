@@ -1,5 +1,6 @@
 #include "file_manger.h"
 #include "memory.h"
+#include "logs/logging_utils.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -114,7 +115,7 @@ bool formatFile(const char *input_file_name, char *new_file1) {
     /* Open input file */
     input_file = fopen(input_file_name, "r");
     if (input_file == NULL) {
-        perror("Error opening input file");
+        logError("Error opening input file\n");
         new_file1[0] = '\0'; /* Empty the new_file1 array if an error occurs */
         return false;
     }
@@ -122,7 +123,7 @@ bool formatFile(const char *input_file_name, char *new_file1) {
     /* Open output file */
     output_file = fopen(new_file1, "w");
     if (output_file == NULL) {
-        perror("Error opening output file");
+        logError("Error opening output file\n");
         fclose(input_file);
         new_file1[0] = '\0';
         return false;
@@ -131,15 +132,14 @@ bool formatFile(const char *input_file_name, char *new_file1) {
     /* Read each line from input file, format it, and write to output file */
     while (fgets(line, sizeof(line), input_file)) {
         if (isLineTooLong(line)) {
-            fprintf(stderr, "Error: Line too long in input file\n");
+            logError("Error: Line too long in input file\n");
             fclose(input_file);
             fclose(output_file);
             return false;
         }
         formatString(line); /* Format the line */
-        /* Skip blank lines */ /* Do we want to skip? @itay*/
-        /*length = strlen(line);
-        if (length > 0)*/
+        /* Skip blank lines */
+        if (strlen(line) > 0)
             fprintf(output_file, "%s\n", line); /* Write formatted line to output file */
     }
 

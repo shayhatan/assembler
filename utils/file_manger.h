@@ -11,16 +11,6 @@
  */
 
 /**
- * @brief Removes excess spaces from a string.
- *
- * Removes multiple consecutive spaces and replaces them with a single space.
- *
- * @param input The input string to be modified.
- */
-void removeExcessSpaces(char *input);
-
-
-/**
  * @brief Formats a string by removing excess spaces and compacting commas.
  *
  * Removes excess spaces and multiple consecutive commas from the input string,

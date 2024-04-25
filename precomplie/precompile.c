@@ -1,15 +1,17 @@
 #include "precompile.h"
 #include "macro/macros.h"
 #include "macro/macro_parser.h"
+#include "logs/logging_utils.h"
 
 bool preCompile(char *arr[], char* am_file, int dex) {
     Macros *macros;
     char temp_file1[PRE_MAX_LINE] = "";
     char temp_file2[PRE_MAX_LINE] = "";
     /* Insure file ends with am extension */
-    if (!endsWithAS(arr[dex]))
-        return false; /* @itay */ /* error msg to log*/
-
+    if (!endsWithAS(arr[dex])) {
+        logError("source file doesn't have a valid file extension\n");
+        return false;
+    }
 
     /* Removing unnecessary white spaces */
     if (!formatFile(arr[dex], temp_file1)) {

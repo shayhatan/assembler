@@ -138,11 +138,16 @@ bool isQuotedString(char *word) {
     if (*word != '\"') return false;
     if (*(word + strlen(word) - 1) != '\"') return false;
 
-    /* todo: validate no 3rd " in between the last and first */
-
     return true;
 }
 
+/**
+ * @brief Removes excess spaces from a string.
+ *
+ * Removes multiple consecutive spaces and replaces them with a single space.
+ *
+ * @param input The input string to be modified.
+ */
 void removeExcessSpaces(char *input) {
     int i = 0, j = 0;
     bool space_flag = false;

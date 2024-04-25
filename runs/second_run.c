@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "assembler.h"
+#include "assembler_types.h"
 #include "../parsers/line_utils.h"
 #include "../logs/logging_utils.h"
 #include "../words/decoders.h"

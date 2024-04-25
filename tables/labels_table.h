@@ -6,13 +6,6 @@
 #include "../parsers/parse_types.h"
 #include "../data_structures/map/map.h"
 
-extern unsigned int IC, DC;
-
-/**
- * allocates a map
- */
-void labelsTableInit();
-
 /**
  * de-allocates a map
  */

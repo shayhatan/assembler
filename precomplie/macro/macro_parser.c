@@ -1,5 +1,6 @@
 #include "../../utils/string_utils.h"
 #include "macro_parser.h"
+#include "logs/logging_utils.h"
 
 
 /**************************** static functions ***************************************/
@@ -68,7 +69,7 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name) {
 
 
     if (fp == NULL) {
-        perror("Error opening formatted file");
+        logError("Error opening formatted file\n");
         return false;
     }
 

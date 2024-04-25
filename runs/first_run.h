@@ -1,7 +1,7 @@
 #ifndef FIRST_RUN_H
 #define FIRST_RUN_H
 
-#include "assembler.h"
+#include "assembler_types.h"
 #include "../parsers/parse_types.h"
 #include <stdio.h>
 

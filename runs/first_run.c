@@ -171,12 +171,10 @@ ParseResult run(FILE *srcFile, Assembler *assembler) {
             case OUT_OF_MEMORY:
                 logError("gracefully clearing all allocations and shutting down\n");
                 disposeLine(&line);
-                /* labelsTableDispose();*/
                 return OUT_OF_MEMORY; /* complete bail out */
             case PARSE_SUCCESS: /* do nothing */
                 break;
         }
-
 
         if (line.isComment || line.isEmpty) {
             disposeLine(&line);
@@ -206,7 +204,7 @@ ParseResult run(FILE *srcFile, Assembler *assembler) {
     }
 
     /*update all symbols with data classification to IC + 100 */
-    updateDataLabels(assembler->IC, assembler->tables->labels_table);
+    updateDataLabels((int)assembler->IC, assembler->tables->labels_table);
     wordUpdateDecode((int) assembler->IC + 100, assembler->tables->words_map);
 
     return PARSE_SUCCESS;
