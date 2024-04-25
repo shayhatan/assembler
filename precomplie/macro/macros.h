@@ -2,11 +2,12 @@
 #define MACROS_H
 
 #include <stdbool.h>
-#include "../precompile_consts.h"
 #include "../../utils/file_manger.h"
 #include "../../utils/memory.h"
 #include "../precompile_list/sorted_list.h"
 #include <string.h>
+
+#define PRE_MAX_LINE 81
 
 /* Struct for storing macro information */
 typedef struct {

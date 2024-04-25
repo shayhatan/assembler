@@ -54,7 +54,7 @@ bool isLineTooLong(const char *line) {
 
     /* Check if the length exceeds the maximum allowed length minus 1 (for null terminator)
        and if the character at the maximum allowed length is not a newline */
-    return (len >= PRE_MAX_LINE - 1 && line[PRE_MAX_LINE - 2] != '\n');
+    return (len >= MAX_FIlE_LINE - 1 && line[MAX_FIlE_LINE - 2] != '\n');
 }
 
 
@@ -106,8 +106,8 @@ void generateOutputFileName(const char *input_file_name, char *output_file_name,
 bool formatFile(const char *input_file_name, char *new_file1) {
     FILE *input_file;
     FILE *output_file;
-    char line[PRE_MAX_LINE];
-    line[PRE_MAX_LINE - 1] = '\0'; /* Null-terminate the line buffer */
+    char line[MAX_FIlE_LINE];
+    line[MAX_FIlE_LINE - 1] = '\0'; /* Null-terminate the line buffer */
 
     /* Generate output file name */
     generateOutputFileName(input_file_name, new_file1, ".out");

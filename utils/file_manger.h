@@ -1,9 +1,9 @@
 #ifndef MMN14_FORMAT_PARSER_H
 #define MMN14_FORMAT_PARSER_H
 
-#include "../precomplie/precompile_consts.h"
 #include <stdbool.h>
 #include <stdio.h>
+#define MAX_FIlE_LINE 81
 
 /**
  * @file format_parser.h
