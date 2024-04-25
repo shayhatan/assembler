@@ -1,6 +1,6 @@
-#include "../../utils/string_utils.h"
 #include "macro_parser.h"
-#include "logs/logging_utils.h"
+#include "../../utils/string_utils.h"
+#include "../../logs/logging_utils.h"
 
 
 /**************************** static functions ***************************************/
@@ -113,7 +113,7 @@ bool processAddMcrLine(char *line, int line_number, char *name, bool *error) {
     if (token != NULL && strcmp(token, "mcr") == 0) {
         token = strtok(NULL, " \n"); /* Get the next token */
 
-        /* Check if the token is the last word in the line */
+        /* Check if the token is the last Word in the line */
         if (isLastLineWord(token)) {
             /* Clear the name buffer */
             memset(name, '\0', PRE_MAX_LINE);

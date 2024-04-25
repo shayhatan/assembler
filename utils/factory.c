@@ -4,14 +4,14 @@
 
 #include "../parsers/parse_types.h"
 
-entry createEntry(char *classification, /* symbol property */
+Entry createEntry(char *classification, /* symbol property */
                   int value /* IC + 100 || DC */) {
-    entry e;
+    Entry e;
 
     e.value = value;
     e.classification = classification;
-    e.wordsCounter = 0;
-    e.isEntry = false;
+    e.words_counter = 0;
+    e.is_entry = false;
 
     return e;
 }

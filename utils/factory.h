@@ -3,7 +3,7 @@
 
 #include "../parsers/parse_types.h"
 
-entry createEntry(char *classification, /* symbol property */
+Entry createEntry(char *classification, /* symbol property */
                   int value /* IC + 100 || DC */);
 
 #endif /*ASSEMBLER_FACTORY_H*/

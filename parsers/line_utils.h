@@ -4,7 +4,7 @@
 #include "parse_types.h"
 
 
-enum ParseResult parseLine(char *line, int lineNumber, input_line *result);
+enum ParseResult parseLine(char *line, int line_number, input_line *result);
 
 void resetLine(input_line *line);
 

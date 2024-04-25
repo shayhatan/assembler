@@ -10,22 +10,22 @@
 
 
 
-void compileInstruction(char *result, const int *key_ptr, const word *current_word);
+void compileInstruction(char *result, const int *key_ptr, const Word *current_word);
 
 static MapDataElement copyElement(MapDataElement existing) {
-    word *clone;
-    word *existing_word = existing;
+    Word *clone;
+    Word *existing_word = existing;
 
     if (existing == NULL) {
         return NULL;
     }
 
-    clone = allocateMemory(sizeof(word));
+    clone = allocateMemory(sizeof(Word));
     if (clone == NULL) {
         return NULL;
     }
 
-    memcpy(clone, existing_word, sizeof(word));
+    memcpy(clone, existing_word, sizeof(Word));
 
     return clone;
 }
@@ -46,7 +46,7 @@ static MapKeyElement copyKeyElement(MapKeyElement existing) {
 
 /** Type of function for deallocating a data element of the map */
 static void cleanMapDataElements(MapDataElement disposable) {
-    word *disposed_word = disposable;
+    Word *disposed_word = disposable;
     free(disposed_word);
 }
 
@@ -76,7 +76,7 @@ void wordsMapDispose(Map words_map) {
     mapDestroy(words_map);
 }
 
-MapResult addWord(int address, word *word, Map words_map) {
+MapResult addWord(int address, Word *word, Map words_map) {
     if (words_map == NULL) {
         return MAP_NULL_ARGUMENT;
     }
@@ -173,7 +173,7 @@ void binaryToBase4(const char *binary, char *base4) {
 MapResult wordUpdateDecode(int IC, Map words_map) {
     int *iter;
     int key;
-    word *current_word;
+    Word *current_word;
     if (words_map == NULL) {
         return MAP_NULL_ARGUMENT;
     }
@@ -197,7 +197,7 @@ MapResult wordUpdateDecode(int IC, Map words_map) {
 MapIterationResult getNextLine(char *result, Map words_map) {
     static int iter = -1;
     int *key_ptr = NULL;
-    word *current_word;
+    Word *current_word;
 
     if (words_map == NULL) {
         return UNDEFINED_MAP;
@@ -229,7 +229,7 @@ MapIterationResult getNextLine(char *result, Map words_map) {
     return SUCCESSFUL_ITERATION;
 }
 
-void compileInstruction(char *result, const int *key_ptr, const word *current_word) {
+void compileInstruction(char *result, const int *key_ptr, const Word *current_word) {
     char base2_buffer[15];
     char base4_buffer[8];
     char encrypted_buffer[8];

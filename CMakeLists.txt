@@ -17,7 +17,6 @@ include_directories(data_structures/map)
 
 add_executable(assembler
         words/consts.h
-        words/parsers.h
         words/types.h
         runs/second_run.c
         runs/first_run.c

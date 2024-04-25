@@ -27,9 +27,9 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count);
 bool processAddMcrLine(char *line, int line_number, char* name, bool* error);
 
 /**
- * Function to check if a token is the last word in a line.
+ * Function to check if a token is the last Word in a line.
  * @param token The token to check.
- * @return true if the token is the last word in the line, false otherwise.
+ * @return true if the token is the last Word in the line, false otherwise.
  */
 bool isLastLineWord(const char *token);
 

@@ -86,7 +86,7 @@ void getStringBetweenSpaces(char *word, char *buffer) {
 
     while (isspace(*current)) current++;
 
-    /* find word end */
+    /* find Word end */
     end_index = min(indexOfChar(current, ' '), indexOfChar(current, '\0'));
 
     for (i = 0; i < end_index; i++) {
@@ -199,7 +199,7 @@ void resetString(char* string) {
 }
 
 bool isInstruction(char *str) {
-    char *inst[] = {".data", ".string", ".extern", ".entry"};
+    char *inst[] = {".data", ".string", ".extern", ".Entry"};
     return isInArray(str, inst, INSTRUCTION_SIZE);
 }
 

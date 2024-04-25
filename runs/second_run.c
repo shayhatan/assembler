@@ -11,15 +11,15 @@ static int address = 100;
 
 static enum ParseResult analyzeLine(input_line *line, Assembler* assembler) {
     MapResult status;
-    if (line->directive_props & (dot_data | dot_string | dot_external | dot_define))
+    if (line->directive_props & (DOT_DATA | DOT_STRING | DOT_EXTERNAL | DOT_DEFINE))
     {
         return PARSE_SUCCESS;
     }
 
-    if (line->directive_props & dot_entry) {
+    if (line->directive_props & DOT_ENTRY) {
         status = setEntryLabel(line->arguments.args[0], assembler->tables->labels_table, &(assembler->has_dot_ent));
         if (status != MAP_SUCCESS) {
-            logError("Failed to set %s as entry label", line->label);
+            logError("Failed to set %s as Entry label", line->label);
             return status == MAP_OUT_OF_MEMORY ? OUT_OF_MEMORY : PARSE_FAILURE;
         }
         return PARSE_SUCCESS;
@@ -79,7 +79,7 @@ enum ParseResult secondRun(FILE *srcFile, Assembler* assembler) {
                 break;
         }
 
-        if (line.isComment || line.isEmpty) {
+        if (line.is_comment || line.is_empty) {
             disposeLine(&line);
             continue;
         }

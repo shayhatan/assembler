@@ -15,7 +15,7 @@ char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "d
                       "rts", "hlt"};
 
 /* todo move to consts*/
-char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".entry", ".define"};
+char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".Entry", ".define"};
 
 
 bool isOpcode(char *word) {
@@ -59,7 +59,7 @@ bool isValidVariableString(char *word) {
 }
 
 bool isConstantIndexString(Operand operand) {
-    char arrName[MAX_ARG_CHARS], indexStr[MAX_ARG_CHARS];
+    char arrName[DEF_MAX_ARG_CHARS], indexStr[DEF_MAX_ARG_CHARS];
     if (operand == NULL || *operand == '\0' || !isalpha(*operand)) return false;
     if (sscanf(operand, "%[a-zA-Z0-9_] [%[^]]]", arrName, indexStr) != 2) {
         return false;
@@ -129,13 +129,13 @@ void readTillNewLine(char **line, char buffer[81]) {
 /* returns an enum flag */
 int getAllowedSourceOperandAddressingsByOpcode(enum Opcode op) {
     if (op == lea) {
-        return direct | constantIndex;
+        return DIRECT | CONSTANT_INDEX;
     }
     if (op == mov || op == cmp || op == add || op == sub) {
-        return instant |
-               direct |
-               directRegister |
-               constantIndex; /* all addressings are valid */
+        return INSTANT |
+               DIRECT |
+               DIRECT_REGISTER |
+               CONSTANT_INDEX; /* all addressings are valid */
     }
     return 0; /* no source operand thus no addressings */
 }
@@ -143,21 +143,21 @@ int getAllowedSourceOperandAddressingsByOpcode(enum Opcode op) {
 /* returns an enum flag */
 int getAllowedTargetOperandAddressingsByOpcode(enum Opcode op) {
     if (op == cmp || op == prn) {
-        return instant |
-               direct |
-               directRegister |
-               constantIndex; /* all addressings are valid */
+        return INSTANT |
+               DIRECT |
+               DIRECT_REGISTER |
+               CONSTANT_INDEX; /* all addressings are valid */
     }
     if (op == jsr || op == bne || op == jmp) {
-        return direct |
-               directRegister;
+        return DIRECT |
+               DIRECT_REGISTER;
     }
     if (op == rts || op == hlt) {
         return 0; /* no target operand thus no addressings */
     }
-    return direct |
-           constantIndex |
-           directRegister;
+    return DIRECT |
+           CONSTANT_INDEX |
+           DIRECT_REGISTER;
 }
 
 int getAmountOfOperandsByOperation(enum Opcode code) {
@@ -172,10 +172,10 @@ int getAmountOfOperandsByOperation(enum Opcode code) {
 
 
 enum Addressing getAddressingFlagForOperand(Operand operand) {
-    if (isInstantAddressing(operand)) return instant;
-    if (isDirectAddressing(operand)) return direct;
-    if (isRegisterAddressing(operand)) return directRegister;
-    if (isConstantIndexString(operand)) return constantIndex;
+    if (isInstantAddressing(operand)) return INSTANT;
+    if (isDirectAddressing(operand)) return DIRECT;
+    if (isRegisterAddressing(operand)) return DIRECT_REGISTER;
+    if (isConstantIndexString(operand)) return CONSTANT_INDEX;
 
     return -1;
 }
@@ -245,7 +245,7 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
             }
             *words_counter = 1;
             /* constant index addressing adds 2 extra words_map */
-            *words_counter += operandsAddressing[0] == constantIndex ? 2 : 1;
+            *words_counter += operandsAddressing[0] == CONSTANT_INDEX ? 2 : 1;
             return PARSE_SUCCESS;
         case 2:
             operandsAddressing[0] = getAddressingFlagForOperand(getNthArgument(&line->arguments, 0));
@@ -255,14 +255,14 @@ enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counte
                 return PARSE_FAILURE;
             }
             *words_counter = 1;
-            if (operandsAddressing[0] == constantIndex) {
+            if (operandsAddressing[0] == CONSTANT_INDEX) {
                 *words_counter += 2;
                 /* in case both are constant index we can't ever unify the extra words_map unlike other addressings */
-                *words_counter += operandsAddressing[1] == constantIndex ? 2 : 1;
+                *words_counter += operandsAddressing[1] == CONSTANT_INDEX ? 2 : 1;
                 return PARSE_SUCCESS;
             }
             /* src is not a constant index but target is -- we need 3 words_map to represent both */
-            if (operandsAddressing[1] == constantIndex) {
+            if (operandsAddressing[1] == CONSTANT_INDEX) {
                 *words_counter += 3;
                 return PARSE_SUCCESS;
             }
@@ -339,13 +339,13 @@ bool doesContainLabel(char *line, String *result) {
 }
 
 
-void addArgument(Arguments *args, char arg[MAX_ARG_CHARS], int arg_index, int arg_size) {
+void addArgument(Arguments *args, char arg[DEF_MAX_ARG_CHARS], int arg_index, int arg_size) {
     duplicateStr(arg, (*args).args[arg_index], arg_size);
 }
 
 typedef void ((ExtractArgumentFunction)(char *, char *));
 
-enum ParseResult _tryGetArguments(char *line, enum ArgumentsCountType expectedAmount, Arguments *args,
+ParseResult _tryGetArguments(char *line, ArgumentsCountType expectedAmount, Arguments *args,
                                   ValidateArgumentFunction validator, ExtractArgumentFunction extractor) {
     String next_string;
     char temp[81];
@@ -393,17 +393,16 @@ void extractQuote(char *src, char *target) {
 
 bool isIntegerOrVariableName(char *word) { return isNumber(word) || isValidVariableString(word); }
 
-enum ParseResult
-tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, Arguments *args) {
+ParseResult tryGetArguments(char *line, ArgumentType type, ArgumentsCountType expected_amount, Arguments *args) {
     switch (type) {
         case NUMERIC_TYPE:
-            return _tryGetArguments(line, expectedAmount, args, isIntegerOrVariableName, getStringBetweenSpaces) != 0;
+            return _tryGetArguments(line, expected_amount, args, isIntegerOrVariableName, getStringBetweenSpaces) != 0;
         case DOUBLE_QUOTE_STRING:
-            return _tryGetArguments(line, expectedAmount, args, isQuotedString, extractQuote) != 0;
+            return _tryGetArguments(line, expected_amount, args, isQuotedString, extractQuote) != 0;
         case LABEL_TYPE:
-            return _tryGetArguments(line, expectedAmount, args, isLabelOrConstantString, getStringBetweenSpaces) != 0;
+            return _tryGetArguments(line, expected_amount, args, isLabelOrConstantString, getStringBetweenSpaces) != 0;
         case STRING_TYPE:
-            return _tryGetArguments(line, expectedAmount, args, getTrue, getStringBetweenSpaces) != 0;
+            return _tryGetArguments(line, expected_amount, args, getTrue, getStringBetweenSpaces) != 0;
     }
     return PARSE_FAILURE;
 }

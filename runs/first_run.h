@@ -9,6 +9,6 @@ typedef enum {
     STOP, NEXT, ANALYZE_OUT_OF_MEMORY
 } AnalyzeStatus;
 
-ParseResult run(FILE *srcFile, Assembler* assembler);
+ParseResult run(FILE *src_file, Assembler* assembler);
 
 #endif /* FIRST_RUN_H */

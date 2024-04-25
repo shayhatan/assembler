@@ -9,15 +9,15 @@ bool isValidVariableString(char *word);
 
 String readNextString(char **line, char delimiter, char result_buffer[81]);
 
-enum Addressing getAddressingFlagForOperand(Operand operand);
+Addressing getAddressingFlagForOperand(Operand operand);
 
 int getAddressingForOperand(Operand operand);
 
-enum ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter);
+ParseResult tryGetOperationWordsCounter(input_line *line, int *words_counter);
 
 bool doesContainLabel(char *line, String *result);
 
-enum ParseResult tryGetLabelValue(char *line, char **result);
+ParseResult tryGetLabelValue(char *line, char **result);
 
 int tryGetDirectiveProps(char *word, enum DirectiveProps *result);
 
@@ -28,13 +28,12 @@ bool isEOF(char *line);
 typedef bool (*ValidateArgumentFunction)(char *data);
 
 /* needs de-allocation after finalizing */
-enum ParseResult
-tryGetArguments(char *line, enum ArgumentType type, enum ArgumentsCountType expectedAmount, Arguments *args);
+ParseResult tryGetArguments(char *line, ArgumentType type, ArgumentsCountType expected_amount, Arguments *args);
 
 int tryGetAssignmentArgument(char *line, DefinitionArgument *argument);
 
 void skipWhitespaces(char **line);
 
-void addArgument(Arguments *args, char arg[MAX_ARG_CHARS], int arg_index, int arg_size);
+void addArgument(Arguments *args, char arg[DEF_MAX_ARG_CHARS], int arg_index, int arg_size);
 
 #endif /*ASSEMBLER_PARSERS_UTILS_H*/

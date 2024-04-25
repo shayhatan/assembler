@@ -7,11 +7,11 @@
 
 typedef struct {
     unsigned int decode: 2;
-    unsigned int targetOperand: 2;
-    unsigned int sourceOperand: 2;
+    unsigned int target_operand: 2;
+    unsigned int source_operand: 2;
     unsigned int opcode: 4;
     unsigned int unused: 4;
-} command_word;
+} CommandWord;
 
 typedef struct {
     unsigned int decode: 2;
@@ -26,17 +26,17 @@ typedef struct {
 
 typedef struct {
     unsigned int decode: 2;
-    unsigned int targetOperand: 3;
-    unsigned int sourceOperand: 3;
+    unsigned int target_operand: 3;
+    unsigned int source_operand: 3;
     unsigned int unused: 6;
-} register_word;
+} RegisterWord;
 
 
 typedef struct {
-    /* first word */
+    /* first Word */
     DirectWord list_word;
 
-    /* second word */
+    /* second Word */
     InstantWord index_word;
 } ConstantIndex;
 
@@ -47,19 +47,19 @@ typedef struct {
 
 typedef union {
     /* opcode */
-    command_word cmd;
+    CommandWord cmd;
 
     /* operands */
     InstantWord instant;
     DirectWord direct;
     ConstantIndex constant_index;
-    register_word reg;
+    RegisterWord reg;
 
     /* data */
     DataWord data;
 
     /* used to translate the value whatever it may be, and print it, */
     int print: 15;
-} word;
+} Word;
 
 #endif /*ASSEMBLER_TYPES_H*/

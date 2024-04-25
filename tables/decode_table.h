@@ -7,7 +7,7 @@
 
 void wordsMapDispose(Map words_map);
 
-MapResult addWord(int address, word *word, Map words_map);
+MapResult addWord(int address, Word *word, Map words_map);
 
 MapResult wordUpdateDecode(int IC, Map words_map);
 
