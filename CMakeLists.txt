@@ -19,7 +19,6 @@ add_executable(assembler
         words/consts.h
         words/parsers.h
         words/types.h
-        consts.h
         runs/second_run.c
         runs/first_run.c
         data_structures/map/map.c
