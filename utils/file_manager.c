@@ -106,9 +106,9 @@ void generateOutputFileName(const char *input_file_name, char *output_file_name,
 bool formatFile(const char *input_file_name, char *new_file1) {
     FILE *input_file;
     FILE *output_file;
+    int index = 0;
     char line[MAX_FIlE_LINE];
     line[MAX_FIlE_LINE - 1] = '\0'; /* Null-terminate the line buffer */
-    int index = 0;
 
     /* Generate output file name */
     generateOutputFileName(input_file_name, new_file1, ".out");
