@@ -126,6 +126,8 @@ void resetLine(InputLine *line) {
     line->is_comment = false;
     line->is_empty = false;
     line->isEOF = false;
+
+    memset(line->arguments.args, 0, sizeof(line->arguments.args)); /* clear buffer */
 }
 
 void disposeLine(InputLine *line) {
