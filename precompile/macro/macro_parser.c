@@ -137,8 +137,8 @@ bool processAddMcrLine(char *line, char *name, bool *parse_failure) {
     return false;
 }
 
-/* Function to replace occurrences of macro_name with allocated_data in a file  assumes for each line 1 macro at most*/
-bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool parse_failure) {
+/* Function to replace occurrences of macro_name with allocated_data in a file Expecting one macro alone in each line*/
+bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool *parse_failure) {
     char *new_str;
     FILE *destination_file;
     char destination_base[PRE_MAX_LINE] = "";
@@ -149,15 +149,14 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
         logError("Error opening file %s\n", filename);
         return false;
     }
-
-    if (parse_failure) {
+    /*This func need review*/
+    if (*parse_failure) {
         fclose(file);
         return true;
     }
 
     generateOutputFileName(filename, destination_base, ".am");
 
-    /* Open destination file */
     destination_file = fopen(destination_base, "w");
     if (destination_file == NULL) {
         logError("Error opening destination file %s\n", destination_base);
@@ -179,14 +178,21 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
                 ++end;
             }
             if (pos != NULL && mcr_size == strlen(macro->macro_name)) {
-                new_str = getReplacedName(line, macro->allocated_data, macro->macro_name);
-                if (!new_str)
-                    return false;
+                /* Expected Macro to appear alone in each line */
+                if (strlen(line) - 1 != strlen(macro->macro_name)) {
+                    logError("Expected Macro to appear alone in each line");
+                    *parse_failure = true;
+                } else {
+                    new_str = getReplacedName(line, macro->allocated_data, macro->macro_name);
+                    if (!new_str)
+                        return false;
 
-                fprintf(destination_file, "%s", new_str);
-                free(new_str);
-                replaced = true;
-                break;
+                    fprintf(destination_file, "%s", new_str);
+                    free(new_str);
+                    replaced = true;
+                    break;
+                }
+
             }
             current = current->next;
         }
