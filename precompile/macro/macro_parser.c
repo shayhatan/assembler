@@ -195,26 +195,31 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
  * Function to check if a given buffer indicates the start of a macro block.
  * Returns true if the buffer contains the start of a macro block, false otherwise.
  */
+/**
+ * Function to check if a given buffer indicates the start of a macro block.
+ * Returns true if the buffer contains the start of a macro block, false otherwise.
+ */
 bool isMacroBlockStart(const char *buffer, Node *macros_head, bool *in_macro_block) {
     Node *current = macros_head; /* Pointer to traverse the list of macros */
-    while (current != NULL) {
-        Macro *macro = (Macro *) current->data; /* Get the current macro */
-        char *start_macro_pos = strstr(buffer, "mcr "); /* Find occurrence of "mcr " in buffer */
-        if (start_macro_pos != NULL) { /* If "mcr " is found */
-            char *macro_name_start = start_macro_pos + strlen("mcr "); /* Get start position of macro name */
-            char *macro_name_end = strchr(macro_name_start, '\n'); /* Find end position of macro name */
-            if (macro_name_end != NULL) { /* If end of macro name is found */
-                *macro_name_end = '\0'; /* Null terminate the macro name */
+    char *start_macro_pos = strstr(buffer, "mcr "); /* Find occurrence of "mcr " in buffer */
+    if (start_macro_pos != NULL) { /* If "mcr " is found */
+        char *macro_name_start = start_macro_pos + strlen("mcr "); /* Get start position of macro name */
+        char *macro_name_end = strchr(macro_name_start, '\n'); /* Find end position of macro name */
+        if (macro_name_end != NULL) { /* If end of macro name is found */
+            *macro_name_end = '\0';
+            while (current != NULL) {
+                Macro *macro = (Macro *) current->data; /* Get the current macro */
+                /* Null terminate the macro name */
                 if (strcmp(macro_name_start, macro->macro_name) ==
                     0) { /* Compare macro name with current macro's name */
                     *in_macro_block = true; /* Set in_macro_block flag to true */
                     return true; /* Return true indicating the start of a macro block */
                 }
+                current = current->next; /* Move to the next macro in the list */
             }
         }
-        current = current->next; /* Move to the next macro in the list */
     }
-    return false; /* Return false if no macro block start is found */
+    return false;
 }
 
 
