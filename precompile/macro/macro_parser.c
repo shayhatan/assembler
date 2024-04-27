@@ -163,9 +163,9 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
 
     strcpy(am_file, destination_base); /* Copy destination file name to am_file */
     while (fgets(line, PRE_MAX_LINE, file) != NULL) {
+        Node *current = macros->macros->head;
         setLogLineContext(++cnt, line, "precompile");
         replaced = false;
-        Node *current = macros->macros->head;
         while (current != NULL) {
             int mcr_size = 0;
             Macro *macro = (Macro *) current->data;
