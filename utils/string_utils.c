@@ -110,7 +110,7 @@ bool isNumber(char *word) {
 
     while (isspace(*current)) current++;
 
-    if (*current == '-')
+    if (*current == '-' || *current == '+')
         current++;
 
     while (*current != '\0') {
