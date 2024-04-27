@@ -72,5 +72,7 @@ Macro *createMacro(char *macro_name, char *data);
  */
 void replaceMacros(const char *file_name, char *temp_file_name, Macros *macros);
 
+char *getReplacedName(char *line, const char *data, const char *name);
+
 #endif /* MACROS_H */
 
