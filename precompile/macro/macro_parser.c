@@ -35,7 +35,7 @@ char *readMacroData(FILE *fp, fpos_t *pos, int *line_count, bool *parse_failure)
         mcr_len += strlen(str); /* Accumulate length of macro content */
         /* Check for unexpected text after 'endmcro' */
         if (hasUnexpectedText(str)) {
-            logError("Error: Unexpected text after 'endmcr'\n");
+            logError("Error: Unexpected text after/before 'endmcr'\n");
             *parse_failure = true;
             return NULL;
         }
@@ -137,12 +137,13 @@ bool processAddMcrLine(char *line, char *name, bool *parse_failure) {
     return false;
 }
 
-/* Function to replace occurrences of macro_name with allocated_data in a file  assumes for each line 1 macro at most*/
-bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool parse_failure) {
-    char *new_str;
+/* Function to replace occurrences of macro_name with allocated_data in a file Expecting one macro alone in each line*/
+bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool *parse_failure) {
     FILE *destination_file;
     char destination_base[PRE_MAX_LINE] = "";
     char line[PRE_MAX_LINE] = "";
+    int cnt = 0;
+    bool replaced = false;
 
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -150,15 +151,10 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
         return false;
     }
 
-    if (parse_failure) {
-        fclose(file);
-        return true;
-    }
-
     generateOutputFileName(filename, destination_base, ".am");
 
-    /* Open destination file */
     destination_file = fopen(destination_base, "w");
+
     if (destination_file == NULL) {
         logError("Error opening destination file %s\n", destination_base);
         fclose(file);
@@ -167,8 +163,9 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
 
     strcpy(am_file, destination_base); /* Copy destination file name to am_file */
     while (fgets(line, PRE_MAX_LINE, file) != NULL) {
-        bool replaced = false;
         Node *current = macros->macros->head;
+        setLogLineContext(++cnt, line, "precompile");
+        replaced = false;
         while (current != NULL) {
             int mcr_size = 0;
             Macro *macro = (Macro *) current->data;
@@ -179,13 +176,14 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
                 ++end;
             }
             if (pos != NULL && mcr_size == strlen(macro->macro_name)) {
-                new_str = getReplacedName(line, macro->allocated_data, macro->macro_name);
-                if (!new_str)
-                    return false;
-
-                fprintf(destination_file, "%s", new_str);
-                free(new_str);
-                replaced = true;
+                /* Expected Macro to appear alone in each line */
+                if (strlen(line) - 1 != strlen(macro->macro_name)) {
+                    logError("Expected Macro to appear alone in each line\n");
+                    *parse_failure = true;
+                } else {
+                    fprintf(destination_file, "%s", macro->allocated_data);
+                    replaced = true;
+                }
                 break;
             }
             current = current->next;
@@ -198,14 +196,12 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
 
     fclose(file);
     fclose(destination_file);
+    if (*parse_failure)
+        remove(am_file);
     return true;
 }
 
 
-/**
- * Function to check if a given buffer indicates the start of a macro block.
- * Returns true if the buffer contains the start of a macro block, false otherwise.
- */
 /**
  * Function to check if a given buffer indicates the start of a macro block.
  * Returns true if the buffer contains the start of a macro block, false otherwise.
@@ -232,6 +228,7 @@ bool isMacroBlockStart(const char *buffer, Node *macros_head, bool *in_macro_blo
     }
     return false;
 }
+
 
 
 /**
@@ -283,7 +280,3 @@ bool removeMacros(const char *source_filename, char *destination_filename, Macro
 
     return true;
 }
-
-
-
-

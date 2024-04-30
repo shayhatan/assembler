@@ -49,7 +49,7 @@ bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *pa
  * @param am_file Pointer to store the name of the output file with replaced macros.
  * @return true if replacement is successful, false otherwise.
  */
-bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool parse_failure);
+bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool *parse_failure);
 
 /**
  * Function to remove macro blocks from a source file and save the result to a destination file.
