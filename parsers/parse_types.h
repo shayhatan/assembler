@@ -79,7 +79,7 @@ typedef enum ArgumentType {
 } ArgumentType;
 
 typedef enum ArgumentsCountType {
-    ANY, SINGLE, PLURAL
+    ANY = -3, SINGLE = -2, PLURAL = -1
 } ArgumentsCountType;
 
 

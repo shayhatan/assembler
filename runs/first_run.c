@@ -31,11 +31,11 @@ int countDataWords(char *label, void *ptr, Assembler *assembler) {
     }
     temp = getEntry(strPtr, assembler->tables->labels_table); /* in case we passed a symbol */
     if (temp == NULL) {
-        logError("non-existent symbol %s cannot be a .data argument", strPtr);
+        logError("non-existent symbol %s cannot be a .data argument\n", strPtr);
         return false;
     }
     if (strcmp(temp->classification, DEF_DOT_DEFINE) != 0) { /* in case the symbol is not a constant */
-        logError(".data symbol %s must be a constant definition", strPtr);
+        logError(".data symbol %s must be a constant definition\n", strPtr);
         return false;
     }
     incrementLabelWordsCounter(label, assembler->tables->labels_table);
@@ -133,12 +133,13 @@ static AnalyzeStatus analyzeLine(InputLine line, Assembler *assembler) {
     /* step 13 */
     if (line.opcode < 0 || line.opcode > 15) {
         logError("invalid operation %d\n", (int) line.opcode);
-        return NEXT;
+        return ANALYZE_FAILURE;
     }
 
     /* steps 14, 15 */
     if (tryGetOperationWordsCounter(&line, &L) != PARSE_SUCCESS) {
         logError("failed to get operand words_map\n");
+        return ANALYZE_FAILURE;
     }
     assembler->IC += L;
 

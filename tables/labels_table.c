@@ -126,7 +126,7 @@ void printLabelsTable(Map labels_table) {
         }
         current_entry = mapGet(labels_table, iter);
         if (current_entry == NULL) {
-            logError("unreachable code had been reached");
+            logError("unreachable code had been reached\n");
             free(iter);
             return;
         }
@@ -149,7 +149,7 @@ void getDCAndIC(char buffer[81], Map labels_table, int IC, int DC) {
         }
         current_entry = mapGet(labels_table, iter);
         if (current_entry == NULL) {
-            logError("unreachable code had been reached");
+            logError("unreachable code had been reached\n");
             free(iter);
             return;
         }

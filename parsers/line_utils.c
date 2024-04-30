@@ -56,12 +56,16 @@ enum ParseResult parseLine(char *line, int line_number, InputLine *result) {
 
     if (strcmp(temp_buffer, "") == 0) {
         /* either an empty line or an empty label */
-        return result->has_label ? PARSE_FAILURE : PARSE_SUCCESS;
+        if (result->has_label) {
+            logError("a label must be followed by an instruction or data definition\n");
+            return PARSE_FAILURE;
+        }
+        return PARSE_SUCCESS;
     }
 
     /* instruction line */
     if (tryGetOpcode(temp_buffer, &result->opcode)) {
-        if (tryGetArguments(line, STRING_TYPE, ANY, &result->arguments) != 0) {
+        if (tryGetArguments(line, STRING_TYPE, getAmountOfOperandsByOperation(result->opcode), &result->arguments) != 0) {
             logError("invalid string arguments %s\n", line);
         }
         return PARSE_SUCCESS;

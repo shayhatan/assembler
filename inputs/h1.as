@@ -1,3 +1,4 @@
+.define xxx =+4
 .entry LIST
 .extern W
 .define sz = 2
@@ -15,6 +16,6 @@ L1: inc L3
 END: hlt
 .define len = 4
 STR: .string "abcdef"
-LIST: .data 6, -9, len
+LIST: .data +6, -9, len
 K: .data 22
 .extern L3

@@ -9,6 +9,8 @@ bool isValidVariableString(char *word);
 
 String readNextString(char **line, char delimiter, char result_buffer[81]);
 
+int getAmountOfOperandsByOperation(enum Opcode code);
+
 Addressing getAddressingFlagForOperand(Operand operand);
 
 int getAddressingForOperand(Operand operand);

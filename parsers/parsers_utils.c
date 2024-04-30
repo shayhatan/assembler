@@ -177,6 +177,7 @@ enum Addressing getAddressingFlagForOperand(Operand operand) {
     if (isRegisterAddressing(operand)) return DIRECT_REGISTER;
     if (isConstantIndexString(operand)) return CONSTANT_INDEX;
 
+    logError("operand \"%s\" does not match any of the allowed formats\n", operand);
     return -1;
 }
 
@@ -210,7 +211,7 @@ bool isAddressingValid(enum Addressing operandsAddressing, enum Opcode opcode, e
             break;
         case target:
             if (!(operandsAddressing & getAllowedTargetOperandAddressingsByOpcode(opcode))) {
-                logError("Invalid addressing, operand %s, is not allowed for Opcode %d as target addressing",
+                logError("Invalid addressing, operand %s, is not allowed for Opcode %d as target addressing\n",
                          operandsAddressing, opcode);
                 return false;
             }
@@ -320,7 +321,7 @@ enum ParseResult tryGetLabelValue(char *line, char **result) {
     duplicateStr(line, buffer, temp.size);
 
     if (!isLabelOrConstantString(buffer)) {
-        logError("invalid label syntax %s", line);
+        logError("invalid label syntax %s\n", line);
         return PARSE_FAILURE;
     }
 
@@ -354,13 +355,21 @@ typedef void ((ExtractArgumentFunction)(char *, char *));
 ParseResult _tryGetArguments(char *line, ArgumentsCountType expectedAmount, Arguments *args,
                                   ValidateArgumentFunction validator, ExtractArgumentFunction extractor) {
     String next_string;
+    int commas_counter = 0;
     char temp[81];
 
     if (line == NULL) {
-        return expectedAmount == ANY ? PARSE_SUCCESS : PARSE_FAILURE; /* line is out of buffer */
+        return (expectedAmount == ANY || expectedAmount == 0) ? PARSE_SUCCESS : PARSE_FAILURE; /* line is out of buffer */
     }
 
     while (line != NULL) {
+        if (line != NULL) { /* extra commas detected */
+            commas_counter++;
+        }
+        if (*line == ',') {
+            logError("missing argument definition\n");
+            return PARSE_FAILURE;
+        }
         next_string = readNextString(&line, ',', temp);
 
         if (next_string.size == 0) {
@@ -377,9 +386,10 @@ ParseResult _tryGetArguments(char *line, ArgumentsCountType expectedAmount, Argu
 
         args->args_count++;
     }
+    args->args_count = commas_counter;
 
     if (expectedAmount == SINGLE && args->args_count > 1) {
-        logError("too many args detected");
+        logError("too many args detected\n");
         return PARSE_FAILURE;
     }
 
@@ -387,7 +397,11 @@ ParseResult _tryGetArguments(char *line, ArgumentsCountType expectedAmount, Argu
         if (args->args_count > 0) {
             return PARSE_SUCCESS;
         }
-        logError("missing args detected");
+        logError("missing args detected\n");
+        return PARSE_FAILURE;
+    }
+    if (expectedAmount >= 0 && expectedAmount != args->args_count) {
+        logError("number of predicted arguments %d exceeds or deficits the expected amount %d, possible causes: extra comma with or without an extra argument \n", args->args_count, expectedAmount);
         return PARSE_FAILURE;
     }
     return PARSE_SUCCESS;
@@ -418,7 +432,7 @@ int tryGetAssignmentArgument(char *line, DefinitionArgument *argument) {
     char *ptr = temp_buffer;
     String temp_string;
     if (line == NULL) {
-        logError("missing constant definition %s", line);
+        logError("missing constant definition %s\n", line);
         return PARSE_FAILURE; /* line is out of buffer */
     }
     temp_string = readNextString(&line, '=', temp_buffer);

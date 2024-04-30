@@ -1,4 +1,8 @@
 .define sz = 2
+cmp  #qw		,,   #45
+cmp  #qw		,   #45,
+    cmp  #qw		,   #45,555
+cmp  #qw		,   #45,555,
 
 MAIN:
     mov r3, LIST[sz]
