@@ -6,7 +6,7 @@
 
 
 void compileExternal(char *result, const int *line_number, char *current_external) {
-    sprintf(result, "%s\t%d", current_external, *line_number);
+    sprintf(result, "%s %d", current_external, *line_number);
 }
 
 static MapDataElement copyElement(MapDataElement existing) {

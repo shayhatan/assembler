@@ -235,7 +235,7 @@ void compileInstruction(char *result, const int *key_ptr, const Word *current_wo
     binaryToBase4(base2_buffer, base4_buffer);
     base4ToEncrypted(base4_buffer, encrypted_buffer);
 
-    sprintf(result, "%d\t%s", *key_ptr, encrypted_buffer);
+    sprintf(result, "%04d %s", *key_ptr, encrypted_buffer);
 }
 
 int writeWordsMap(FILE *ob_file, Map words_map, Map labels_table, int IC, int DC) {

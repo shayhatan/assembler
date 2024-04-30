@@ -157,7 +157,7 @@ void getDCAndIC(char buffer[81], Map labels_table, int IC, int DC) {
         free(iter);
     }
 
-    sprintf(buffer, "%d\t%d", IC, DC);
+    sprintf(buffer, "  %d %d", IC, DC);
 }
 
 MapResult setEntryLabel(char *label, Map labels_table, bool *has_dot_ent) {
@@ -212,7 +212,7 @@ int writeEntriesFile(FILE *ent_file, Map labels_table) {
         data = mapGet(labels_table, iter);
         if (data->is_entry) {
             printf("\n%s, %d\n", iter, data->value);
-            fprintf(ent_file, "%s\t%d\n", iter, data->value);
+            fprintf(ent_file, "%s %d\n", iter, data->value);
         }
         free(iter);
     }
