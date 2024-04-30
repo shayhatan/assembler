@@ -107,9 +107,6 @@ int tryGetOpcode(char *word, enum Opcode *result);
  */
 bool isEOF(char *line);
 
-<<<<<<< HEAD
-/* needs de-allocation after finalizing */
-=======
 /**
  * Tries to parse arguments from the given line according to the specified type and expected amount.
  *
@@ -119,7 +116,6 @@ bool isEOF(char *line);
  * @param args Pointer to store the parsed arguments.
  * @return ParseResult indicating success or failure.
  */
->>>>>>> 9d3d75962876230096dbaeba75c2e97ee85e6d80
 ParseResult tryGetArguments(char *line, ArgumentType type, ArgumentsCountType expected_amount, Arguments *args);
 
 /**
