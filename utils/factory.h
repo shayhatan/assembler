@@ -3,6 +3,7 @@
 
 #include "../parsers/parse_types.h"
 
+/** create an default Entry instance */
 Entry createEntry(char *classification, /* symbol property */
                   int value /* IC + 100 || DC */);
 

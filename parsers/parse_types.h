@@ -79,7 +79,7 @@ typedef enum ArgumentType {
 } ArgumentType;
 
 typedef enum ArgumentsCountType {
-    ANY = -3, SINGLE = -2, PLURAL = -1
+    ANY = -3, SINGLE = -2, PLURAL = -1 /* we pass an integer (exact amount) or these enum values as expected amount */
 } ArgumentsCountType;
 
 

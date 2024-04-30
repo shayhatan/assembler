@@ -55,7 +55,7 @@ typedef union {
     ConstantIndex constant_index;
     RegisterWord reg;
 
-    /* data */
+    /* data word (absolute values) */
     DataWord data;
 
     /* used to translate the value whatever it may be, and print it, */
