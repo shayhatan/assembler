@@ -112,6 +112,7 @@ bool processAddMcrLine(char *line, char *name, bool *parse_failure) {
         alpha[0] = *token;
 
         if (!isAlphaNumeric(alpha)) {
+            logError("Macro name does not start with alphabetic letter!");
             *parse_failure = true;
             return false;
         }
