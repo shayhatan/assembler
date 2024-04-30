@@ -10,8 +10,10 @@ typedef struct {
     bool has_dot_ent;
 } Assembler;
 
+/** Initializes the assembler context */
 MapResult assemblerInit(Assembler *assembler);
 
+/** clears the assembler context */
 void assemblerDispose(Assembler *assembler);
 
 #endif /*ASSEMBLER_ASSEMBLER_UTILS_H*/

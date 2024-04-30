@@ -3,7 +3,20 @@
 A limited custom-built assembly compiler written in c-90.
 
 # Abstract
+
+
+## Fatal Errors Assumptions
+
+In case of fatal errors, the program will terminate gracefully close the program at once. These include but are not limited to:
+
+- Inability to perform IO operations
+- Memory allocation failures
+- Any other critical errors that impede the program's functionality
+- input lines are expected to contain at most 80 characters
+
+
 ## Assumptions
+
 This program follows the 2024 1st semester guidelines provided by the Israeli Open University the course forums, and assumptions made by the team:
 - Input lines contain at most `80` characters (+1 for string termination)
 - There is a limit to the **amount of node allocations** that are used by the tables/maps within this program
