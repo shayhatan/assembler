@@ -1,0 +1,12 @@
+mcr r1mov reg1,val
+add reg2,reg1
+endmcr
+r1
+
+mov reg1,val
+add reg2,reg1
+
+mcr .datamov reg1,val
+add reg2,reg1
+endmcr
+BLA: .data 12

@@ -51,7 +51,6 @@ enum ParseResult secondRun(FILE *srcFile, Assembler* assembler) {
     while (fgets(buffer, 81, srcFile) != 0) {
         InputLine line;
         enum ParseResult parse_result;
-        bool shouldStop = false;
 
         resetLine(&line);
 
