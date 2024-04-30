@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 typedef enum {
-    STOP, NEXT, ANALYZE_OUT_OF_MEMORY
+    STOP, NEXT, ANALYZE_OUT_OF_MEMORY, ANALYZE_FAILURE
 } AnalyzeStatus;
 
 ParseResult run(FILE *src_file, Assembler* assembler);

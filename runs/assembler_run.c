@@ -92,7 +92,6 @@ void assemblerRun(char *files[], int index) {
         exit(current_run_result);
     }
 
-    /* printLabelsTable(assembler.tables->labels_table);*/
     fseek(source_file, 0, SEEK_SET);
     current_run_result = secondRun(source_file, &assembler);
 

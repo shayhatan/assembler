@@ -16,8 +16,8 @@
 #define mapResultToString(enum_value) \
     (enum_value == MAP_ERROR ? "MAP_ERROR" : \
     (enum_value == MAP_OUT_OF_MEMORY ? "MAP_OUT_OF_MEMORY" : \
-    (enum_value == MAP_ITEM_DOES_NOT_EXIST ? "MAP_OUT_OF_MEMORY" : \
-    (enum_value == MAP_ITEM_ALREADY_EXISTS ? "MAP_OUT_OF_MEMORY" : \
+    (enum_value == MAP_ITEM_DOES_NOT_EXIST ? "MAP_ITEM_DOES_NOT_EXIST" : \
+    (enum_value == MAP_ITEM_ALREADY_EXISTS ? "MAP_ITEM_ALREADY_EXISTS" : \
     (enum_value == MAP_NULL_ARGUMENT ? "MAP_NULL_ARGUMENT" : "UNKNOWN")))))
 
 typedef enum OperandType {

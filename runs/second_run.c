@@ -86,17 +86,15 @@ enum ParseResult secondRun(FILE *srcFile, Assembler* assembler) {
             case PARSE_SUCCESS:
                 break;
             case PARSE_FAILURE:
-                shouldStop = true;
+                /*shouldStop = true;*/
+                errored = true;
                 break;
             case OUT_OF_MEMORY:
-                shouldStop = true;
+                disposeLine(&line);
                 logError("Out of memory!\n");
                 return OUT_OF_MEMORY;
         }
         disposeLine(&line);
-        if (shouldStop) {
-            break;
-        }
     }
 
     if (errored) {

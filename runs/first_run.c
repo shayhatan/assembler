@@ -52,10 +52,11 @@ static AnalyzeStatus analyzeLine(InputLine line, Assembler *assembler) {
 
     /* step 4 */
     if (line.directive_props & DOT_DEFINE) {
-        if (setLabel(line.const_definition_arg.constant_id,
-                     createEntry(DEF_DOT_DEFINE, line.const_definition_arg.constant_value), true,
-                     assembler->tables->labels_table) == MAP_OUT_OF_MEMORY) {
-            return ANALYZE_OUT_OF_MEMORY;
+        status = setLabel(line.const_definition_arg.constant_id,
+                          createEntry(DEF_DOT_DEFINE, line.const_definition_arg.constant_value), true,
+                          assembler->tables->labels_table);
+        if (status != MAP_SUCCESS) {
+            return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : ANALYZE_FAILURE;
         }
         return NEXT;
     }
@@ -66,7 +67,7 @@ static AnalyzeStatus analyzeLine(InputLine line, Assembler *assembler) {
         /* step 8 */
         status = setLabel(line.label, createEntry(DEF_DOT_DATA, (int) assembler->DC), true, assembler->tables->labels_table);
         if (status != MAP_SUCCESS) {
-            return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
+            return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : ANALYZE_FAILURE;
         }
         /* step 9 (.string case) */
         /* increase DC according to arguments */
@@ -79,7 +80,7 @@ static AnalyzeStatus analyzeLine(InputLine line, Assembler *assembler) {
             countStringWords(line.label, line.arguments.args[0], assembler);
             status = decodeString(&temp, &line.arguments, assembler->tables->words_map);
             if (status != MAP_SUCCESS) {
-                return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
+                return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : ANALYZE_FAILURE;
             }
         }
         /* step 9 (.data case) */
@@ -99,7 +100,7 @@ static AnalyzeStatus analyzeLine(InputLine line, Assembler *assembler) {
             }
             status = decodeData(&temp, &line.arguments, assembler->tables->labels_table, assembler->tables->words_map);
             if (status != MAP_SUCCESS) {
-                return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : NEXT;
+                return status == MAP_OUT_OF_MEMORY ? ANALYZE_OUT_OF_MEMORY : ANALYZE_FAILURE;
             }
         }
 
@@ -191,8 +192,10 @@ ParseResult run(FILE *src_file, Assembler *assembler) {
                 disposeLine(&line);
                 shouldStop = true;
                 logError("Out of memory!\n");
-                disposeLine(&line);
                 return OUT_OF_MEMORY;
+            case ANALYZE_FAILURE:
+                errored = true;
+                break;
         }
         disposeLine(&line);
         memset(buffer, 0, sizeof(buffer)); /* clear buffer */
