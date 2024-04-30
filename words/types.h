@@ -1,7 +1,3 @@
-/*
- Created by User on 28/02/2024.
-*/
-
 #ifndef ASSEMBLER_TYPES_H
 #define ASSEMBLER_TYPES_H
 
