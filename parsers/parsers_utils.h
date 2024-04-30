@@ -146,6 +146,6 @@ void skipWhitespaces(char **line);
  * @param arg_index The index of the argument.
  * @param arg_size The size of the argument.
  */
-void addArgument(Arguments *args, char arg[DEF_MAX_ARG_CHARS], int arg_index, int arg_size);;
+void addArgument(Arguments *args, char arg[DEF_MAX_ARG_CHARS], int arg_index, int arg_size);
 
 #endif /*ASSEMBLER_PARSERS_UTILS_H*/
