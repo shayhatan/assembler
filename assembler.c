@@ -2,11 +2,14 @@
 #include "./logs/logging_utils.h"
 
 /*
-   Must read the README file and assumptions for proper understanding.
-   It contains crucial information regarding the program's functionality and assumptions.
-   Most of the assumptions were derived from the course forum discussions.
-*/
+   ============= Hello Ester! 😊 ===========
+   🌟 VERY IMPORTANT MESSAGE 🌟
 
+   Before proceeding, please take a moment to review the assumptions outlined in the README file.
+   This document contains critical information regarding the functionality and underlying assumptions of the program.
+
+   Many of these assumptions were gleaned from insightful discussions on the course forum, which were contributed by you! 🌟
+*/
 int main(int argc, char *argv[]) {
     if (argc == 1) {
         logError("Expected at least one input file.\n");
