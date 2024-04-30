@@ -257,17 +257,23 @@ enum ParseResult tryGetOperationWordsCounter(InputLine *line, int *words_counter
             *words_counter = 1;
             if (operandsAddressing[0] == CONSTANT_INDEX) {
                 *words_counter += 2;
-                /* in case both are constant index we can't ever unify the extra words_map unlike other addressings */
+                /* in case both are constant index we can't ever unify the extra words unlike other addressings */
                 *words_counter += operandsAddressing[1] == CONSTANT_INDEX ? 2 : 1;
                 return PARSE_SUCCESS;
             }
-            /* src is not a constant index but target is -- we need 3 words_map to represent both */
+            /* src is not a constant index but target is -- we need 3 words to represent both */
             if (operandsAddressing[1] == CONSTANT_INDEX) {
                 *words_counter += 3;
                 return PARSE_SUCCESS;
             }
-            /* neither addressings are constant index unify if possible otherwise use 2 words_map */
-            *words_counter += operandsAddressing[0] == operandsAddressing[1] ? 1 : 2;
+            /* neither addressings are constant index */
+            /* if both addressing are direct register - unify operands into one word */
+            if (operandsAddressing[1] == operandsAddressing[0] && operandsAddressing[0] == DIRECT_REGISTER) {
+                *words_counter += 1;
+                return PARSE_SUCCESS;
+            }
+            /* addressings can not be unified and definitely require a word for each operand */
+            *words_counter += 2;
             return PARSE_SUCCESS;
         default:
             return PARSE_FAILURE; /* unreachable */

@@ -33,7 +33,7 @@ bool preCompile(char *arr[], char *am_file, int dex, bool *parse_failure) {
     }
     /* no need for temp_file1 */
     remove(temp_file1);
-    if (!replaceMacrosInFile(temp_file2, macros, am_file, *parse_failure)) {
+    if (!replaceMacrosInFile(temp_file2, macros, am_file, parse_failure)) {
         freeMacros(macros);
         remove(temp_file2);
         /* if file created */
