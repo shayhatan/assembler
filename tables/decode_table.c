@@ -58,12 +58,6 @@ static int compareKeyElements(MapKeyElement key1, MapKeyElement key2) {
     return *(int *) key1 - *(int *) key2;
 }
 
-/*void wordsMapInit() {
-    if (words_map != NULL) return;
-    words_map = mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
-                          compareKeyElements);
-}*/
-
 Map wordsMapCreate() {
     return mapCreate(copyElement, copyKeyElement, cleanMapDataElements, cleanMapKeyElements,
                      compareKeyElements);

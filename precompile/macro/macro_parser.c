@@ -171,6 +171,7 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
     }
 
     strcpy(am_file, destination_base); /* Copy destination file name to am_file */
+    /* Check each macro for occurrence in the line */
     while (fgets(line, PRE_MAX_LINE, file) != NULL) {
         Node *current = macros->macros->head;
         setLogLineContext(++cnt, line, "precompile");
@@ -180,10 +181,12 @@ bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bo
             Macro *macro = (Macro *) current->data;
             char *pos = strstr(line, macro->macro_name);/* Find occurrence of macro_name in line */
             char *end = pos;
+            /* Calculate the length of the macro occurrence */
             while (pos != NULL && *end != '\0' && *end != '\n' && *end != ' ') {
                 ++mcr_size;
                 ++end;
             }
+            /* Replace macro occurrence with allocated data if found */
             if (pos != NULL && mcr_size == strlen(macro->macro_name)) {
                 /* Expected Macro to appear alone in each line */
                 if (strlen(line) - 1 != strlen(macro->macro_name)) {

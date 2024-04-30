@@ -9,6 +9,7 @@
 
 typedef int (*WriteFunction)(FILE *, Map);
 
+/* Tries to create an output file and writes content using a specified function */
 bool
 tryCreateOutputFile(char *source_file_path, char *output_file_path, char *extension, Map map, WriteFunction writeFn) {
     FILE *file = NULL;
@@ -24,6 +25,7 @@ tryCreateOutputFile(char *source_file_path, char *output_file_path, char *extens
     return true;
 }
 
+/* Writes outputs including object, external, and entry files */
 void writeOutputs(char *file, Assembler *assembler) {
     char ob_file[81] = "", ex_file[81] = "", ent_file[81] = "";
     FILE *obj_file = NULL;
@@ -58,6 +60,7 @@ void writeOutputs(char *file, Assembler *assembler) {
     }
 }
 
+/* Runs the assembler */
 void assemblerRun(char *files[], int index) {
     char am_file[81] = ""; /*Need to  handle errors properly*/
     ParseResult current_run_result = PARSE_SUCCESS, overall_run_result = PARSE_SUCCESS;
@@ -65,11 +68,13 @@ void assemblerRun(char *files[], int index) {
     Assembler assembler;
     bool precompile_parse_failure = false;
 
+    /* Pre-compile source file */
     if (!preCompile(files, am_file, index, &precompile_parse_failure)) {
         logError("Error pre-compiling\n");
         return;
     }
 
+    /* Initialize assembler */
     if (assemblerInit(&assembler) == MAP_OUT_OF_MEMORY) {
         logError("Out of memory during initialization\n");
         exit(-1);
@@ -81,6 +86,7 @@ void assemblerRun(char *files[], int index) {
         exit(-1);
     }
 
+    /* Run first pass of assembler */
     current_run_result = run(source_file, &assembler);
     if (current_run_result != PARSE_SUCCESS) {
         overall_run_result = current_run_result;
@@ -91,7 +97,7 @@ void assemblerRun(char *files[], int index) {
         fclose(source_file);
         exit(current_run_result);
     }
-
+    /* Reset file pointer for second pass */
     fseek(source_file, 0, SEEK_SET);
     current_run_result = secondRun(source_file, &assembler);
 
@@ -105,7 +111,6 @@ void assemblerRun(char *files[], int index) {
     }
 
     /* runs finished successfully, create output files */
-
     writeOutputs(files[index], &assembler);
 
     printf("Compilation finished with status %d\n", overall_run_result);

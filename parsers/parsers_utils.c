@@ -10,11 +10,11 @@
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
-/* todo move to consts*/
+
 char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne", "red", "prn", "jsr",
                       "rts", "hlt"};
 
-/* todo move to consts*/
+
 char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".entry", ".define"};
 
 typedef bool (*ValidateArgumentFunction)(char *data);

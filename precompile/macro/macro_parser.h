@@ -35,18 +35,26 @@ bool processAddMcrLine(char *line, char *name, bool *error);
 bool isLastLineWord(const char *token);
 
 /**
- * Function to process macro lines in a formatted file.
+ * @brief Processes macro lines in a formatted file.
+ *
+ * This function reads macro lines from a formatted file and adds them to the Macros structure.
+ *
  * @param macros Pointer to the Macros structure.
  * @param formatted_file_name The name of the formatted file to process.
+ * @param parse_failure Pointer to a boolean flag indicating parsing failure.
  * @return true if processing is successful, false otherwise.
  */
 bool processMacroLines(Macros *macros, const char *formatted_file_name, bool *parse_failure);
 
 /**
- * Function to replace occurrences of macro names with allocated data in a file.
+ * @brief Replaces occurrences of macros in a file with allocated data.
+ *
+ * This function expects one macro alone in each line of the file.
+ *
  * @param filename The name of the input file.
- * @param macros Pointer to the Macros structure containing macro definitions.
- * @param am_file Pointer to store the name of the output file with replaced macros.
+ * @param macros Pointer to the Macros structure containing macros and their data.
+ * @param am_file Pointer to store the name of the generated .am file.
+ * @param parse_failure Pointer to a boolean flag indicating parsing failure.
  * @return true if replacement is successful, false otherwise.
  */
 bool replaceMacrosInFile(const char *filename, Macros *macros, char *am_file, bool *parse_failure);

@@ -4,11 +4,22 @@
 
 #include <stdbool.h>
 #include "../words/consts.h"
+/* symbol properties (symbol-table metadata) */
+#define DEF_DOT_CODE ".code"
+#define DEF_DOT_DATA ".data"
+#define DEF_DOT_EXTERNAL ".external"
+#define DEF_DOT_DEFINE ".mdefine"
+
+/* raw directives */
+#define DEF_RAW_DOT_STRING ".string"
+#define DEF_RAW_DOT_DATA ".data"
+#define DEF_RAW_DOT_EXTERN ".extern"
+#define DEF_MAX_ARG_CHARS 36
+#define DEF_MAX_ARGS 80
 
 typedef enum Addressing {
     INSTANT = 1,
     DIRECT = 2,
-/*  indirectRegister = 4, */
     DIRECT_REGISTER = 8,
     CONSTANT_INDEX = 16
 } Addressing;
@@ -25,18 +36,6 @@ typedef struct {
     int constant_value;
 } DefinitionArgument;
 
-/* symbol properties (symbol-table metadata) */
-#define DEF_DOT_CODE ".code"
-#define DEF_DOT_DATA ".data"
-#define DEF_DOT_EXTERNAL ".external"
-#define DEF_DOT_DEFINE ".mdefine"
-
-/* raw directives */
-#define DEF_RAW_DOT_STRING ".string"
-#define DEF_RAW_DOT_DATA ".data"
-#define DEF_RAW_DOT_EXTERN ".extern"
-#define DEF_MAX_ARG_CHARS 36
-#define DEF_MAX_ARGS 80
 
 typedef enum ParseResult {
     PARSE_SUCCESS, PARSE_FAILURE, OUT_OF_MEMORY
