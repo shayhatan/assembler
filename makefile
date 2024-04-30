@@ -14,7 +14,7 @@ ${BIN_DIR}/assembler: $(OBJ_DIR)/assembler.o $(OBJ_DIR)/first_run.o $(OBJ_DIR)/s
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/assembler $(OBJ_DIR)/assembler.o $(OBJ_DIR)/first_run.o $(OBJ_DIR)/second_run.o $(OBJ_DIR)/factory.o $(OBJ_DIR)/map.o $(OBJ_DIR)/labels_table.o $(OBJ_DIR)/logging_utils.o $(OBJ_DIR)/parsers_utils.o $(OBJ_DIR)/string_utils.o $(OBJ_DIR)/line_utils.o $(OBJ_DIR)/decoders.o $(OBJ_DIR)/decoders_table.o $(OBJ_DIR)/macros.o $(OBJ_DIR)/macro_parser.o $(OBJ_DIR)/sorted_list.o $(OBJ_DIR)/precompile.o $(OBJ_DIR)/assembler_run.o $(OBJ_DIR)/assembler_utils.o $(OBJ_DIR)/tables.o $(OBJ_DIR)/file_manager.o $(OBJ_DIR)/externals_table.o $(OBJ_DIR)/memory.o ${LIBS}
 
 # Build rule for assembler.o
-$(OBJ_DIR)/assembler.o: assembler.c runs/assembler_run.h runs/assembler_run.c
+$(OBJ_DIR)/assembler.o: assembler.c runs/assembler_run.h runs/assembler_run.c logs/logging_utils.h logs/logging_utils.c
 	$(CC) $(CFLAGS) -o $(OBJ_DIR)/assembler.o -c assembler.c
 
 # Build rule for factory.o

@@ -4,17 +4,18 @@ A limited custom-built assembly compiler written in c-90.
 
 # Abstract
 ## Assumptions
-This program follows the 2024 1st semester guidelines provided by the Israeli Open University, and assumptions made by the team:
-
-- Input lines contain at most 80 characters (+1 for string termination)
+This program follows the 2024 1st semester guidelines provided by the Israeli Open University the course forums, and assumptions made by the team:
+- Input lines contain at most `80` characters (+1 for string termination)
 - There is a limit to the **amount of node allocations** that are used by the tables/maps within this program
 - Macros content can be assumed to be correct
 - Macros always have a closing tag (`endmcr`)
 - Macros definition always appear prior to their usage
+- Macros context are encapsulated
 - There is a fixed amount of operations that need to be supported which do not cover the entire assembly lang operations
 - There is no requirement to use the most optimal solutions for the data-structures (black-red-trees/hash-tables), as such we took the liberty of using a sorted list instead
 - An operand has a maximal length of 36 characters (we preferred to reduce allocations for easier stability and maintenance)
-- The maximal amount of operands is 80
+- The maximal amount of operands is `80`
+- Input macro names are defined once (distinct macros) 
 - Parse failures only prevent the creation of output files, however they do not break the flow
   - Fatal errors such as inability to perform IO operations or memory allocations will gracefully close the program at once
 - We use a small amount of static globals in self-contained modules (namely the log handling)

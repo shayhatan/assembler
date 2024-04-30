@@ -104,20 +104,20 @@ bool isLastLineWord(const char *token) {
  */
 bool processAddMcrLine(char *line, char *name, bool *parse_failure) {
     char *token;
-    char alpha[2] = "";   /* To check if macro's name starts with alphabetic char */
     token = strtok(line, " \n"); /* Tokenize the line using space and newline as delimiters */
 
 /* Check if the first token is "mcr" */
     if (token != NULL && strcmp(token, "mcr") == 0) {
-        alpha[0] = *token;
-
-        if (!isAlphaNumeric(alpha)) {
-            logError("Macro name does not start with alphabetic letter!");
-            *parse_failure = true;
-            return false;
-        }
 
         token = strtok(NULL, " \n"); /* Get the next token */
+        if (token != NULL) {
+
+            if (!((*token <= 'z' && *token >= 'a') || (*token <= 'Z' && *token >= 'A'))) { /* does the macro name begin with an alphabet */
+                logError("Macro name does not start with alphabetic letter\n");
+                *parse_failure = true;
+                return false;
+            }
+        }
 
         /* Check if the token is the last Word in the line */
         if (isLastLineWord(token)) {
