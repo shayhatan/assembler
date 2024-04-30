@@ -1,3 +1,8 @@
+# If not exists
+$(shell mkdir -p bin)
+# If not exists
+$(shell mkdir -p obj)
+
 # Compiler
 CC = gcc
 # Compiler flags
