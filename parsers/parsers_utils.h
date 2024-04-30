@@ -27,8 +27,6 @@ int tryGetOpcode(char *word, enum Opcode *result);
 
 bool isEOF(char *line);
 
-typedef bool (*ValidateArgumentFunction)(char *data);
-
 /* needs de-allocation after finalizing */
 ParseResult tryGetArguments(char *line, ArgumentType type, ArgumentsCountType expected_amount, Arguments *args);
 

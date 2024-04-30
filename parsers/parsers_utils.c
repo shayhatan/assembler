@@ -17,6 +17,7 @@ char *OPERATIONS[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "d
 /* todo move to consts*/
 char *DIRECTIVE_PROPS[] = {".data", ".string", ".extern", ".entry", ".define"};
 
+typedef bool (*ValidateArgumentFunction)(char *data);
 
 bool isOpcode(char *word) {
     int i;
