@@ -59,7 +59,9 @@ If you wish to store error logs into a file, please execute the program and pipe
 ```
 
 ## Inputs
-Under the inputs sub-folder you can find many input files. As a convention valid inputs begin with the letter `h` (for "happy"), and invalid inputs begin with the letter `i` (for "invalid")
+Under the inputs sub-folder you can find many input files. 
+As a convention valid inputs begin with the letter `h` (for "happy"),
+and invalid inputs begin with the letter `i` (for "invalid")
 >NOTE: per the project requirements, the outputs of the assembler are written there as well.
 <br/>
 
