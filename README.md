@@ -50,12 +50,12 @@ rm -rf LOCAL_PROJECT_PATH
 
 To run the program, make sure you have installed it properly first, following that use the following commands in your prefered terminal:
 ```shell
-./bin/assembler ./inputs/YOUR_DESIRED_INPUT
+./assembler ./inputs/YOUR_DESIRED_INPUT
 ```
 
 If you wish to store error logs into a file, please execute the program and pipe the `stderr` into a file as follows:
 ```shell
-./bin/assembler ./inputs/YOUR_DESIRED_INPUT 2> PATH_TO_ERROR_FILE
+./assembler ./inputs/YOUR_DESIRED_INPUT 2> PATH_TO_ERROR_FILE
 ```
 
 ## Inputs
