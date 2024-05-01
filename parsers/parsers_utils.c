@@ -44,10 +44,6 @@ bool isRegisterAddressing(Operand operand) {
     return ((operand[0] == 'r' && '0' <= operand[1] && operand[1] <= '7' && operand[2] == '\0') ? true : false);
 }
 
-bool isIndirectRegisterAddressing(Operand operand) {
-    return (operand[0] == '*') && isRegisterAddressing(operand + 1);
-}
-
 bool isInstantAddressing(Operand operand) {
     if (operand[0] != '#') return false;
 
