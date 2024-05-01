@@ -137,6 +137,7 @@ bool formatFile(const char *input_file_name, char *new_file1) {
             logError("Error: Line too long in input file\n");
             fclose(input_file);
             fclose(output_file);
+            remove(new_file1);
             return false;
         }
         formatString(line); /* Format the line */
