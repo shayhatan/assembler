@@ -39,6 +39,23 @@
 /** The Node structure is Node define here to make the interface hidden */
 typedef struct Map_t *Map;
 
+/*!
+* Macro for iterating over a map.
+* Declares a new iterator for the loop.
+* iterator needs to be deallocated (freed) each iteration
+*/
+#define MAP_FOREACH(type, iterator, map) \
+    for(iterator = (type) mapGetFirst(map) ; \
+        iterator != NULL ;\
+        iterator = mapGetNext(map))
+
+typedef enum {
+    UNDEFINED_MAP,
+    NULL_NODE,
+    SUCCESSFUL_ITERATION,
+    ITERATION_FINISHED
+} MapIterationResult;
+
 /** Type used for returning error codes from map functions */
 typedef enum MapResult_t {
     MAP_SUCCESS,
@@ -232,23 +249,5 @@ MapKeyElement mapGetNext(Map map);
 * 	MAP_SUCCESS - Otherwise.
 */
 MapResult mapClear(Map map);
-
-/*!
-* Macro for iterating over a map.
-* Declares a new iterator for the loop.
-* iterator needs to be deallocated (freed) each iteration
-*/
-#define MAP_FOREACH(type, iterator, map) \
-    for(iterator = (type) mapGetFirst(map) ; \
-        iterator != NULL ;\
-        iterator = mapGetNext(map))
-
-
-typedef enum {
-    UNDEFINED_MAP,
-    NULL_NODE,
-    SUCCESSFUL_ITERATION,
-    ITERATION_FINISHED
-} MapIterationResult;
 
 #endif /*MMN14_MAP_H*/

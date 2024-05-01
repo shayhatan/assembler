@@ -25,6 +25,7 @@ MapResult assemblerInit(Assembler *assembler) {
 }
 
 void assemblerDispose(Assembler *assembler) {
+    printf("cleanup initiated\n");
     if (assembler->tables != NULL) {
         /*Dispose Tables*/
         tablesDispose(assembler->tables);

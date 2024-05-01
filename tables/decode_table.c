@@ -242,7 +242,7 @@ int writeWordsMap(FILE *ob_file, Map words_map, Map labels_table, int IC, int DC
     status = getNextLine(buffer, words_map);
     while (status == SUCCESSFUL_ITERATION) {
         ++size;
-        printf("%s\n", buffer);
+        /*printf("%s\n", buffer);*/
         fprintf(ob_file, "%s\n", buffer);
         resetString(buffer);
         status = getNextLine(buffer, words_map);

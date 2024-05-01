@@ -124,10 +124,10 @@ int writeExternals(FILE *ext_file, Map externals_map) {
     int size = 0; /* if size is 0  by the end of the func we wont create ext_file*/
     char buffer[81] = {'\0'};
     MapIterationResult status = getNextExternal(buffer, externals_map);
-    printf("===========Print Externals==============\n");
+    /*printf("===========Print Externals==============\n");*/
     while (status == SUCCESSFUL_ITERATION) {
         ++size;
-        printf("%s\n", buffer);
+        /*printf("%s\n", buffer);*/
         fprintf(ext_file, "%s\n", buffer);
         resetString(buffer);
         status = getNextExternal(buffer, externals_map);

@@ -206,12 +206,12 @@ int writeEntriesFile(FILE *ent_file, Map labels_table) {
     char *iter;
     Entry *data = NULL;
     int size = 0;
-    printf("=======ENTRY======");
+    /*printf("=======ENTRY======");*/
     for (iter = mapGetFirst(labels_table); iter != NULL; iter = mapGetNext(labels_table)) {
         ++size;
         data = mapGet(labels_table, iter);
         if (data->is_entry) {
-            printf("\n%s, %d\n", iter, data->value);
+            /*printf("\n%s, %d\n", iter, data->value);*/
             fprintf(ent_file, "%s %d\n", iter, data->value);
         }
         free(iter);

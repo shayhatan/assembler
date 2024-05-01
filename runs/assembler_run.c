@@ -68,12 +68,14 @@ void assemblerRun(char *files[], int index) {
     Assembler assembler;
     bool precompile_parse_failure = false;
 
+    printf("precompile initiated\n");
     /* Pre-compile source file */
     if (!preCompile(files, am_file, index, &precompile_parse_failure)) {
         logError("Error pre-compiling\n");
         return;
     }
 
+    printf("initialize assembler context\n");
     /* Initialize assembler */
     if (assemblerInit(&assembler) == MAP_OUT_OF_MEMORY) {
         logError("Out of memory during initialization\n");
@@ -86,6 +88,7 @@ void assemblerRun(char *files[], int index) {
         exit(-1);
     }
 
+    printf("first run initiated\n");
     /* Run first pass of assembler */
     current_run_result = run(source_file, &assembler);
     if (current_run_result != PARSE_SUCCESS) {
@@ -99,6 +102,8 @@ void assemblerRun(char *files[], int index) {
     }
     /* Reset file pointer for second pass */
     fseek(source_file, 0, SEEK_SET);
+
+    printf("second run initiated\n");
     current_run_result = secondRun(source_file, &assembler);
 
     fclose(source_file); /* close am file */
@@ -110,6 +115,7 @@ void assemblerRun(char *files[], int index) {
         exit(current_run_result);
     }
 
+    printf("write outputs initiated\n");
     /* runs finished successfully, create output files */
     writeOutputs(files[index], &assembler);
 
