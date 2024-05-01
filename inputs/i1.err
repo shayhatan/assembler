@@ -1,0 +1,61 @@
+[ERROR][context=first-run][#line=2]: "cmp #qw,,#45" - failed by - missing argument definition
+[ERROR][context=first-run][#line=3]: "cmp #qw,#45," - failed by - number of predicted arguments 3 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=first-run][#line=4]: "cmp #qw,#45,555" - failed by - number of predicted arguments 3 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=first-run][#line=5]: "cmp #qw,#45,555," - failed by - number of predicted arguments 4 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=first-run][#line=7]: "MAIN:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=first-run][#line=9]: "mov 3,LIST[sz]" - failed by - operand "3" does not match any of the allowed formats
+[ERROR][context=first-run][#line=11]: "LOOP:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=first-run][#line=19]: "L1:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=first-run][#line=23]: "END:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=first-run][#line=26]: "DAM: jrr 15" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "jrr" instead
+[ERROR][context=first-run][#line=28]: "TEST: mov r1" - failed by - number of predicted arguments 1 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=first-run][#line=31]: "TEST1: jmp r1,r2" - failed by - number of predicted arguments 2 exceeds or deficits the expected amount 1, possible causes: extra comma with or without an extra argument 
+[ERROR][context=first-run][#line=32]: "TEST2: jmp r1,r2" - failed by - number of predicted arguments 2 exceeds or deficits the expected amount 1, possible causes: extra comma with or without an extra argument 
+[ERROR][context=first-run][#line=34]: ".define r1=5" - failed by - invalid constant id syntax 5
+
+[ERROR][context=first-run][#line=35]: ".define r1" - failed by - invalid constant id syntax NULL
+[ERROR][context=first-run][#line=37]: ".define len = fdsf" - failed by - invalid numeric constant value NULL
+[ERROR][context=first-run][#line=38]: "mov 4,r1" - failed by - operand "4" does not match any of the allowed formats
+[ERROR][context=first-run][#line=42]: "STR1:..string. "abcdef"" - failed by - a label must be followed by at least one space character
+[ERROR][context=first-run][#line=43]: "DAT:..data 14" - failed by - a label must be followed by at least one space character
+[ERROR][context=first-run][#line=44]: "DAT1:..data #14" - failed by - a label must be followed by at least one space character
+[ERROR][context=first-run][#line=45]: "DAT1:..data "aaa"" - failed by - a label must be followed by at least one space character
+[ERROR][context=first-run][#line=47]: "bad comments" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "bad" instead
+[ERROR][context=first-run][#line=48]: "unknown #13,r3" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "unknown" instead
+[ERROR][context=first-run][#line=49]: ".define stttr = "-2"" - failed by - invalid numeric constant value NULL
+[ERROR][context=first-run][#line=50]: ".define stttr1 "-2"" - failed by - invalid constant id syntax NULL
+[ERROR][context=first-run][#line=58]: ".entry .entry" - failed by - argument .entry doesn't match the expected format
+[ERROR][context=first-run][#line=59]: ".entry .extern" - failed by - argument .extern doesn't match the expected format
+[ERROR][context=first-run][#line=61]: ".extern "BLA"" - failed by - argument "BLA" doesn't match the expected format
+[ERROR][context=second-run][#line=2]: "cmp #qw,,#45" - failed by - missing argument definition
+[ERROR][context=second-run][#line=3]: "cmp #qw,#45," - failed by - number of predicted arguments 3 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=second-run][#line=4]: "cmp #qw,#45,555" - failed by - number of predicted arguments 3 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=second-run][#line=5]: "cmp #qw,#45,555," - failed by - number of predicted arguments 4 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=second-run][#line=7]: "MAIN:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=second-run][#line=9]: "mov 3,LIST[sz]" - failed by - operand "3" does not match any of the allowed formats
+[ERROR][context=second-run][#line=11]: "LOOP:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=second-run][#line=12]: "jmp L1" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=14]: "bne END" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=19]: "L1:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=second-run][#line=21]: "bne LOOP" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=23]: "END:" - failed by - a label must be followed by an instruction or data definition
+[ERROR][context=second-run][#line=26]: "DAM: jrr 15" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "jrr" instead
+[ERROR][context=second-run][#line=28]: "TEST: mov r1" - failed by - number of predicted arguments 1 exceeds or deficits the expected amount 2, possible causes: extra comma with or without an extra argument 
+[ERROR][context=second-run][#line=31]: "TEST1: jmp r1,r2" - failed by - number of predicted arguments 2 exceeds or deficits the expected amount 1, possible causes: extra comma with or without an extra argument 
+[ERROR][context=second-run][#line=32]: "TEST2: jmp r1,r2" - failed by - number of predicted arguments 2 exceeds or deficits the expected amount 1, possible causes: extra comma with or without an extra argument 
+[ERROR][context=second-run][#line=34]: ".define r1=5" - failed by - invalid constant id syntax 5
+
+[ERROR][context=second-run][#line=35]: ".define r1" - failed by - invalid constant id syntax NULL
+[ERROR][context=second-run][#line=37]: ".define len = fdsf" - failed by - invalid numeric constant value NULL
+[ERROR][context=second-run][#line=38]: "mov 4,r1" - failed by - operand "4" does not match any of the allowed formats
+[ERROR][context=second-run][#line=42]: "STR1:..string. "abcdef"" - failed by - a label must be followed by at least one space character
+[ERROR][context=second-run][#line=43]: "DAT:..data 14" - failed by - a label must be followed by at least one space character
+[ERROR][context=second-run][#line=44]: "DAT1:..data #14" - failed by - a label must be followed by at least one space character
+[ERROR][context=second-run][#line=45]: "DAT1:..data "aaa"" - failed by - a label must be followed by at least one space character
+[ERROR][context=second-run][#line=47]: "bad comments" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "bad" instead
+[ERROR][context=second-run][#line=48]: "unknown #13,r3" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "unknown" instead
+[ERROR][context=second-run][#line=49]: ".define stttr = "-2"" - failed by - invalid numeric constant value NULL
+[ERROR][context=second-run][#line=50]: ".define stttr1 "-2"" - failed by - invalid constant id syntax NULL
+[ERROR][context=second-run][#line=58]: ".entry .entry" - failed by - argument .entry doesn't match the expected format
+[ERROR][context=second-run][#line=59]: ".entry .extern" - failed by - argument .extern doesn't match the expected format
+[ERROR][context=second-run][#line=61]: ".extern "BLA"" - failed by - argument "BLA" doesn't match the expected format

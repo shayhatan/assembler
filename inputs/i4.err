@@ -1,0 +1,7 @@
+[ERROR][context=precompile][#line=6]: "mcr" - failed by - missing macro name
+[ERROR][context=first-run][#line=6]: "mcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=first-run][#line=9]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=second-run][#line=6]: "mcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=second-run][#line=7]: "mov reg1,val" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=8]: "add reg2,reg1" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=9]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead

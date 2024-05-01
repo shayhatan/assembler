@@ -1,0 +1,1 @@
+[ERROR][context=format file][#line=2]: "BLA: .data 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123," - failed by - Error: Line too long in input file

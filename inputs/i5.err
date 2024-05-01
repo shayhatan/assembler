@@ -1,0 +1,20 @@
+[ERROR][context=precompile][#line=1]: "mcr r1" - failed by - Invalid macro name! (reg/opcode/directive)
+[ERROR][context=precompile][#line=7]: "mcr hlt" - failed by - Invalid macro name! (reg/opcode/directive)
+[ERROR][context=precompile][#line=13]: "mcr .data" - failed by - Macro name does not start with alphabetic letter
+[ERROR][context=first-run][#line=1]: "mcr r1mov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=first-run][#line=3]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=first-run][#line=4]: "r1" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "r1" instead
+[ERROR][context=first-run][#line=6]: "mcr hltmov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=first-run][#line=8]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=first-run][#line=11]: "mcr .datamov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=first-run][#line=13]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=second-run][#line=1]: "mcr r1mov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=second-run][#line=2]: "add reg2,reg1" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=3]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=second-run][#line=4]: "r1" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "r1" instead
+[ERROR][context=second-run][#line=6]: "mcr hltmov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=second-run][#line=7]: "add reg2,reg1" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=8]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=second-run][#line=11]: "mcr .datamov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=second-run][#line=12]: "add reg2,reg1" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=13]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead

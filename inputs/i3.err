@@ -1,0 +1,11 @@
+[ERROR][context=precompile][#line=3]: "mcr M2 <" - failed by - Extra text after macro name definition
+[ERROR][context=precompile][#line=7]: "mcr M2 M3" - failed by - Extra text after macro name definition
+[ERROR][context=first-run][#line=3]: "mcr M2 <mov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=first-run][#line=4]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=first-run][#line=6]: "mcr M2 M3mov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=first-run][#line=8]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=second-run][#line=3]: "mcr M2 <mov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=second-run][#line=4]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead
+[ERROR][context=second-run][#line=6]: "mcr M2 M3mov reg1,val" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "mcr" instead
+[ERROR][context=second-run][#line=7]: "add reg2,reg1" - failed by - failed to decode a DIRECT/INSTANT/SINGLE register operand, status: MAP_ERROR
+[ERROR][context=second-run][#line=8]: "endmcr" - failed by - invalid line definition, expected the next Word to be an operation or directive but got "endmcr" instead

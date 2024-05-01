@@ -1,6 +1,4 @@
 # If not exists
-$(shell mkdir -p bin)
-# If not exists
 $(shell mkdir -p obj)
 
 # Compiler
@@ -10,7 +8,7 @@ CFLAGS = -ansi -pedantic -Wall -g
 # Directories
 SRC_DIR = .
 OBJ_DIR = ./obj
-BIN_DIR = ./bin
+BIN_DIR = ./
 # Executable
 TARGET = assembler
 LIBS = -lm

@@ -1,0 +1,2 @@
+[ERROR][context=first-run][#line=1]: ".string "k12 "" - failed by - invalid operation -1
+[ERROR][context=first-run][#line=207]: "arr233: .data 1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,0" - failed by - max allowed memory encountered
