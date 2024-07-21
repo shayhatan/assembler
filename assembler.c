@@ -2,7 +2,7 @@
 #include "./logs/logging_utils.h"
 
 /**
-   ============= Hello Ester! 😊 ===========
+   ============= Hello! 😊 ===========
    🌟 VERY IMPORTANT MESSAGE 🌟
 
    Before proceeding, please take a moment to review the assumptions outlined in the README file.
@@ -10,7 +10,7 @@
 
    Additionally, we've included stderr-file outputs demonstrating error cases and a picture demonstrating the compilation process using the "make" command in the terminal.
 
-   Many of these assumptions were gleaned from insightful discussions on the course forum, which were contributed by you! 🌟
+   Many of these assumptions were gleaned from insightful discussions on the course forum. 🌟
 **/
 
 int main(int argc, char *argv[]) {
